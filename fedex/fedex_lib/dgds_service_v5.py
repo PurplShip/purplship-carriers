@@ -2,33 +2,37 @@
 # -*- coding: utf-8 -*-
 
 #
-# Generated Fri Mar  6 15:54:35 2020 by generateDS.py version 2.35.15.
-# Python 3.8.1 (v3.8.1:1b293b6006, Dec 18 2019, 14:08:53)  [Clang 6.0 (clang-600.0.57)]
+# Generated Thu May  6 11:00:03 2021 by generateDS.py version 2.38.6.
+# Python 3.8.6 (v3.8.6:db455296be, Sep 23 2020, 13:31:39)  [Clang 6.0 (clang-600.0.57)]
 #
 # Command line options:
 #   ('--no-namespace-defs', '')
-#   ('-o', './python/dgds_service_v5.py')
+#   ('-o', './fedex_lib/dgds_service_v5.py')
 #
 # Command line arguments:
-#   ./schemas/DGDSService_v5.xsd
+#   /Users/danielkobina/Workspace/Carriers Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd
 #
 # Command line:
-#   /Users/danielkobina/Documents/Open/.sandbox/bin/generateDS --no-namespace-defs -o "./python/dgds_service_v5.py" ./schemas/DGDSService_v5.xsd
+#   /Users/danielkobina/Workspace/project/purplship-carriers/.venv/purplship-carriers/bin/generateDS --no-namespace-defs -o "./fedex_lib/dgds_service_v5.py" /Users/danielkobina/Workspace/Carriers Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd
 #
 # Current working directory (os.getcwd()):
-#   2020-02
+#   fedex
 #
 
+import sys
+try:
+    ModulenotfoundExp_ = ModuleNotFoundError
+except NameError:
+    ModulenotfoundExp_ = ImportError
 from six.moves import zip_longest
 import os
-import sys
 import re as re_
 import base64
 import datetime as datetime_
 import decimal as decimal_
 try:
     from lxml import etree as etree_
-except ImportError:
+except ModulenotfoundExp_ :
     from xml.etree import ElementTree as etree_
 
 
@@ -107,11 +111,11 @@ def parsexmlstring_(instring, parser=None, **kwargs):
 
 try:
     from generatedsnamespaces import GenerateDSNamespaceDefs as GenerateDSNamespaceDefs_
-except ImportError:
+except ModulenotfoundExp_ :
     GenerateDSNamespaceDefs_ = {}
 try:
     from generatedsnamespaces import GenerateDSNamespaceTypePrefixes as GenerateDSNamespaceTypePrefixes_
-except ImportError:
+except ModulenotfoundExp_ :
     GenerateDSNamespaceTypePrefixes_ = {}
 
 #
@@ -122,7 +126,7 @@ except ImportError:
 #
 try:
     from generatedscollector import GdsCollector as GdsCollector_
-except ImportError:
+except ModulenotfoundExp_ :
 
     class GdsCollector_(object):
 
@@ -156,7 +160,7 @@ except ImportError:
 
 try:
     from enum import Enum
-except ImportError:
+except ModulenotfoundExp_ :
     Enum = object
 
 #
@@ -168,7 +172,7 @@ except ImportError:
 
 try:
     from generatedssuper import GeneratedsSuper
-except ImportError as exp:
+except ModulenotfoundExp_ as exp:
     
     class GeneratedsSuper(object):
         __hash__ = object.__hash__
@@ -211,6 +215,8 @@ except ImportError as exp:
                 raise_parse_error(node, 'Requires integer value')
             return value
         def gds_format_integer_list(self, input_data, input_name=''):
+            if len(input_data) > 0 and not isinstance(input_data[0], BaseStrType_):
+                input_data = [str(s) for s in input_data]
             return '%s' % ' '.join(input_data)
         def gds_validate_integer_list(
                 self, input_data, node=None, input_name=''):
@@ -219,7 +225,7 @@ except ImportError as exp:
                 try:
                     int(value)
                 except (TypeError, ValueError):
-                    raise_parse_error(node, 'Requires sequence of integer valuess')
+                    raise_parse_error(node, 'Requires sequence of integer values')
             return values
         def gds_format_float(self, input_data, input_name=''):
             return ('%.15f' % input_data).rstrip('0')
@@ -236,6 +242,8 @@ except ImportError as exp:
                 raise_parse_error(node, 'Requires float value')
             return value
         def gds_format_float_list(self, input_data, input_name=''):
+            if len(input_data) > 0 and not isinstance(input_data[0], BaseStrType_):
+                input_data = [str(s) for s in input_data]
             return '%s' % ' '.join(input_data)
         def gds_validate_float_list(
                 self, input_data, node=None, input_name=''):
@@ -247,7 +255,12 @@ except ImportError as exp:
                     raise_parse_error(node, 'Requires sequence of float values')
             return values
         def gds_format_decimal(self, input_data, input_name=''):
-            return ('%s' % input_data).rstrip('0')
+            return_value = '%s' % input_data
+            if '.' in return_value:
+                return_value = return_value.rstrip('0')
+                if return_value.endswith('.'):
+                    return_value = return_value.rstrip('.')
+            return return_value
         def gds_parse_decimal(self, input_data, node=None, input_name=''):
             try:
                 decimal_value = decimal_.Decimal(input_data)
@@ -261,7 +274,9 @@ except ImportError as exp:
                 raise_parse_error(node, 'Requires decimal value')
             return value
         def gds_format_decimal_list(self, input_data, input_name=''):
-            return '%s' % ' '.join(input_data)
+            if len(input_data) > 0 and not isinstance(input_data[0], BaseStrType_):
+                input_data = [str(s) for s in input_data]
+            return ' '.join([self.gds_format_decimal(item) for item in input_data])
         def gds_validate_decimal_list(
                 self, input_data, node=None, input_name=''):
             values = input_data.split()
@@ -272,7 +287,7 @@ except ImportError as exp:
                     raise_parse_error(node, 'Requires sequence of decimal values')
             return values
         def gds_format_double(self, input_data, input_name=''):
-            return '%e' % input_data
+            return '%s' % input_data
         def gds_parse_double(self, input_data, node=None, input_name=''):
             try:
                 fval_ = float(input_data)
@@ -286,6 +301,8 @@ except ImportError as exp:
                 raise_parse_error(node, 'Requires double or float value')
             return value
         def gds_format_double_list(self, input_data, input_name=''):
+            if len(input_data) > 0 and not isinstance(input_data[0], BaseStrType_):
+                input_data = [str(s) for s in input_data]
             return '%s' % ' '.join(input_data)
         def gds_validate_double_list(
                 self, input_data, node=None, input_name=''):
@@ -315,11 +332,14 @@ except ImportError as exp:
                     '(one of True, 1, False, 0)')
             return input_data
         def gds_format_boolean_list(self, input_data, input_name=''):
+            if len(input_data) > 0 and not isinstance(input_data[0], BaseStrType_):
+                input_data = [str(s) for s in input_data]
             return '%s' % ' '.join(input_data)
         def gds_validate_boolean_list(
                 self, input_data, node=None, input_name=''):
             values = input_data.split()
             for value in values:
+                value = self.gds_parse_boolean(value, node, input_name)
                 if value not in (True, 1, False, 0, ):
                     raise_parse_error(
                         node,
@@ -766,7 +786,10 @@ def find_attr_value_(attr_name, node):
         value = attrs.get(attr_name)
     elif len(attr_parts) == 2:
         prefix, name = attr_parts
-        namespace = node.nsmap.get(prefix)
+        if prefix == 'xml':
+            namespace = 'http://www.w3.org/XML/1998/namespace'
+        else:
+            namespace = node.nsmap.get(prefix)
         if namespace is not None:
             value = attrs.get('{%s}%s' % (namespace, name, ))
     return value
@@ -847,7 +870,7 @@ class MixedContainer:
                 self.name,
                 base64.b64encode(self.value),
                 self.name))
-    def to_etree(self, element):
+    def to_etree(self, element, mapping_=None, nsmap_=None):
         if self.category == MixedContainer.CategoryText:
             # Prevent exporting empty content as empty lines.
             if self.value.strip():
@@ -867,7 +890,7 @@ class MixedContainer:
             subelement.text = self.to_etree_simple()
         else:    # category == MixedContainer.CategoryComplex
             self.value.to_etree(element)
-    def to_etree_simple(self):
+    def to_etree_simple(self, mapping_=None, nsmap_=None):
         if self.content_type == MixedContainer.TypeString:
             text = self.value
         elif (self.content_type == MixedContainer.TypeInteger or
@@ -945,7 +968,7 @@ def _cast(typ, value):
 #
 
 
-class CarrierCodeType(Enum):
+class CarrierCodeType(str, Enum):
     """Identification of a FedEx operating company (transportation)."""
     FDXC='FDXC'
     FDXE='FDXE'
@@ -955,21 +978,21 @@ class CarrierCodeType(Enum):
     FXSP='FXSP'
 
 
-class DangerousGoodsAccessibilityType(Enum):
+class DangerousGoodsAccessibilityType(str, Enum):
     ACCESSIBLE='ACCESSIBLE'
     INACCESSIBLE='INACCESSIBLE'
 
 
-class DangerousGoodsAircraftCategoryType(Enum):
+class DangerousGoodsAircraftCategoryType(str, Enum):
     CARGO_AIRCRAFT_ONLY='CARGO_AIRCRAFT_ONLY'
     PASSENGER_AND_CARGO_AIRCRAFT='PASSENGER_AND_CARGO_AIRCRAFT'
 
 
-class DangerousGoodsContainerAttributeType(Enum):
+class DangerousGoodsContainerAttributeType(str, Enum):
     ALL_PACKED_IN_ONE='ALL_PACKED_IN_ONE'
 
 
-class DangerousGoodsDescriptorType(Enum):
+class DangerousGoodsDescriptorType(str, Enum):
     """FEDEX INTERNAL USE ONLY: Describes the characteristics of the dangerous
     goods inferred from the commodity data."""
     ALCOHOLIC_BEVERAGE='ALCOHOLIC_BEVERAGE'
@@ -980,25 +1003,25 @@ class DangerousGoodsDescriptorType(Enum):
     RADIOACTIVE='RADIOACTIVE'
 
 
-class DangerousGoodsHandlingUnitAttributeType(Enum):
+class DangerousGoodsHandlingUnitAttributeType(str, Enum):
     OVERPACK='OVERPACK'
 
 
-class DangerousGoodsPackingGroupType(Enum):
+class DangerousGoodsPackingGroupType(str, Enum):
     I='I'
     II='II'
     III='III'
     UNDEFINED='UNDEFINED'
 
 
-class DangerousGoodsRegulationAttributeType(Enum):
+class DangerousGoodsRegulationAttributeType(str, Enum):
     """This attribute type identifies characteristics of a dangerous goods
     regulation that influence how FedEx systems process dangerous goods
     shipments."""
     DRY_ICE_DECLARATION_REQUIRED='DRY_ICE_DECLARATION_REQUIRED'
 
 
-class ExpressRegionCode(Enum):
+class ExpressRegionCode(str, Enum):
     """Indicates a FedEx Express operating region."""
     APAC='APAC'
     CA='CA'
@@ -1007,7 +1030,7 @@ class ExpressRegionCode(Enum):
     US='US'
 
 
-class HazardousCommodityOptionType(Enum):
+class HazardousCommodityOptionType(str, Enum):
     """Indicates which kind of hazardous content is being reported."""
     BATTERY='BATTERY'
     HAZARDOUS_MATERIALS='HAZARDOUS_MATERIALS'
@@ -1017,7 +1040,7 @@ class HazardousCommodityOptionType(Enum):
     SMALL_QUANTITY_EXCEPTION='SMALL_QUANTITY_EXCEPTION'
 
 
-class HazardousCommodityRegulationType(Enum):
+class HazardousCommodityRegulationType(str, Enum):
     """Identifies the source of regulation for hazardous commodity data."""
     ADR='ADR'
     DOT='DOT'
@@ -1025,14 +1048,14 @@ class HazardousCommodityRegulationType(Enum):
     ORMD='ORMD'
 
 
-class NetExplosiveClassificationType(Enum):
+class NetExplosiveClassificationType(str, Enum):
     NET_EXPLOSIVE_CONTENT='NET_EXPLOSIVE_CONTENT'
     NET_EXPLOSIVE_MASS='NET_EXPLOSIVE_MASS'
     NET_EXPLOSIVE_QUANTITY='NET_EXPLOSIVE_QUANTITY'
     NET_EXPLOSIVE_WEIGHT='NET_EXPLOSIVE_WEIGHT'
 
 
-class NotificationSeverityType(Enum):
+class NotificationSeverityType(str, Enum):
     ERROR='ERROR'
     FAILURE='FAILURE'
     NOTE='NOTE'
@@ -1040,20 +1063,20 @@ class NotificationSeverityType(Enum):
     WARNING='WARNING'
 
 
-class PhysicalFormType(Enum):
+class PhysicalFormType(str, Enum):
     GAS='GAS'
     LIQUID='LIQUID'
     SOLID='SOLID'
     SPECIAL='SPECIAL'
 
 
-class RadioactiveLabelType(Enum):
+class RadioactiveLabelType(str, Enum):
     III_YELLOW='III_YELLOW'
     II_YELLOW='II_YELLOW'
     I_WHITE='I_WHITE'
 
 
-class RadioactivityUnitOfMeasure(Enum):
+class RadioactivityUnitOfMeasure(str, Enum):
     BQ='BQ'
     GBQ='GBQ'
     KBQ='KBQ'
@@ -1062,11 +1085,11 @@ class RadioactivityUnitOfMeasure(Enum):
     TBQ='TBQ'
 
 
-class ShipmentDryIceProcessingOptionType(Enum):
+class ShipmentDryIceProcessingOptionType(str, Enum):
     SHIPMENT_LEVEL_DRY_ICE_ONLY='SHIPMENT_LEVEL_DRY_ICE_ONLY'
 
 
-class TrackingIdType(Enum):
+class TrackingIdType(str, Enum):
     EXPRESS='EXPRESS'
     FEDEX='FEDEX'
     FREIGHT='FREIGHT'
@@ -1076,20 +1099,20 @@ class TrackingIdType(Enum):
     USPS='USPS'
 
 
-class UploadDangerousGoodsProcessingOptionType(Enum):
+class UploadDangerousGoodsProcessingOptionType(str, Enum):
     VALIDATION_ERRORS_AS_WARNINGS='VALIDATION_ERRORS_AS_WARNINGS'
 
 
-class UploadedDangerousGoodsShipmentAttributeType(Enum):
+class UploadedDangerousGoodsShipmentAttributeType(str, Enum):
     MANUAL_SHIPPING_LABEL='MANUAL_SHIPPING_LABEL'
 
 
-class ValidateDangerousGoodsProcessingOptionType(Enum):
+class ValidateDangerousGoodsProcessingOptionType(str, Enum):
     BYPASS_PRODUCT_VALIDATION='BYPASS_PRODUCT_VALIDATION'
     BYPASS_TRACKING_NUMBER_VALIDATION='BYPASS_TRACKING_NUMBER_VALIDATION'
 
 
-class WeightUnits(Enum):
+class WeightUnits(str, Enum):
     KG='KG'
     LB='LB'
 
@@ -1106,20 +1129,20 @@ class AddDangerousGoodsHandlingUnitReply(GeneratedsSuper):
         self.ns_prefix_ = None
         self.HighestSeverity = HighestSeverity
         self.validate_NotificationSeverityType(self.HighestSeverity)
-        self.HighestSeverity_nsprefix_ = None
+        self.HighestSeverity_nsprefix_ = "ns"
         if Notifications is None:
             self.Notifications = []
         else:
             self.Notifications = Notifications
-        self.Notifications_nsprefix_ = None
+        self.Notifications_nsprefix_ = "ns"
         self.TransactionDetail = TransactionDetail
-        self.TransactionDetail_nsprefix_ = None
+        self.TransactionDetail_nsprefix_ = "ns"
         self.Version = Version
-        self.Version_nsprefix_ = None
+        self.Version_nsprefix_ = "ns"
         self.CompletedShipmentDetail = CompletedShipmentDetail
-        self.CompletedShipmentDetail_nsprefix_ = None
+        self.CompletedShipmentDetail_nsprefix_ = "ns"
         self.CompletedHandlingUnitGroup = CompletedHandlingUnitGroup
-        self.CompletedHandlingUnitGroup_nsprefix_ = None
+        self.CompletedHandlingUnitGroup_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -1302,17 +1325,17 @@ class AddDangerousGoodsHandlingUnitRequest(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.WebAuthenticationDetail = WebAuthenticationDetail
-        self.WebAuthenticationDetail_nsprefix_ = None
+        self.WebAuthenticationDetail_nsprefix_ = "ns"
         self.ClientDetail = ClientDetail
-        self.ClientDetail_nsprefix_ = None
+        self.ClientDetail_nsprefix_ = "ns"
         self.TransactionDetail = TransactionDetail
-        self.TransactionDetail_nsprefix_ = None
+        self.TransactionDetail_nsprefix_ = "ns"
         self.Version = Version
-        self.Version_nsprefix_ = None
+        self.Version_nsprefix_ = "ns"
         self.UploadId = UploadId
         self.UploadId_nsprefix_ = None
         self.HandlingUnitGroup = HandlingUnitGroup
-        self.HandlingUnitGroup_nsprefix_ = None
+        self.HandlingUnitGroup_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -1821,9 +1844,9 @@ class ClientDetail(GeneratedsSuper):
         self.IntegratorId_nsprefix_ = None
         self.Region = Region
         self.validate_ExpressRegionCode(self.Region)
-        self.Region_nsprefix_ = None
+        self.Region_nsprefix_ = "ns"
         self.Localization = Localization
-        self.Localization_nsprefix_ = None
+        self.Localization_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -2012,7 +2035,7 @@ class CompletedDangerousGoodsHandlingUnitGroup(GeneratedsSuper):
         self.NumberOfHandlingUnits = NumberOfHandlingUnits
         self.NumberOfHandlingUnits_nsprefix_ = None
         self.HandlingUnitShippingDetail = HandlingUnitShippingDetail
-        self.HandlingUnitShippingDetail_nsprefix_ = None
+        self.HandlingUnitShippingDetail_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -2138,32 +2161,32 @@ class CompletedDangerousGoodsShipmentDetail(GeneratedsSuper):
         self.ns_prefix_ = None
         self.Regulation = Regulation
         self.validate_HazardousCommodityRegulationType(self.Regulation)
-        self.Regulation_nsprefix_ = None
+        self.Regulation_nsprefix_ = "ns"
         if RegulationAttributes is None:
             self.RegulationAttributes = []
         else:
             self.RegulationAttributes = RegulationAttributes
-        self.RegulationAttributes_nsprefix_ = None
+        self.RegulationAttributes_nsprefix_ = "ns"
         self.TotalHandlingUnitCount = TotalHandlingUnitCount
         self.TotalHandlingUnitCount_nsprefix_ = None
         self.AircraftCategoryType = AircraftCategoryType
         self.validate_DangerousGoodsAircraftCategoryType(self.AircraftCategoryType)
-        self.AircraftCategoryType_nsprefix_ = None
+        self.AircraftCategoryType_nsprefix_ = "ns"
         if DangerousGoodsDescriptors is None:
             self.DangerousGoodsDescriptors = []
         else:
             self.DangerousGoodsDescriptors = DangerousGoodsDescriptors
-        self.DangerousGoodsDescriptors_nsprefix_ = None
+        self.DangerousGoodsDescriptors_nsprefix_ = "ns"
         self.Accessibility = Accessibility
         self.validate_DangerousGoodsAccessibilityType(self.Accessibility)
-        self.Accessibility_nsprefix_ = None
+        self.Accessibility_nsprefix_ = "ns"
         if Options is None:
             self.Options = []
         else:
             self.Options = Options
-        self.Options_nsprefix_ = None
+        self.Options_nsprefix_ = "ns"
         self.ShipmentDryIceDetail = ShipmentDryIceDetail
-        self.ShipmentDryIceDetail_nsprefix_ = None
+        self.ShipmentDryIceDetail_nsprefix_ = "ns"
         if isinstance(ExpirationDate, BaseStrType_):
             initvalue_ = datetime_.datetime.strptime(ExpirationDate, '%Y-%m-%d').date()
         else:
@@ -2757,27 +2780,27 @@ class DangerousGoodsHandlingUnitShippingDetail(GeneratedsSuper):
             self.TrackingNumberUnits = []
         else:
             self.TrackingNumberUnits = TrackingNumberUnits
-        self.TrackingNumberUnits_nsprefix_ = None
+        self.TrackingNumberUnits_nsprefix_ = "ns"
         self.Description = Description
         self.Description_nsprefix_ = None
         self.AircraftCategoryType = AircraftCategoryType
         self.validate_DangerousGoodsAircraftCategoryType(self.AircraftCategoryType)
-        self.AircraftCategoryType_nsprefix_ = None
+        self.AircraftCategoryType_nsprefix_ = "ns"
         if DangerousGoodsDescriptors is None:
             self.DangerousGoodsDescriptors = []
         else:
             self.DangerousGoodsDescriptors = DangerousGoodsDescriptors
-        self.DangerousGoodsDescriptors_nsprefix_ = None
+        self.DangerousGoodsDescriptors_nsprefix_ = "ns"
         self.Accessibility = Accessibility
         self.validate_DangerousGoodsAccessibilityType(self.Accessibility)
-        self.Accessibility_nsprefix_ = None
+        self.Accessibility_nsprefix_ = "ns"
         if Options is None:
             self.Options = []
         else:
             self.Options = Options
-        self.Options_nsprefix_ = None
+        self.Options_nsprefix_ = "ns"
         self.DryIceWeight = DryIceWeight
-        self.DryIceWeight_nsprefix_ = None
+        self.DryIceWeight_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -3044,7 +3067,7 @@ class DangerousGoodsInnerReceptacleDetail(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.Quantity = Quantity
-        self.Quantity_nsprefix_ = None
+        self.Quantity_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -3140,7 +3163,7 @@ class DangerousGoodsRadionuclideActivity(GeneratedsSuper):
         self.Value_nsprefix_ = None
         self.UnitOfMeasure = UnitOfMeasure
         self.validate_RadioactivityUnitOfMeasure(self.UnitOfMeasure)
-        self.UnitOfMeasure_nsprefix_ = None
+        self.UnitOfMeasure_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -3272,10 +3295,10 @@ class DangerousGoodsRadionuclideDetail(GeneratedsSuper):
             self.Radionuclides = Radionuclides
         self.Radionuclides_nsprefix_ = None
         self.Activity = Activity
-        self.Activity_nsprefix_ = None
+        self.Activity_nsprefix_ = "ns"
         self.PhysicalForm = PhysicalForm
         self.validate_PhysicalFormType(self.PhysicalForm)
-        self.PhysicalForm_nsprefix_ = None
+        self.PhysicalForm_nsprefix_ = "ns"
         self.ChemicalForm = ChemicalForm
         self.ChemicalForm_nsprefix_ = None
     def factory(*args_, **kwargs_):
@@ -3570,18 +3593,18 @@ class DeleteDangerousGoodsHandlingUnitReply(GeneratedsSuper):
         self.ns_prefix_ = None
         self.HighestSeverity = HighestSeverity
         self.validate_NotificationSeverityType(self.HighestSeverity)
-        self.HighestSeverity_nsprefix_ = None
+        self.HighestSeverity_nsprefix_ = "ns"
         if Notifications is None:
             self.Notifications = []
         else:
             self.Notifications = Notifications
-        self.Notifications_nsprefix_ = None
+        self.Notifications_nsprefix_ = "ns"
         self.TransactionDetail = TransactionDetail
-        self.TransactionDetail_nsprefix_ = None
+        self.TransactionDetail_nsprefix_ = "ns"
         self.Version = Version
-        self.Version_nsprefix_ = None
+        self.Version_nsprefix_ = "ns"
         self.CompletedShipmentDetail = CompletedShipmentDetail
-        self.CompletedShipmentDetail_nsprefix_ = None
+        self.CompletedShipmentDetail_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -3751,13 +3774,13 @@ class DeleteDangerousGoodsHandlingUnitRequest(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.WebAuthenticationDetail = WebAuthenticationDetail
-        self.WebAuthenticationDetail_nsprefix_ = None
+        self.WebAuthenticationDetail_nsprefix_ = "ns"
         self.ClientDetail = ClientDetail
-        self.ClientDetail_nsprefix_ = None
+        self.ClientDetail_nsprefix_ = "ns"
         self.TransactionDetail = TransactionDetail
-        self.TransactionDetail_nsprefix_ = None
+        self.TransactionDetail_nsprefix_ = "ns"
         self.Version = Version
-        self.Version_nsprefix_ = None
+        self.Version_nsprefix_ = "ns"
         self.UploadId = UploadId
         self.UploadId_nsprefix_ = None
         self.HandlingUnitGroupId = HandlingUnitGroupId
@@ -3950,16 +3973,16 @@ class DeleteDangerousGoodsReply(GeneratedsSuper):
         self.ns_prefix_ = None
         self.HighestSeverity = HighestSeverity
         self.validate_NotificationSeverityType(self.HighestSeverity)
-        self.HighestSeverity_nsprefix_ = None
+        self.HighestSeverity_nsprefix_ = "ns"
         if Notifications is None:
             self.Notifications = []
         else:
             self.Notifications = Notifications
-        self.Notifications_nsprefix_ = None
+        self.Notifications_nsprefix_ = "ns"
         self.TransactionDetail = TransactionDetail
-        self.TransactionDetail_nsprefix_ = None
+        self.TransactionDetail_nsprefix_ = "ns"
         self.Version = Version
-        self.Version_nsprefix_ = None
+        self.Version_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -4116,13 +4139,13 @@ class DeleteDangerousGoodsRequest(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.WebAuthenticationDetail = WebAuthenticationDetail
-        self.WebAuthenticationDetail_nsprefix_ = None
+        self.WebAuthenticationDetail_nsprefix_ = "ns"
         self.ClientDetail = ClientDetail
-        self.ClientDetail_nsprefix_ = None
+        self.ClientDetail_nsprefix_ = "ns"
         self.TransactionDetail = TransactionDetail
-        self.TransactionDetail_nsprefix_ = None
+        self.TransactionDetail_nsprefix_ = "ns"
         self.Version = Version
-        self.Version_nsprefix_ = None
+        self.Version_nsprefix_ = "ns"
         self.UploadId = UploadId
         self.UploadId_nsprefix_ = None
     def factory(*args_, **kwargs_):
@@ -4385,20 +4408,20 @@ class ModifyDangerousGoodsHandlingUnitReply(GeneratedsSuper):
         self.ns_prefix_ = None
         self.HighestSeverity = HighestSeverity
         self.validate_NotificationSeverityType(self.HighestSeverity)
-        self.HighestSeverity_nsprefix_ = None
+        self.HighestSeverity_nsprefix_ = "ns"
         if Notifications is None:
             self.Notifications = []
         else:
             self.Notifications = Notifications
-        self.Notifications_nsprefix_ = None
+        self.Notifications_nsprefix_ = "ns"
         self.TransactionDetail = TransactionDetail
-        self.TransactionDetail_nsprefix_ = None
+        self.TransactionDetail_nsprefix_ = "ns"
         self.Version = Version
-        self.Version_nsprefix_ = None
+        self.Version_nsprefix_ = "ns"
         self.CompletedShipmentDetail = CompletedShipmentDetail
-        self.CompletedShipmentDetail_nsprefix_ = None
+        self.CompletedShipmentDetail_nsprefix_ = "ns"
         self.CompletedHandlingUnitGroup = CompletedHandlingUnitGroup
-        self.CompletedHandlingUnitGroup_nsprefix_ = None
+        self.CompletedHandlingUnitGroup_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -4581,17 +4604,17 @@ class ModifyDangerousGoodsHandlingUnitRequest(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.WebAuthenticationDetail = WebAuthenticationDetail
-        self.WebAuthenticationDetail_nsprefix_ = None
+        self.WebAuthenticationDetail_nsprefix_ = "ns"
         self.ClientDetail = ClientDetail
-        self.ClientDetail_nsprefix_ = None
+        self.ClientDetail_nsprefix_ = "ns"
         self.TransactionDetail = TransactionDetail
-        self.TransactionDetail_nsprefix_ = None
+        self.TransactionDetail_nsprefix_ = "ns"
         self.Version = Version
-        self.Version_nsprefix_ = None
+        self.Version_nsprefix_ = "ns"
         self.UploadId = UploadId
         self.UploadId_nsprefix_ = None
         self.HandlingUnitGroup = HandlingUnitGroup
-        self.HandlingUnitGroup_nsprefix_ = None
+        self.HandlingUnitGroup_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -4752,18 +4775,18 @@ class ModifyDangerousGoodsShipmentReply(GeneratedsSuper):
         self.ns_prefix_ = None
         self.HighestSeverity = HighestSeverity
         self.validate_NotificationSeverityType(self.HighestSeverity)
-        self.HighestSeverity_nsprefix_ = None
+        self.HighestSeverity_nsprefix_ = "ns"
         if Notifications is None:
             self.Notifications = []
         else:
             self.Notifications = Notifications
-        self.Notifications_nsprefix_ = None
+        self.Notifications_nsprefix_ = "ns"
         self.TransactionDetail = TransactionDetail
-        self.TransactionDetail_nsprefix_ = None
+        self.TransactionDetail_nsprefix_ = "ns"
         self.Version = Version
-        self.Version_nsprefix_ = None
+        self.Version_nsprefix_ = "ns"
         self.CompletedShipmentDetail = CompletedShipmentDetail
-        self.CompletedShipmentDetail_nsprefix_ = None
+        self.CompletedShipmentDetail_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -4933,17 +4956,17 @@ class ModifyDangerousGoodsShipmentRequest(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.WebAuthenticationDetail = WebAuthenticationDetail
-        self.WebAuthenticationDetail_nsprefix_ = None
+        self.WebAuthenticationDetail_nsprefix_ = "ns"
         self.ClientDetail = ClientDetail
-        self.ClientDetail_nsprefix_ = None
+        self.ClientDetail_nsprefix_ = "ns"
         self.TransactionDetail = TransactionDetail
-        self.TransactionDetail_nsprefix_ = None
+        self.TransactionDetail_nsprefix_ = "ns"
         self.Version = Version
-        self.Version_nsprefix_ = None
+        self.Version_nsprefix_ = "ns"
         self.UploadId = UploadId
         self.UploadId_nsprefix_ = None
         self.ShipmentDetail = ShipmentDetail
-        self.ShipmentDetail_nsprefix_ = None
+        self.ShipmentDetail_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -5104,7 +5127,7 @@ class NetExplosiveDetail(GeneratedsSuper):
         self.ns_prefix_ = None
         self.Type = Type
         self.validate_NetExplosiveClassificationType(self.Type)
-        self.Type_nsprefix_ = None
+        self.Type_nsprefix_ = "ns"
         self.Amount = Amount
         self.Amount_nsprefix_ = None
         self.Units = Units
@@ -5253,7 +5276,7 @@ class Notification(GeneratedsSuper):
         self.ns_prefix_ = None
         self.Severity = Severity
         self.validate_NotificationSeverityType(self.Severity)
-        self.Severity_nsprefix_ = None
+        self.Severity_nsprefix_ = "ns"
         self.Source = Source
         self.Source_nsprefix_ = None
         self.Code = Code
@@ -5266,7 +5289,7 @@ class Notification(GeneratedsSuper):
             self.MessageParameters = []
         else:
             self.MessageParameters = MessageParameters
-        self.MessageParameters_nsprefix_ = None
+        self.MessageParameters_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -5688,7 +5711,7 @@ class RadioactiveDangerousGoodsHandlingUnitDetail(GeneratedsSuper):
         self.CriticalitySafetyIndex_nsprefix_ = None
         self.LabelType = LabelType
         self.validate_RadioactiveLabelType(self.LabelType)
-        self.LabelType_nsprefix_ = None
+        self.LabelType_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -5845,9 +5868,9 @@ class RecordedDangerousGoodsHandlingUnitGroup(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.UploadedHandlingUnitGroup = UploadedHandlingUnitGroup
-        self.UploadedHandlingUnitGroup_nsprefix_ = None
+        self.UploadedHandlingUnitGroup_nsprefix_ = "ns"
         self.HandlingUnitShippingDetail = HandlingUnitShippingDetail
-        self.HandlingUnitShippingDetail_nsprefix_ = None
+        self.HandlingUnitShippingDetail_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -5953,9 +5976,9 @@ class RecordedDangerousGoodsShipmentDetail(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.UploadedShipmentDetail = UploadedShipmentDetail
-        self.UploadedShipmentDetail_nsprefix_ = None
+        self.UploadedShipmentDetail_nsprefix_ = "ns"
         self.CompletedShipmentDetail = CompletedShipmentDetail
-        self.CompletedShipmentDetail_nsprefix_ = None
+        self.CompletedShipmentDetail_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -6062,23 +6085,23 @@ class RetrieveDangerousGoodsReply(GeneratedsSuper):
         self.ns_prefix_ = None
         self.HighestSeverity = HighestSeverity
         self.validate_NotificationSeverityType(self.HighestSeverity)
-        self.HighestSeverity_nsprefix_ = None
+        self.HighestSeverity_nsprefix_ = "ns"
         if Notifications is None:
             self.Notifications = []
         else:
             self.Notifications = Notifications
-        self.Notifications_nsprefix_ = None
+        self.Notifications_nsprefix_ = "ns"
         self.TransactionDetail = TransactionDetail
-        self.TransactionDetail_nsprefix_ = None
+        self.TransactionDetail_nsprefix_ = "ns"
         self.Version = Version
-        self.Version_nsprefix_ = None
+        self.Version_nsprefix_ = "ns"
         self.ShipmentDetail = ShipmentDetail
-        self.ShipmentDetail_nsprefix_ = None
+        self.ShipmentDetail_nsprefix_ = "ns"
         if HandlingUnitGroups is None:
             self.HandlingUnitGroups = []
         else:
             self.HandlingUnitGroups = HandlingUnitGroups
-        self.HandlingUnitGroups_nsprefix_ = None
+        self.HandlingUnitGroups_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -6267,13 +6290,13 @@ class RetrieveDangerousGoodsRequest(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.WebAuthenticationDetail = WebAuthenticationDetail
-        self.WebAuthenticationDetail_nsprefix_ = None
+        self.WebAuthenticationDetail_nsprefix_ = "ns"
         self.ClientDetail = ClientDetail
-        self.ClientDetail_nsprefix_ = None
+        self.ClientDetail_nsprefix_ = "ns"
         self.TransactionDetail = TransactionDetail
-        self.TransactionDetail_nsprefix_ = None
+        self.TransactionDetail_nsprefix_ = "ns"
         self.Version = Version
-        self.Version_nsprefix_ = None
+        self.Version_nsprefix_ = "ns"
         self.UploadId = UploadId
         self.UploadId_nsprefix_ = None
     def factory(*args_, **kwargs_):
@@ -6425,9 +6448,9 @@ class ShipmentDryIceDetail(GeneratedsSuper):
         self.PackageCount = PackageCount
         self.PackageCount_nsprefix_ = None
         self.TotalWeight = TotalWeight
-        self.TotalWeight_nsprefix_ = None
+        self.TotalWeight_nsprefix_ = "ns"
         self.ProcessingOptions = ProcessingOptions
-        self.ProcessingOptions_nsprefix_ = None
+        self.ProcessingOptions_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -6553,7 +6576,7 @@ class ShipmentDryIceProcessingOptionsRequested(GeneratedsSuper):
             self.Options = []
         else:
             self.Options = Options
-        self.Options_nsprefix_ = None
+        self.Options_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -6672,7 +6695,7 @@ class TrackingId(GeneratedsSuper):
         self.ns_prefix_ = None
         self.TrackingIdType = TrackingIdType
         self.validate_TrackingIdType(self.TrackingIdType)
-        self.TrackingIdType_nsprefix_ = None
+        self.TrackingIdType_nsprefix_ = "ns"
         self.FormId = FormId
         self.FormId_nsprefix_ = None
         self.UspsApplicationId = UspsApplicationId
@@ -6842,7 +6865,7 @@ class TrackingNumberUnit(GeneratedsSuper):
             self.TrackingIds = []
         else:
             self.TrackingIds = TrackingIds
-        self.TrackingIds_nsprefix_ = None
+        self.TrackingIds_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -6960,7 +6983,7 @@ class TransactionDetail(GeneratedsSuper):
         self.CustomerTransactionId = CustomerTransactionId
         self.CustomerTransactionId_nsprefix_ = None
         self.Localization = Localization
-        self.Localization_nsprefix_ = None
+        self.Localization_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -7071,7 +7094,7 @@ class UploadDangerousGoodsProcessingOptionsRequested(GeneratedsSuper):
             self.Options = []
         else:
             self.Options = Options
-        self.Options_nsprefix_ = None
+        self.Options_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -7190,27 +7213,27 @@ class UploadDangerousGoodsReply(GeneratedsSuper):
         self.ns_prefix_ = None
         self.HighestSeverity = HighestSeverity
         self.validate_NotificationSeverityType(self.HighestSeverity)
-        self.HighestSeverity_nsprefix_ = None
+        self.HighestSeverity_nsprefix_ = "ns"
         if Notifications is None:
             self.Notifications = []
         else:
             self.Notifications = Notifications
-        self.Notifications_nsprefix_ = None
+        self.Notifications_nsprefix_ = "ns"
         self.TransactionDetail = TransactionDetail
-        self.TransactionDetail_nsprefix_ = None
+        self.TransactionDetail_nsprefix_ = "ns"
         self.Version = Version
-        self.Version_nsprefix_ = None
+        self.Version_nsprefix_ = "ns"
         self.UploadId = UploadId
         self.UploadId_nsprefix_ = None
         self.MasterTrackingId = MasterTrackingId
-        self.MasterTrackingId_nsprefix_ = None
+        self.MasterTrackingId_nsprefix_ = "ns"
         self.CompletedShipmentDetail = CompletedShipmentDetail
-        self.CompletedShipmentDetail_nsprefix_ = None
+        self.CompletedShipmentDetail_nsprefix_ = "ns"
         if CompletedHandlingUnitGroups is None:
             self.CompletedHandlingUnitGroups = []
         else:
             self.CompletedHandlingUnitGroups = CompletedHandlingUnitGroups
-        self.CompletedHandlingUnitGroups_nsprefix_ = None
+        self.CompletedHandlingUnitGroups_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -7427,22 +7450,22 @@ class UploadDangerousGoodsRequest(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.WebAuthenticationDetail = WebAuthenticationDetail
-        self.WebAuthenticationDetail_nsprefix_ = None
+        self.WebAuthenticationDetail_nsprefix_ = "ns"
         self.ClientDetail = ClientDetail
-        self.ClientDetail_nsprefix_ = None
+        self.ClientDetail_nsprefix_ = "ns"
         self.TransactionDetail = TransactionDetail
-        self.TransactionDetail_nsprefix_ = None
+        self.TransactionDetail_nsprefix_ = "ns"
         self.Version = Version
-        self.Version_nsprefix_ = None
+        self.Version_nsprefix_ = "ns"
         self.ProcessingOptions = ProcessingOptions
-        self.ProcessingOptions_nsprefix_ = None
+        self.ProcessingOptions_nsprefix_ = "ns"
         self.ShipmentDetail = ShipmentDetail
-        self.ShipmentDetail_nsprefix_ = None
+        self.ShipmentDetail_nsprefix_ = "ns"
         if HandlingUnitGroups is None:
             self.HandlingUnitGroups = []
         else:
             self.HandlingUnitGroups = HandlingUnitGroups
-        self.HandlingUnitGroups_nsprefix_ = None
+        self.HandlingUnitGroups_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -7619,18 +7642,18 @@ class UploadedDangerousGoodsCommodityContent(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.Description = Description
-        self.Description_nsprefix_ = None
+        self.Description_nsprefix_ = "ns"
         self.Quantity = Quantity
-        self.Quantity_nsprefix_ = None
+        self.Quantity_nsprefix_ = "ns"
         if InnerReceptacles is None:
             self.InnerReceptacles = []
         else:
             self.InnerReceptacles = InnerReceptacles
-        self.InnerReceptacles_nsprefix_ = None
+        self.InnerReceptacles_nsprefix_ = "ns"
         self.RadionuclideDetail = RadionuclideDetail
-        self.RadionuclideDetail_nsprefix_ = None
+        self.RadionuclideDetail_nsprefix_ = "ns"
         self.NetExplosiveDetail = NetExplosiveDetail
-        self.NetExplosiveDetail_nsprefix_ = None
+        self.NetExplosiveDetail_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -7788,12 +7811,12 @@ class UploadedDangerousGoodsCommodityDescription(GeneratedsSuper):
         self.SequenceNumber_nsprefix_ = None
         self.PackingGroup = PackingGroup
         self.validate_DangerousGoodsPackingGroupType(self.PackingGroup)
-        self.PackingGroup_nsprefix_ = None
+        self.PackingGroup_nsprefix_ = "ns"
         self.PackingInstructions = PackingInstructions
         self.PackingInstructions_nsprefix_ = None
         self.AircraftCategoryType = AircraftCategoryType
         self.validate_DangerousGoodsAircraftCategoryType(self.AircraftCategoryType)
-        self.AircraftCategoryType_nsprefix_ = None
+        self.AircraftCategoryType_nsprefix_ = "ns"
         self.ProperShippingName = ProperShippingName
         self.ProperShippingName_nsprefix_ = None
         self.TechnicalName = TechnicalName
@@ -8130,18 +8153,18 @@ class UploadedDangerousGoodsContainer(GeneratedsSuper):
             self.Attributes = []
         else:
             self.Attributes = Attributes
-        self.Attributes_nsprefix_ = None
+        self.Attributes_nsprefix_ = "ns"
         self.ContainerType = ContainerType
         self.ContainerType_nsprefix_ = None
         self.QValue = QValue
         self.QValue_nsprefix_ = None
         self.GrossWeight = GrossWeight
-        self.GrossWeight_nsprefix_ = None
+        self.GrossWeight_nsprefix_ = "ns"
         if Commodities is None:
             self.Commodities = []
         else:
             self.Commodities = Commodities
-        self.Commodities_nsprefix_ = None
+        self.Commodities_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -8323,7 +8346,7 @@ class UploadedDangerousGoodsContainerGroup(GeneratedsSuper):
         self.NumberOfIdenticalContainers = NumberOfIdenticalContainers
         self.NumberOfIdenticalContainers_nsprefix_ = None
         self.Container = Container
-        self.Container_nsprefix_ = None
+        self.Container_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -8436,14 +8459,14 @@ class UploadedDangerousGoodsHandlingUnit(GeneratedsSuper):
             self.Attributes = []
         else:
             self.Attributes = Attributes
-        self.Attributes_nsprefix_ = None
+        self.Attributes_nsprefix_ = "ns"
         self.RadioactiveDetail = RadioactiveDetail
-        self.RadioactiveDetail_nsprefix_ = None
+        self.RadioactiveDetail_nsprefix_ = "ns"
         if ContainerGroups is None:
             self.ContainerGroups = []
         else:
             self.ContainerGroups = ContainerGroups
-        self.ContainerGroups_nsprefix_ = None
+        self.ContainerGroups_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -8602,14 +8625,14 @@ class UploadedDangerousGoodsHandlingUnitGroup(GeneratedsSuper):
             self.AssociatedDocumentDetails = []
         else:
             self.AssociatedDocumentDetails = AssociatedDocumentDetails
-        self.AssociatedDocumentDetails_nsprefix_ = None
+        self.AssociatedDocumentDetails_nsprefix_ = "ns"
         if TrackingNumberUnits is None:
             self.TrackingNumberUnits = []
         else:
             self.TrackingNumberUnits = TrackingNumberUnits
-        self.TrackingNumberUnits_nsprefix_ = None
+        self.TrackingNumberUnits_nsprefix_ = "ns"
         self.HandlingUnit = HandlingUnit
-        self.HandlingUnit_nsprefix_ = None
+        self.HandlingUnit_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -8790,14 +8813,14 @@ class UploadedDangerousGoodsShipmentDetail(GeneratedsSuper):
             self.Attributes = []
         else:
             self.Attributes = Attributes
-        self.Attributes_nsprefix_ = None
+        self.Attributes_nsprefix_ = "ns"
         self.Origin = Origin
-        self.Origin_nsprefix_ = None
+        self.Origin_nsprefix_ = "ns"
         self.Destination = Destination
-        self.Destination_nsprefix_ = None
+        self.Destination_nsprefix_ = "ns"
         self.CarrierCode = CarrierCode
         self.validate_CarrierCodeType(self.CarrierCode)
-        self.CarrierCode_nsprefix_ = None
+        self.CarrierCode_nsprefix_ = "ns"
         self.ServiceType = ServiceType
         self.ServiceType_nsprefix_ = None
         if isinstance(ShipDate, BaseStrType_):
@@ -8809,18 +8832,18 @@ class UploadedDangerousGoodsShipmentDetail(GeneratedsSuper):
         self.Offeror = Offeror
         self.Offeror_nsprefix_ = None
         self.Signatory = Signatory
-        self.Signatory_nsprefix_ = None
+        self.Signatory_nsprefix_ = "ns"
         self.InfectiousSubstanceResponsibleContact = InfectiousSubstanceResponsibleContact
-        self.InfectiousSubstanceResponsibleContact_nsprefix_ = None
+        self.InfectiousSubstanceResponsibleContact_nsprefix_ = "ns"
         self.EmergencyContactNumber = EmergencyContactNumber
         self.EmergencyContactNumber_nsprefix_ = None
         self.AircraftCategoryType = AircraftCategoryType
         self.validate_DangerousGoodsAircraftCategoryType(self.AircraftCategoryType)
-        self.AircraftCategoryType_nsprefix_ = None
+        self.AircraftCategoryType_nsprefix_ = "ns"
         self.AdditionalHandling = AdditionalHandling
         self.AdditionalHandling_nsprefix_ = None
         self.MasterTrackingId = MasterTrackingId
-        self.MasterTrackingId_nsprefix_ = None
+        self.MasterTrackingId_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -9144,7 +9167,7 @@ class ValidateDangerousGoodsProcessingOptionsRequested(GeneratedsSuper):
             self.Options = []
         else:
             self.Options = Options
-        self.Options_nsprefix_ = None
+        self.Options_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -9263,23 +9286,23 @@ class ValidateDangerousGoodsReply(GeneratedsSuper):
         self.ns_prefix_ = None
         self.HighestSeverity = HighestSeverity
         self.validate_NotificationSeverityType(self.HighestSeverity)
-        self.HighestSeverity_nsprefix_ = None
+        self.HighestSeverity_nsprefix_ = "ns"
         if Notifications is None:
             self.Notifications = []
         else:
             self.Notifications = Notifications
-        self.Notifications_nsprefix_ = None
+        self.Notifications_nsprefix_ = "ns"
         self.TransactionDetail = TransactionDetail
-        self.TransactionDetail_nsprefix_ = None
+        self.TransactionDetail_nsprefix_ = "ns"
         self.Version = Version
-        self.Version_nsprefix_ = None
+        self.Version_nsprefix_ = "ns"
         self.CompletedShipmentDetail = CompletedShipmentDetail
-        self.CompletedShipmentDetail_nsprefix_ = None
+        self.CompletedShipmentDetail_nsprefix_ = "ns"
         if CompletedHandlingUnitGroups is None:
             self.CompletedHandlingUnitGroups = []
         else:
             self.CompletedHandlingUnitGroups = CompletedHandlingUnitGroups
-        self.CompletedHandlingUnitGroups_nsprefix_ = None
+        self.CompletedHandlingUnitGroups_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -9468,22 +9491,22 @@ class ValidateDangerousGoodsRequest(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.WebAuthenticationDetail = WebAuthenticationDetail
-        self.WebAuthenticationDetail_nsprefix_ = None
+        self.WebAuthenticationDetail_nsprefix_ = "ns"
         self.ClientDetail = ClientDetail
-        self.ClientDetail_nsprefix_ = None
+        self.ClientDetail_nsprefix_ = "ns"
         self.TransactionDetail = TransactionDetail
-        self.TransactionDetail_nsprefix_ = None
+        self.TransactionDetail_nsprefix_ = "ns"
         self.Version = Version
-        self.Version_nsprefix_ = None
+        self.Version_nsprefix_ = "ns"
         self.ProcessingOptions = ProcessingOptions
-        self.ProcessingOptions_nsprefix_ = None
+        self.ProcessingOptions_nsprefix_ = "ns"
         self.ShipmentDetail = ShipmentDetail
-        self.ShipmentDetail_nsprefix_ = None
+        self.ShipmentDetail_nsprefix_ = "ns"
         if HandlingUnitGroups is None:
             self.HandlingUnitGroups = []
         else:
             self.HandlingUnitGroups = HandlingUnitGroups
-        self.HandlingUnitGroups_nsprefix_ = None
+        self.HandlingUnitGroups_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -9662,7 +9685,7 @@ class Weight(GeneratedsSuper):
         self.ns_prefix_ = None
         self.Units = Units
         self.validate_WeightUnits(self.Units)
-        self.Units_nsprefix_ = None
+        self.Units_nsprefix_ = "ns"
         self.Value = Value
         self.Value_nsprefix_ = None
     def factory(*args_, **kwargs_):
@@ -9792,9 +9815,9 @@ class WebAuthenticationDetail(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.ParentCredential = ParentCredential
-        self.ParentCredential_nsprefix_ = None
+        self.ParentCredential_nsprefix_ = "ns"
         self.UserCredential = UserCredential
-        self.UserCredential_nsprefix_ = None
+        self.UserCredential_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -10237,7 +10260,8 @@ def parse(inFileName, silence=False, print_warnings=True):
     return rootObj
 
 
-def parseEtree(inFileName, silence=False, print_warnings=True):
+def parseEtree(inFileName, silence=False, print_warnings=True,
+               mapping=None, nsmap=None):
     parser = None
     doc = parsexml_(inFileName, parser)
     gds_collector = GdsCollector_()
@@ -10249,8 +10273,10 @@ def parseEtree(inFileName, silence=False, print_warnings=True):
     rootObj = rootClass.factory()
     rootObj.build(rootNode, gds_collector_=gds_collector)
     # Enable Python to collect the space used by the DOM.
-    mapping = {}
-    rootElement = rootObj.to_etree(None, name_=rootTag, mapping_=mapping)
+    if mapping is None:
+        mapping = {}
+    rootElement = rootObj.to_etree(
+        None, name_=rootTag, mapping_=mapping, nsmap_=nsmap)
     reverse_mapping = rootObj.gds_reverse_node_mapping(mapping)
     if not SaveElementTreeNode:
         doc = None
@@ -10351,6 +10377,311 @@ if __name__ == '__main__':
 
 RenameMappings_ = {
 }
+
+#
+# Mapping of namespaces to types defined in them
+# and the file in which each is defined.
+# simpleTypes are marked "ST" and complexTypes "CT".
+NamespaceToDefMappings_ = {'http://fedex.com/ws/dgds/v5': [('CarrierCodeType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'ST'),
+                                 ('DangerousGoodsAccessibilityType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'ST'),
+                                 ('DangerousGoodsAircraftCategoryType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'ST'),
+                                 ('DangerousGoodsContainerAttributeType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'ST'),
+                                 ('DangerousGoodsDescriptorType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'ST'),
+                                 ('DangerousGoodsHandlingUnitAttributeType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'ST'),
+                                 ('DangerousGoodsPackingGroupType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'ST'),
+                                 ('DangerousGoodsRegulationAttributeType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'ST'),
+                                 ('ExpressRegionCode',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'ST'),
+                                 ('HazardousCommodityOptionType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'ST'),
+                                 ('HazardousCommodityRegulationType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'ST'),
+                                 ('NetExplosiveClassificationType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'ST'),
+                                 ('NotificationSeverityType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'ST'),
+                                 ('PhysicalFormType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'ST'),
+                                 ('RadioactiveLabelType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'ST'),
+                                 ('RadioactivityUnitOfMeasure',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'ST'),
+                                 ('ShipmentDryIceProcessingOptionType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'ST'),
+                                 ('TrackingIdType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'ST'),
+                                 ('UploadDangerousGoodsProcessingOptionType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'ST'),
+                                 ('UploadedDangerousGoodsShipmentAttributeType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'ST'),
+                                 ('ValidateDangerousGoodsProcessingOptionType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'ST'),
+                                 ('WeightUnits',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'ST'),
+                                 ('AddDangerousGoodsHandlingUnitReply',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('AddDangerousGoodsHandlingUnitRequest',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('Address',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('AssociatedEnterpriseDocumentDetail',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('ClientDetail',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('CompletedDangerousGoodsHandlingUnitGroup',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('CompletedDangerousGoodsShipmentDetail',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('Contact',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('DangerousGoodsHandlingUnitShippingDetail',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('DangerousGoodsInnerReceptacleDetail',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('DangerousGoodsRadionuclideActivity',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('DangerousGoodsRadionuclideDetail',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('DangerousGoodsSignatory',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('DeleteDangerousGoodsHandlingUnitReply',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('DeleteDangerousGoodsHandlingUnitRequest',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('DeleteDangerousGoodsReply',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('DeleteDangerousGoodsRequest',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('Localization',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('ModifyDangerousGoodsHandlingUnitReply',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('ModifyDangerousGoodsHandlingUnitRequest',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('ModifyDangerousGoodsShipmentReply',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('ModifyDangerousGoodsShipmentRequest',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('NetExplosiveDetail',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('Notification',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('NotificationParameter',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('PreciseQuantity',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('RadioactiveDangerousGoodsHandlingUnitDetail',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('RecordedDangerousGoodsHandlingUnitGroup',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('RecordedDangerousGoodsShipmentDetail',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('RetrieveDangerousGoodsReply',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('RetrieveDangerousGoodsRequest',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('ShipmentDryIceDetail',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('ShipmentDryIceProcessingOptionsRequested',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('TrackingId',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('TrackingNumberUnit',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('TransactionDetail',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('UploadDangerousGoodsProcessingOptionsRequested',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('UploadDangerousGoodsReply',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('UploadDangerousGoodsRequest',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('UploadedDangerousGoodsCommodityContent',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('UploadedDangerousGoodsCommodityDescription',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('UploadedDangerousGoodsContainer',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('UploadedDangerousGoodsContainerGroup',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('UploadedDangerousGoodsHandlingUnit',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('UploadedDangerousGoodsHandlingUnitGroup',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('UploadedDangerousGoodsShipmentDetail',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('ValidateDangerousGoodsProcessingOptionsRequested',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('ValidateDangerousGoodsReply',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('ValidateDangerousGoodsRequest',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('Weight',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('WebAuthenticationDetail',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('WebAuthenticationCredential',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT'),
+                                 ('VersionId',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/DGDSService_v5.xsd',
+                                  'CT')]}
 
 __all__ = [
     "AddDangerousGoodsHandlingUnitReply",

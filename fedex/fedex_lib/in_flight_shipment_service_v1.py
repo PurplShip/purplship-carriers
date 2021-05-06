@@ -2,33 +2,37 @@
 # -*- coding: utf-8 -*-
 
 #
-# Generated Fri Mar  6 15:54:36 2020 by generateDS.py version 2.35.15.
-# Python 3.8.1 (v3.8.1:1b293b6006, Dec 18 2019, 14:08:53)  [Clang 6.0 (clang-600.0.57)]
+# Generated Thu May  6 11:00:03 2021 by generateDS.py version 2.38.6.
+# Python 3.8.6 (v3.8.6:db455296be, Sep 23 2020, 13:31:39)  [Clang 6.0 (clang-600.0.57)]
 #
 # Command line options:
 #   ('--no-namespace-defs', '')
-#   ('-o', './python/in_flight_shipment_service_v1.py')
+#   ('-o', './fedex_lib/in_flight_shipment_service_v1.py')
 #
 # Command line arguments:
-#   ./schemas/InFlightShipmentService_v1.xsd
+#   /Users/danielkobina/Workspace/Carriers Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd
 #
 # Command line:
-#   /Users/danielkobina/Documents/Open/.sandbox/bin/generateDS --no-namespace-defs -o "./python/in_flight_shipment_service_v1.py" ./schemas/InFlightShipmentService_v1.xsd
+#   /Users/danielkobina/Workspace/project/purplship-carriers/.venv/purplship-carriers/bin/generateDS --no-namespace-defs -o "./fedex_lib/in_flight_shipment_service_v1.py" /Users/danielkobina/Workspace/Carriers Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd
 #
 # Current working directory (os.getcwd()):
-#   2020-02
+#   fedex
 #
 
+import sys
+try:
+    ModulenotfoundExp_ = ModuleNotFoundError
+except NameError:
+    ModulenotfoundExp_ = ImportError
 from six.moves import zip_longest
 import os
-import sys
 import re as re_
 import base64
 import datetime as datetime_
 import decimal as decimal_
 try:
     from lxml import etree as etree_
-except ImportError:
+except ModulenotfoundExp_ :
     from xml.etree import ElementTree as etree_
 
 
@@ -107,11 +111,11 @@ def parsexmlstring_(instring, parser=None, **kwargs):
 
 try:
     from generatedsnamespaces import GenerateDSNamespaceDefs as GenerateDSNamespaceDefs_
-except ImportError:
+except ModulenotfoundExp_ :
     GenerateDSNamespaceDefs_ = {}
 try:
     from generatedsnamespaces import GenerateDSNamespaceTypePrefixes as GenerateDSNamespaceTypePrefixes_
-except ImportError:
+except ModulenotfoundExp_ :
     GenerateDSNamespaceTypePrefixes_ = {}
 
 #
@@ -122,7 +126,7 @@ except ImportError:
 #
 try:
     from generatedscollector import GdsCollector as GdsCollector_
-except ImportError:
+except ModulenotfoundExp_ :
 
     class GdsCollector_(object):
 
@@ -156,7 +160,7 @@ except ImportError:
 
 try:
     from enum import Enum
-except ImportError:
+except ModulenotfoundExp_ :
     Enum = object
 
 #
@@ -168,7 +172,7 @@ except ImportError:
 
 try:
     from generatedssuper import GeneratedsSuper
-except ImportError as exp:
+except ModulenotfoundExp_ as exp:
     
     class GeneratedsSuper(object):
         __hash__ = object.__hash__
@@ -211,6 +215,8 @@ except ImportError as exp:
                 raise_parse_error(node, 'Requires integer value')
             return value
         def gds_format_integer_list(self, input_data, input_name=''):
+            if len(input_data) > 0 and not isinstance(input_data[0], BaseStrType_):
+                input_data = [str(s) for s in input_data]
             return '%s' % ' '.join(input_data)
         def gds_validate_integer_list(
                 self, input_data, node=None, input_name=''):
@@ -219,7 +225,7 @@ except ImportError as exp:
                 try:
                     int(value)
                 except (TypeError, ValueError):
-                    raise_parse_error(node, 'Requires sequence of integer valuess')
+                    raise_parse_error(node, 'Requires sequence of integer values')
             return values
         def gds_format_float(self, input_data, input_name=''):
             return ('%.15f' % input_data).rstrip('0')
@@ -236,6 +242,8 @@ except ImportError as exp:
                 raise_parse_error(node, 'Requires float value')
             return value
         def gds_format_float_list(self, input_data, input_name=''):
+            if len(input_data) > 0 and not isinstance(input_data[0], BaseStrType_):
+                input_data = [str(s) for s in input_data]
             return '%s' % ' '.join(input_data)
         def gds_validate_float_list(
                 self, input_data, node=None, input_name=''):
@@ -247,7 +255,12 @@ except ImportError as exp:
                     raise_parse_error(node, 'Requires sequence of float values')
             return values
         def gds_format_decimal(self, input_data, input_name=''):
-            return ('%s' % input_data).rstrip('0')
+            return_value = '%s' % input_data
+            if '.' in return_value:
+                return_value = return_value.rstrip('0')
+                if return_value.endswith('.'):
+                    return_value = return_value.rstrip('.')
+            return return_value
         def gds_parse_decimal(self, input_data, node=None, input_name=''):
             try:
                 decimal_value = decimal_.Decimal(input_data)
@@ -261,7 +274,9 @@ except ImportError as exp:
                 raise_parse_error(node, 'Requires decimal value')
             return value
         def gds_format_decimal_list(self, input_data, input_name=''):
-            return '%s' % ' '.join(input_data)
+            if len(input_data) > 0 and not isinstance(input_data[0], BaseStrType_):
+                input_data = [str(s) for s in input_data]
+            return ' '.join([self.gds_format_decimal(item) for item in input_data])
         def gds_validate_decimal_list(
                 self, input_data, node=None, input_name=''):
             values = input_data.split()
@@ -272,7 +287,7 @@ except ImportError as exp:
                     raise_parse_error(node, 'Requires sequence of decimal values')
             return values
         def gds_format_double(self, input_data, input_name=''):
-            return '%e' % input_data
+            return '%s' % input_data
         def gds_parse_double(self, input_data, node=None, input_name=''):
             try:
                 fval_ = float(input_data)
@@ -286,6 +301,8 @@ except ImportError as exp:
                 raise_parse_error(node, 'Requires double or float value')
             return value
         def gds_format_double_list(self, input_data, input_name=''):
+            if len(input_data) > 0 and not isinstance(input_data[0], BaseStrType_):
+                input_data = [str(s) for s in input_data]
             return '%s' % ' '.join(input_data)
         def gds_validate_double_list(
                 self, input_data, node=None, input_name=''):
@@ -315,11 +332,14 @@ except ImportError as exp:
                     '(one of True, 1, False, 0)')
             return input_data
         def gds_format_boolean_list(self, input_data, input_name=''):
+            if len(input_data) > 0 and not isinstance(input_data[0], BaseStrType_):
+                input_data = [str(s) for s in input_data]
             return '%s' % ' '.join(input_data)
         def gds_validate_boolean_list(
                 self, input_data, node=None, input_name=''):
             values = input_data.split()
             for value in values:
+                value = self.gds_parse_boolean(value, node, input_name)
                 if value not in (True, 1, False, 0, ):
                     raise_parse_error(
                         node,
@@ -766,7 +786,10 @@ def find_attr_value_(attr_name, node):
         value = attrs.get(attr_name)
     elif len(attr_parts) == 2:
         prefix, name = attr_parts
-        namespace = node.nsmap.get(prefix)
+        if prefix == 'xml':
+            namespace = 'http://www.w3.org/XML/1998/namespace'
+        else:
+            namespace = node.nsmap.get(prefix)
         if namespace is not None:
             value = attrs.get('{%s}%s' % (namespace, name, ))
     return value
@@ -847,7 +870,7 @@ class MixedContainer:
                 self.name,
                 base64.b64encode(self.value),
                 self.name))
-    def to_etree(self, element):
+    def to_etree(self, element, mapping_=None, nsmap_=None):
         if self.category == MixedContainer.CategoryText:
             # Prevent exporting empty content as empty lines.
             if self.value.strip():
@@ -867,7 +890,7 @@ class MixedContainer:
             subelement.text = self.to_etree_simple()
         else:    # category == MixedContainer.CategoryComplex
             self.value.to_etree(element)
-    def to_etree_simple(self):
+    def to_etree_simple(self, mapping_=None, nsmap_=None):
         if self.content_type == MixedContainer.TypeString:
             text = self.value
         elif (self.content_type == MixedContainer.TypeInteger or
@@ -945,7 +968,7 @@ def _cast(typ, value):
 #
 
 
-class AppointmentWindowType(Enum):
+class AppointmentWindowType(str, Enum):
     """The description that FedEx uses for a given appointment window."""
     AFTERNOON='AFTERNOON'
     LATE_AFTERNOON='LATE_AFTERNOON'
@@ -953,7 +976,7 @@ class AppointmentWindowType(Enum):
     MORNING='MORNING'
 
 
-class AssociatedAccountNumberType(Enum):
+class AssociatedAccountNumberType(str, Enum):
     """This enumeration represents a kind of "legacy" account number from a
     FedEx operating entity."""
     FEDEX_EXPRESS='FEDEX_EXPRESS'
@@ -962,31 +985,31 @@ class AssociatedAccountNumberType(Enum):
     FEDEX_OFFICE='FEDEX_OFFICE'
 
 
-class AutoConfigurationType(Enum):
+class AutoConfigurationType(str, Enum):
     ENTERPRISE='ENTERPRISE'
     SHIPPING_SERVICE_PROVIDER='SHIPPING_SERVICE_PROVIDER'
     SOFTWARE_ONLY='SOFTWARE_ONLY'
     TRADITIONAL='TRADITIONAL'
 
 
-class CreditCardAuthorizationType(Enum):
+class CreditCardAuthorizationType(str, Enum):
     AUTHORIZE_NON_ACCOUNT='AUTHORIZE_NON_ACCOUNT'
     AUTHORIZE_WITH_ACCOUNT='AUTHORIZE_WITH_ACCOUNT'
     VERIFY_WITH_ACCOUNT='VERIFY_WITH_ACCOUNT'
 
 
-class CreditCardSettlementScheduleType(Enum):
+class CreditCardSettlementScheduleType(str, Enum):
     SETTLE_IMMEDIATELY='SETTLE_IMMEDIATELY'
     SETTLE_NEXT_DAY='SETTLE_NEXT_DAY'
     SETTLE_ON_DELIVERY='SETTLE_ON_DELIVERY'
 
 
-class CreditCardTransactionAttributeType(Enum):
+class CreditCardTransactionAttributeType(str, Enum):
     ORIGINATED_BY_AUTHORIZED_PERSONNEL='ORIGINATED_BY_AUTHORIZED_PERSONNEL'
     ORIGINATED_BY_UNAUTHORIZED_PERSONNEL='ORIGINATED_BY_UNAUTHORIZED_PERSONNEL'
 
 
-class CreditCardType(Enum):
+class CreditCardType(str, Enum):
     AMEX='AMEX'
     DANKORT='DANKORT'
     DINERS='DINERS'
@@ -996,21 +1019,21 @@ class CreditCardType(Enum):
     VISA='VISA'
 
 
-class DeliveryActionType(Enum):
+class DeliveryActionType(str, Enum):
     """Specifies the actions that can be taken on a delivery option."""
     ADD='ADD'
 
 
-class DeliveryOptionType(Enum):
+class DeliveryOptionType(str, Enum):
     """Specifies the different option types for delivery."""
     REDIRECT_TO_HOLD_AT_LOCATION='REDIRECT_TO_HOLD_AT_LOCATION'
 
 
-class DocumentFormatOptionType(Enum):
+class DocumentFormatOptionType(str, Enum):
     SUPPRESS_ADDITIONAL_LANGUAGES='SUPPRESS_ADDITIONAL_LANGUAGES'
 
 
-class EMailNotificationRecipientType(Enum):
+class EMailNotificationRecipientType(str, Enum):
     BROKER='BROKER'
     OTHER='OTHER'
     RECIPIENT='RECIPIENT'
@@ -1018,7 +1041,7 @@ class EMailNotificationRecipientType(Enum):
     THIRD_PARTY='THIRD_PARTY'
 
 
-class ExpressRegionCode(Enum):
+class ExpressRegionCode(str, Enum):
     """Indicates a FedEx Express operating region."""
     APAC='APAC'
     CA='CA'
@@ -1027,12 +1050,12 @@ class ExpressRegionCode(Enum):
     US='US'
 
 
-class LinearUnits(Enum):
+class LinearUnits(str, Enum):
     CM='CM'
     IN='IN'
 
 
-class NotificationSeverityType(Enum):
+class NotificationSeverityType(str, Enum):
     ERROR='ERROR'
     FAILURE='FAILURE'
     NOTE='NOTE'
@@ -1040,11 +1063,11 @@ class NotificationSeverityType(Enum):
     WARNING='WARNING'
 
 
-class OperationalDocumentType(Enum):
+class OperationalDocumentType(str, Enum):
     SIGNATURE_RELEASE_DOCUMENT='SIGNATURE_RELEASE_DOCUMENT'
 
 
-class PaymentType(Enum):
+class PaymentType(str, Enum):
     ACCOUNT='ACCOUNT'
     CASH='CASH'
     COLLECT='COLLECT'
@@ -1054,7 +1077,7 @@ class PaymentType(Enum):
     THIRD_PARTY='THIRD_PARTY'
 
 
-class RerouteDeliveryType(Enum):
+class RerouteDeliveryType(str, Enum):
     """Specifies the different ways to reroute a shipment."""
     CROSS_COUNTRY_DEFERRED='CROSS_COUNTRY_DEFERRED'
     CROSS_COUNTRY_EXPEDITED='CROSS_COUNTRY_EXPEDITED'
@@ -1062,14 +1085,14 @@ class RerouteDeliveryType(Enum):
     UNDETERMINED='UNDETERMINED'
 
 
-class RescheduleDeliveryType(Enum):
+class RescheduleDeliveryType(str, Enum):
     """Specifies the ways to reschedule the delivery of a shipment."""
     APPOINTMENT='APPOINTMENT'
     DATE_CERTAIN='DATE_CERTAIN'
     EVENING='EVENING'
 
 
-class ShippingDocumentDispositionType(Enum):
+class ShippingDocumentDispositionType(str, Enum):
     """Specifies how to return a shipping document to the caller."""
     CONFIRMED='CONFIRMED'
     DEFERRED_QUEUED='DEFERRED_QUEUED'
@@ -1081,19 +1104,19 @@ class ShippingDocumentDispositionType(Enum):
     STORED='STORED'
 
 
-class ShippingDocumentEMailGroupingType(Enum):
+class ShippingDocumentEMailGroupingType(str, Enum):
     BY_RECIPIENT='BY_RECIPIENT'
     NONE='NONE'
 
 
-class ShippingDocumentGroupingType(Enum):
+class ShippingDocumentGroupingType(str, Enum):
     """Specifies how to organize all shipping documents of the same type."""
     CONSOLIDATED_BY_DOCUMENT_TYPE='CONSOLIDATED_BY_DOCUMENT_TYPE'
     CONSOLIDATED_BY_IMAGE_TYPE='CONSOLIDATED_BY_IMAGE_TYPE'
     INDIVIDUAL='INDIVIDUAL'
 
 
-class ShippingDocumentImageType(Enum):
+class ShippingDocumentImageType(str, Enum):
     """Specifies the image format used for a shipping document."""
     DIB='DIB'
     DOC='DOC'
@@ -1107,14 +1130,14 @@ class ShippingDocumentImageType(Enum):
     ZPLII='ZPLII'
 
 
-class ShippingDocumentNamingType(Enum):
+class ShippingDocumentNamingType(str, Enum):
     """Identifies the convention by which file names are constructed for STORED
     or DEFERRED documents."""
     FAST='FAST'
     LEGACY_FXRS='LEGACY_FXRS'
 
 
-class ShippingDocumentStockType(Enum):
+class ShippingDocumentStockType(str, Enum):
     """Specifies the type of paper (stock) on which a document will be
     printed."""
     OP__900_LG='OP_900_LG'
@@ -1133,12 +1156,12 @@ class ShippingDocumentStockType(Enum):
     STOCK__4_X_9_TRAILING_DOC_TAB='STOCK_4X9_TRAILING_DOC_TAB'
 
 
-class SurchargeLevelType(Enum):
+class SurchargeLevelType(str, Enum):
     PACKAGE='PACKAGE'
     SHIPMENT='SHIPMENT'
 
 
-class SurchargeType(Enum):
+class SurchargeType(str, Enum):
     ADDITIONAL_HANDLING='ADDITIONAL_HANDLING'
     ANCILLARY_FEE='ANCILLARY_FEE'
     APPOINTMENT_DELIVERY='APPOINTMENT_DELIVERY'
@@ -1231,7 +1254,7 @@ class SurchargeType(Enum):
     WEIGHING='WEIGHING'
 
 
-class TinType(Enum):
+class TinType(str, Enum):
     BUSINESS_NATIONAL='BUSINESS_NATIONAL'
     BUSINESS_STATE='BUSINESS_STATE'
     BUSINESS_UNION='BUSINESS_UNION'
@@ -1239,7 +1262,7 @@ class TinType(Enum):
     PERSONAL_STATE='PERSONAL_STATE'
 
 
-class TrackingIdType(Enum):
+class TrackingIdType(str, Enum):
     EXPRESS='EXPRESS'
     FEDEX='FEDEX'
     FREIGHT='FREIGHT'
@@ -1249,7 +1272,7 @@ class TrackingIdType(Enum):
     USPS='USPS'
 
 
-class TransactionSourceFormat(Enum):
+class TransactionSourceFormat(str, Enum):
     API_CTS='API_CTS'
     API_XML='API_XML'
     DIRECT='DIRECT'
@@ -1259,7 +1282,7 @@ class TransactionSourceFormat(Enum):
     WSI_XML='WSI_XML'
 
 
-class TransitTimeType(Enum):
+class TransitTimeType(str, Enum):
     EIGHTEEN_DAYS='EIGHTEEN_DAYS'
     EIGHT_DAYS='EIGHT_DAYS'
     ELEVEN_DAYS='ELEVEN_DAYS'
@@ -1283,7 +1306,7 @@ class TransitTimeType(Enum):
     UNKNOWN='UNKNOWN'
 
 
-class WebServiceEnvironment(Enum):
+class WebServiceEnvironment(str, Enum):
     """Identifies the environment (level) for which an AuthenticationCredential
     is valid, and within which transactions are received."""
     PRODUCTION='PRODUCTION'
@@ -1538,7 +1561,7 @@ class AppointmentDetail(GeneratedsSuper):
             self.WindowDetails = []
         else:
             self.WindowDetails = WindowDetails
-        self.WindowDetails_nsprefix_ = None
+        self.WindowDetails_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -1653,9 +1676,9 @@ class AppointmentTimeDetail(GeneratedsSuper):
         self.ns_prefix_ = None
         self.Type = Type
         self.validate_AppointmentWindowType(self.Type)
-        self.Type_nsprefix_ = None
+        self.Type_nsprefix_ = "ns"
         self.Window = Window
-        self.Window_nsprefix_ = None
+        self.Window_nsprefix_ = "ns"
         self.Description = Description
         self.Description_nsprefix_ = None
     def factory(*args_, **kwargs_):
@@ -1798,7 +1821,7 @@ class AssociatedAccount(GeneratedsSuper):
         self.ns_prefix_ = None
         self.Type = Type
         self.validate_AssociatedAccountNumberType(self.Type)
-        self.Type_nsprefix_ = None
+        self.Type_nsprefix_ = "ns"
         self.AccountNumber = AccountNumber
         self.AccountNumber_nsprefix_ = None
     def factory(*args_, **kwargs_):
@@ -1955,18 +1978,18 @@ class ClientDetail(GeneratedsSuper):
         self.IntegratorId_nsprefix_ = None
         self.Region = Region
         self.validate_ExpressRegionCode(self.Region)
-        self.Region_nsprefix_ = None
+        self.Region_nsprefix_ = "ns"
         self.AutoConfigurationType = AutoConfigurationType
         self.validate_AutoConfigurationType(self.AutoConfigurationType)
-        self.AutoConfigurationType_nsprefix_ = None
+        self.AutoConfigurationType_nsprefix_ = "ns"
         self.CspCredentialKey = CspCredentialKey
         self.CspCredentialKey_nsprefix_ = None
         self.UserCredentialKey = UserCredentialKey
         self.UserCredentialKey_nsprefix_ = None
         self.InitiativeManifest = InitiativeManifest
-        self.InitiativeManifest_nsprefix_ = None
+        self.InitiativeManifest_nsprefix_ = "ns"
         self.Localization = Localization
-        self.Localization_nsprefix_ = None
+        self.Localization_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -2610,9 +2633,9 @@ class ContactAndAddress(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.Contact = Contact
-        self.Contact_nsprefix_ = None
+        self.Contact_nsprefix_ = "ns"
         self.Address = Address
-        self.Address_nsprefix_ = None
+        self.Address_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -2721,7 +2744,7 @@ class CreditCard(GeneratedsSuper):
         self.Number_nsprefix_ = None
         self.CreditCardType = CreditCardType
         self.validate_CreditCardType(self.CreditCardType)
-        self.CreditCardType_nsprefix_ = None
+        self.CreditCardType_nsprefix_ = "ns"
         self.ExpirationDate = ExpirationDate
         self.ExpirationDate_nsprefix_ = None
         if isinstance(LastAuthenticationByFedexDate, BaseStrType_):
@@ -2733,7 +2756,7 @@ class CreditCard(GeneratedsSuper):
         self.VerificationCode = VerificationCode
         self.VerificationCode_nsprefix_ = None
         self.CreditCardHolder = CreditCardHolder
-        self.CreditCardHolder_nsprefix_ = None
+        self.CreditCardHolder_nsprefix_ = "ns"
         if TrackData is None:
             self.TrackData = []
         else:
@@ -2948,7 +2971,7 @@ class CreditCardTransactionAttributesDetail(GeneratedsSuper):
             self.Types = []
         else:
             self.Types = Types
-        self.Types_nsprefix_ = None
+        self.Types_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -3071,16 +3094,16 @@ class CreditCardTransactionDetail(GeneratedsSuper):
         self.AuthorizationId_nsprefix_ = None
         self.AuthorizationType = AuthorizationType
         self.validate_CreditCardAuthorizationType(self.AuthorizationType)
-        self.AuthorizationType_nsprefix_ = None
+        self.AuthorizationType_nsprefix_ = "ns"
         self.SettlementScheduleType = SettlementScheduleType
         self.validate_CreditCardSettlementScheduleType(self.SettlementScheduleType)
-        self.SettlementScheduleType_nsprefix_ = None
+        self.SettlementScheduleType_nsprefix_ = "ns"
         self.FraudDetectionDetail = FraudDetectionDetail
-        self.FraudDetectionDetail_nsprefix_ = None
+        self.FraudDetectionDetail_nsprefix_ = "ns"
         self.PayorAuthenticationCode = PayorAuthenticationCode
         self.PayorAuthenticationCode_nsprefix_ = None
         self.AttributesDetail = AttributesDetail
-        self.AttributesDetail_nsprefix_ = None
+        self.AttributesDetail_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -3413,9 +3436,9 @@ class DeliveryRequestDetail(GeneratedsSuper):
         self.ns_prefix_ = None
         self.Type = Type
         self.validate_DeliveryOptionType(self.Type)
-        self.Type_nsprefix_ = None
+        self.Type_nsprefix_ = "ns"
         self.RedirectToHoldAtLocationDetail = RedirectToHoldAtLocationDetail
-        self.RedirectToHoldAtLocationDetail_nsprefix_ = None
+        self.RedirectToHoldAtLocationDetail_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -3543,7 +3566,7 @@ class DocumentFormatOptionsRequested(GeneratedsSuper):
             self.Options = []
         else:
             self.Options = Options
-        self.Options_nsprefix_ = None
+        self.Options_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -3774,7 +3797,7 @@ class LinearMeasure(GeneratedsSuper):
         self.Value_nsprefix_ = None
         self.Units = Units
         self.validate_LinearUnits(self.Units)
-        self.Units_nsprefix_ = None
+        self.Units_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -4242,7 +4265,7 @@ class Notification(GeneratedsSuper):
         self.ns_prefix_ = None
         self.Severity = Severity
         self.validate_NotificationSeverityType(self.Severity)
-        self.Severity_nsprefix_ = None
+        self.Severity_nsprefix_ = "ns"
         self.Source = Source
         self.Source_nsprefix_ = None
         self.Code = Code
@@ -4255,7 +4278,7 @@ class Notification(GeneratedsSuper):
             self.MessageParameters = []
         else:
             self.MessageParameters = MessageParameters
-        self.MessageParameters_nsprefix_ = None
+        self.MessageParameters_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -4684,9 +4707,9 @@ class OperationalDocumentSpecification(GeneratedsSuper):
             self.DocumentTypes = []
         else:
             self.DocumentTypes = DocumentTypes
-        self.DocumentTypes_nsprefix_ = None
+        self.DocumentTypes_nsprefix_ = "ns"
         self.SignatureReleaseDocumentDetail = SignatureReleaseDocumentDetail
-        self.SignatureReleaseDocumentDetail_nsprefix_ = None
+        self.SignatureReleaseDocumentDetail_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -4819,7 +4842,7 @@ class ParsedContact(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.PersonName = PersonName
-        self.PersonName_nsprefix_ = None
+        self.PersonName_nsprefix_ = "ns"
         self.Title = Title
         self.Title_nsprefix_ = None
         self.CompanyName = CompanyName
@@ -5067,9 +5090,9 @@ class ParsedContactAndAddress(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.Contact = Contact
-        self.Contact_nsprefix_ = None
+        self.Contact_nsprefix_ = "ns"
         self.Address = Address
-        self.Address_nsprefix_ = None
+        self.Address_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -5362,11 +5385,11 @@ class Party(GeneratedsSuper):
             self.Tins = []
         else:
             self.Tins = Tins
-        self.Tins_nsprefix_ = None
+        self.Tins_nsprefix_ = "ns"
         self.Contact = Contact
-        self.Contact_nsprefix_ = None
+        self.Contact_nsprefix_ = "ns"
         self.Address = Address
-        self.Address_nsprefix_ = None
+        self.Address_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -5506,12 +5529,12 @@ class Payor(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.ResponsibleParty = ResponsibleParty
-        self.ResponsibleParty_nsprefix_ = None
+        self.ResponsibleParty_nsprefix_ = "ns"
         if AssociatedAccounts is None:
             self.AssociatedAccounts = []
         else:
             self.AssociatedAccounts = AssociatedAccounts
-        self.AssociatedAccounts_nsprefix_ = None
+        self.AssociatedAccounts_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -5625,20 +5648,20 @@ class ProcessDeliveryReply(GeneratedsSuper):
         self.ns_prefix_ = None
         self.HighestSeverity = HighestSeverity
         self.validate_NotificationSeverityType(self.HighestSeverity)
-        self.HighestSeverity_nsprefix_ = None
+        self.HighestSeverity_nsprefix_ = "ns"
         if Notifications is None:
             self.Notifications = []
         else:
             self.Notifications = Notifications
-        self.Notifications_nsprefix_ = None
+        self.Notifications_nsprefix_ = "ns"
         self.TransactionDetail = TransactionDetail
-        self.TransactionDetail_nsprefix_ = None
+        self.TransactionDetail_nsprefix_ = "ns"
         self.Version = Version
-        self.Version_nsprefix_ = None
+        self.Version_nsprefix_ = "ns"
         self.Confirmation = Confirmation
         self.Confirmation_nsprefix_ = None
         self.MasterTrackingNumber = MasterTrackingNumber
-        self.MasterTrackingNumber_nsprefix_ = None
+        self.MasterTrackingNumber_nsprefix_ = "ns"
         self.PackageCount = PackageCount
         self.PackageCount_nsprefix_ = None
         if isinstance(EstimatedDeliveryTimestamp, BaseStrType_):
@@ -5864,28 +5887,28 @@ class ProcessDeliveryRequest(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.WebAuthenticationDetail = WebAuthenticationDetail
-        self.WebAuthenticationDetail_nsprefix_ = None
+        self.WebAuthenticationDetail_nsprefix_ = "ns"
         self.ClientDetail = ClientDetail
-        self.ClientDetail_nsprefix_ = None
+        self.ClientDetail_nsprefix_ = "ns"
         self.UserDetail = UserDetail
-        self.UserDetail_nsprefix_ = None
+        self.UserDetail_nsprefix_ = "ns"
         self.TransactionDetail = TransactionDetail
-        self.TransactionDetail_nsprefix_ = None
+        self.TransactionDetail_nsprefix_ = "ns"
         self.Version = Version
-        self.Version_nsprefix_ = None
+        self.Version_nsprefix_ = "ns"
         self.ApplicationId = ApplicationId
         self.ApplicationId_nsprefix_ = None
         self.ActionRequested = ActionRequested
         self.validate_DeliveryActionType(self.ActionRequested)
-        self.ActionRequested_nsprefix_ = None
+        self.ActionRequested_nsprefix_ = "ns"
         self.UniqueTrackingNumber = UniqueTrackingNumber
-        self.UniqueTrackingNumber_nsprefix_ = None
+        self.UniqueTrackingNumber_nsprefix_ = "ns"
         self.RecipientContact = RecipientContact
-        self.RecipientContact_nsprefix_ = None
+        self.RecipientContact_nsprefix_ = "ns"
         self.DestinationAddress = DestinationAddress
-        self.DestinationAddress_nsprefix_ = None
+        self.DestinationAddress_nsprefix_ = "ns"
         self.DeliveryRequestDetail = DeliveryRequestDetail
-        self.DeliveryRequestDetail_nsprefix_ = None
+        self.DeliveryRequestDetail_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -6131,14 +6154,14 @@ class RatedDeliveryDetail(GeneratedsSuper):
         self.TotalPieces = TotalPieces
         self.TotalPieces_nsprefix_ = None
         self.TotalNetCharge = TotalNetCharge
-        self.TotalNetCharge_nsprefix_ = None
+        self.TotalNetCharge_nsprefix_ = "ns"
         self.TotalSurcharges = TotalSurcharges
-        self.TotalSurcharges_nsprefix_ = None
+        self.TotalSurcharges_nsprefix_ = "ns"
         if Surcharges is None:
             self.Surcharges = []
         else:
             self.Surcharges = Surcharges
-        self.Surcharges_nsprefix_ = None
+        self.Surcharges_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -6284,7 +6307,7 @@ class RedirectToHoldAtLocationRequestDetail(GeneratedsSuper):
         self.HoldingLocationNumber = HoldingLocationNumber
         self.HoldingLocationNumber_nsprefix_ = None
         self.HoldingLocationContactAndAddress = HoldingLocationContactAndAddress
-        self.HoldingLocationContactAndAddress_nsprefix_ = None
+        self.HoldingLocationContactAndAddress_nsprefix_ = "ns"
         self.Comments = Comments
         self.Comments_nsprefix_ = None
     def factory(*args_, **kwargs_):
@@ -6426,10 +6449,10 @@ class RerouteDeliveryDetail(GeneratedsSuper):
         self.ns_prefix_ = None
         self.Type = Type
         self.validate_RerouteDeliveryType(self.Type)
-        self.Type_nsprefix_ = None
+        self.Type_nsprefix_ = "ns"
         self.TransitTime = TransitTime
         self.validate_TransitTimeType(self.TransitTime)
-        self.TransitTime_nsprefix_ = None
+        self.TransitTime_nsprefix_ = "ns"
         if isinstance(CommitmentDate, BaseStrType_):
             initvalue_ = datetime_.datetime.strptime(CommitmentDate, '%Y-%m-%d').date()
         else:
@@ -6613,16 +6636,16 @@ class ShippingDocumentDispositionDetail(GeneratedsSuper):
         self.ns_prefix_ = None
         self.DispositionType = DispositionType
         self.validate_ShippingDocumentDispositionType(self.DispositionType)
-        self.DispositionType_nsprefix_ = None
+        self.DispositionType_nsprefix_ = "ns"
         self.Grouping = Grouping
         self.validate_ShippingDocumentGroupingType(self.Grouping)
-        self.Grouping_nsprefix_ = None
+        self.Grouping_nsprefix_ = "ns"
         self.StorageDetail = StorageDetail
-        self.StorageDetail_nsprefix_ = None
+        self.StorageDetail_nsprefix_ = "ns"
         self.EMailDetail = EMailDetail
-        self.EMailDetail_nsprefix_ = None
+        self.EMailDetail_nsprefix_ = "ns"
         self.PrintDetail = PrintDetail
-        self.PrintDetail_nsprefix_ = None
+        self.PrintDetail_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -6809,12 +6832,12 @@ class ShippingDocumentEMailDetail(GeneratedsSuper):
             self.EMailRecipients = []
         else:
             self.EMailRecipients = EMailRecipients
-        self.EMailRecipients_nsprefix_ = None
+        self.EMailRecipients_nsprefix_ = "ns"
         self.Grouping = Grouping
         self.validate_ShippingDocumentEMailGroupingType(self.Grouping)
-        self.Grouping_nsprefix_ = None
+        self.Grouping_nsprefix_ = "ns"
         self.Localization = Localization
-        self.Localization_nsprefix_ = None
+        self.Localization_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -6960,7 +6983,7 @@ class ShippingDocumentEMailRecipient(GeneratedsSuper):
         self.ns_prefix_ = None
         self.RecipientType = RecipientType
         self.validate_EMailNotificationRecipientType(self.RecipientType)
-        self.RecipientType_nsprefix_ = None
+        self.RecipientType_nsprefix_ = "ns"
         self.Address = Address
         self.Address_nsprefix_ = None
     def factory(*args_, **kwargs_):
@@ -7093,21 +7116,21 @@ class ShippingDocumentFormat(GeneratedsSuper):
             self.Dispositions = []
         else:
             self.Dispositions = Dispositions
-        self.Dispositions_nsprefix_ = None
+        self.Dispositions_nsprefix_ = "ns"
         self.TopOfPageOffset = TopOfPageOffset
-        self.TopOfPageOffset_nsprefix_ = None
+        self.TopOfPageOffset_nsprefix_ = "ns"
         self.ImageType = ImageType
         self.validate_ShippingDocumentImageType(self.ImageType)
-        self.ImageType_nsprefix_ = None
+        self.ImageType_nsprefix_ = "ns"
         self.StockType = StockType
         self.validate_ShippingDocumentStockType(self.StockType)
-        self.StockType_nsprefix_ = None
+        self.StockType_nsprefix_ = "ns"
         self.ProvideInstructions = ProvideInstructions
         self.ProvideInstructions_nsprefix_ = None
         self.OptionsRequested = OptionsRequested
-        self.OptionsRequested_nsprefix_ = None
+        self.OptionsRequested_nsprefix_ = "ns"
         self.Localization = Localization
-        self.Localization_nsprefix_ = None
+        self.Localization_nsprefix_ = "ns"
         self.CustomDocumentIdentifier = CustomDocumentIdentifier
         self.CustomDocumentIdentifier_nsprefix_ = None
     def factory(*args_, **kwargs_):
@@ -7441,7 +7464,7 @@ class ShippingDocumentStorageDetail(GeneratedsSuper):
         self.FilePath_nsprefix_ = None
         self.FileNaming = FileNaming
         self.validate_ShippingDocumentNamingType(self.FileNaming)
-        self.FileNaming_nsprefix_ = None
+        self.FileNaming_nsprefix_ = "ns"
         self.FileSuffix = FileSuffix
         self.FileSuffix_nsprefix_ = None
     def factory(*args_, **kwargs_):
@@ -7586,7 +7609,7 @@ class SignatureReleaseDocumentDetail(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.Format = Format
-        self.Format_nsprefix_ = None
+        self.Format_nsprefix_ = "ns"
         self.Id = Id
         self.Id_nsprefix_ = None
     def factory(*args_, **kwargs_):
@@ -7697,14 +7720,14 @@ class Surcharge(GeneratedsSuper):
         self.ns_prefix_ = None
         self.SurchargeType = SurchargeType
         self.validate_SurchargeType(self.SurchargeType)
-        self.SurchargeType_nsprefix_ = None
+        self.SurchargeType_nsprefix_ = "ns"
         self.Level = Level
         self.validate_SurchargeLevelType(self.Level)
-        self.Level_nsprefix_ = None
+        self.Level_nsprefix_ = "ns"
         self.Description = Description
         self.Description_nsprefix_ = None
         self.Amount = Amount
-        self.Amount_nsprefix_ = None
+        self.Amount_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -7877,7 +7900,7 @@ class TaxpayerIdentification(GeneratedsSuper):
         self.ns_prefix_ = None
         self.TinType = TinType
         self.validate_TinType(self.TinType)
-        self.TinType_nsprefix_ = None
+        self.TinType_nsprefix_ = "ns"
         self.Number = Number
         self.Number_nsprefix_ = None
         self.Usage = Usage
@@ -8064,7 +8087,7 @@ class TrackingId(GeneratedsSuper):
         self.ns_prefix_ = None
         self.TrackingIdType = TrackingIdType
         self.validate_TrackingIdType(self.TrackingIdType)
-        self.TrackingIdType_nsprefix_ = None
+        self.TrackingIdType_nsprefix_ = "ns"
         self.FormId = FormId
         self.FormId_nsprefix_ = None
         self.UspsApplicationId = UspsApplicationId
@@ -8229,17 +8252,17 @@ class TransactionDetail(GeneratedsSuper):
         self.CustomerTransactionId = CustomerTransactionId
         self.CustomerTransactionId_nsprefix_ = None
         self.Localization = Localization
-        self.Localization_nsprefix_ = None
+        self.Localization_nsprefix_ = "ns"
         self.InternalTransactionId = InternalTransactionId
         self.InternalTransactionId_nsprefix_ = None
         self.Tracing = Tracing
         self.Tracing_nsprefix_ = None
         self.SourceFormat = SourceFormat
         self.validate_TransactionSourceFormat(self.SourceFormat)
-        self.SourceFormat_nsprefix_ = None
+        self.SourceFormat_nsprefix_ = "ns"
         self.Environment = Environment
         self.validate_WebServiceEnvironment(self.Environment)
-        self.Environment_nsprefix_ = None
+        self.Environment_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -8704,16 +8727,16 @@ class ValidateDeliveryReply(GeneratedsSuper):
         self.ns_prefix_ = None
         self.HighestSeverity = HighestSeverity
         self.validate_NotificationSeverityType(self.HighestSeverity)
-        self.HighestSeverity_nsprefix_ = None
+        self.HighestSeverity_nsprefix_ = "ns"
         if Notifications is None:
             self.Notifications = []
         else:
             self.Notifications = Notifications
-        self.Notifications_nsprefix_ = None
+        self.Notifications_nsprefix_ = "ns"
         self.TransactionDetail = TransactionDetail
-        self.TransactionDetail_nsprefix_ = None
+        self.TransactionDetail_nsprefix_ = "ns"
         self.Version = Version
-        self.Version_nsprefix_ = None
+        self.Version_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -8871,28 +8894,28 @@ class ValidateDeliveryRequest(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.WebAuthenticationDetail = WebAuthenticationDetail
-        self.WebAuthenticationDetail_nsprefix_ = None
+        self.WebAuthenticationDetail_nsprefix_ = "ns"
         self.ClientDetail = ClientDetail
-        self.ClientDetail_nsprefix_ = None
+        self.ClientDetail_nsprefix_ = "ns"
         self.UserDetail = UserDetail
-        self.UserDetail_nsprefix_ = None
+        self.UserDetail_nsprefix_ = "ns"
         self.TransactionDetail = TransactionDetail
-        self.TransactionDetail_nsprefix_ = None
+        self.TransactionDetail_nsprefix_ = "ns"
         self.Version = Version
-        self.Version_nsprefix_ = None
+        self.Version_nsprefix_ = "ns"
         self.ApplicationId = ApplicationId
         self.ApplicationId_nsprefix_ = None
         self.ActionRequested = ActionRequested
         self.validate_DeliveryActionType(self.ActionRequested)
-        self.ActionRequested_nsprefix_ = None
+        self.ActionRequested_nsprefix_ = "ns"
         self.UniqueTrackingNumber = UniqueTrackingNumber
-        self.UniqueTrackingNumber_nsprefix_ = None
+        self.UniqueTrackingNumber_nsprefix_ = "ns"
         self.RecipientContact = RecipientContact
-        self.RecipientContact_nsprefix_ = None
+        self.RecipientContact_nsprefix_ = "ns"
         self.DestinationAddress = DestinationAddress
-        self.DestinationAddress_nsprefix_ = None
+        self.DestinationAddress_nsprefix_ = "ns"
         self.DeliveryRequestDetail = DeliveryRequestDetail
-        self.DeliveryRequestDetail_nsprefix_ = None
+        self.DeliveryRequestDetail_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -9137,9 +9160,9 @@ class WebAuthenticationDetail(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.ParentCredential = ParentCredential
-        self.ParentCredential_nsprefix_ = None
+        self.ParentCredential_nsprefix_ = "ns"
         self.UserCredential = UserCredential
-        self.UserCredential_nsprefix_ = None
+        self.UserCredential_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -9570,7 +9593,8 @@ def parse(inFileName, silence=False, print_warnings=True):
     return rootObj
 
 
-def parseEtree(inFileName, silence=False, print_warnings=True):
+def parseEtree(inFileName, silence=False, print_warnings=True,
+               mapping=None, nsmap=None):
     parser = None
     doc = parsexml_(inFileName, parser)
     gds_collector = GdsCollector_()
@@ -9582,8 +9606,10 @@ def parseEtree(inFileName, silence=False, print_warnings=True):
     rootObj = rootClass.factory()
     rootObj.build(rootNode, gds_collector_=gds_collector)
     # Enable Python to collect the space used by the DOM.
-    mapping = {}
-    rootElement = rootObj.to_etree(None, name_=rootTag, mapping_=mapping)
+    if mapping is None:
+        mapping = {}
+    rootElement = rootObj.to_etree(
+        None, name_=rootTag, mapping_=mapping, nsmap_=nsmap)
     reverse_mapping = rootObj.gds_reverse_node_mapping(mapping)
     if not SaveElementTreeNode:
         doc = None
@@ -9684,6 +9710,335 @@ if __name__ == '__main__':
 
 RenameMappings_ = {
 }
+
+#
+# Mapping of namespaces to types defined in them
+# and the file in which each is defined.
+# simpleTypes are marked "ST" and complexTypes "CT".
+NamespaceToDefMappings_ = {'http://fedex.com/ws/ifss/v1': [('AppointmentWindowType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'ST'),
+                                 ('AssociatedAccountNumberType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'ST'),
+                                 ('AutoConfigurationType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'ST'),
+                                 ('CreditCardAuthorizationType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'ST'),
+                                 ('CreditCardSettlementScheduleType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'ST'),
+                                 ('CreditCardTransactionAttributeType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'ST'),
+                                 ('CreditCardType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'ST'),
+                                 ('DeliveryActionType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'ST'),
+                                 ('DeliveryOptionType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'ST'),
+                                 ('DocumentFormatOptionType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'ST'),
+                                 ('EMailNotificationRecipientType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'ST'),
+                                 ('ExpressRegionCode',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'ST'),
+                                 ('LinearUnits',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'ST'),
+                                 ('NotificationSeverityType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'ST'),
+                                 ('OperationalDocumentType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'ST'),
+                                 ('PaymentType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'ST'),
+                                 ('RerouteDeliveryType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'ST'),
+                                 ('RescheduleDeliveryType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'ST'),
+                                 ('ShippingDocumentDispositionType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'ST'),
+                                 ('ShippingDocumentEMailGroupingType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'ST'),
+                                 ('ShippingDocumentGroupingType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'ST'),
+                                 ('ShippingDocumentImageType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'ST'),
+                                 ('ShippingDocumentNamingType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'ST'),
+                                 ('ShippingDocumentStockType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'ST'),
+                                 ('SurchargeLevelType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'ST'),
+                                 ('SurchargeType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'ST'),
+                                 ('TinType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'ST'),
+                                 ('TrackingIdType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'ST'),
+                                 ('TransactionSourceFormat',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'ST'),
+                                 ('TransitTimeType',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'ST'),
+                                 ('WebServiceEnvironment',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'ST'),
+                                 ('Address',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('AppointmentDetail',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('AppointmentTimeDetail',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('AssociatedAccount',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('ClientDetail',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('Contact',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('ContactAndAddress',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('CreditCard',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('CreditCardTransactionAttributesDetail',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('CreditCardTransactionDetail',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('CreditFraudDetectionDetail',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('DeliveryRequestDetail',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('DocumentFormatOptionsRequested',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('InitiativeManifest',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('LinearMeasure',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('LocalTimeRange',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('Localization',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('Money',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('Notification',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('NotificationParameter',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('OperationalDocumentPart',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('OperationalDocumentSpecification',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('ParsedContact',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('ParsedContactAndAddress',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('ParsedPersonName',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('Party',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('Payor',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('ProcessDeliveryReply',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('ProcessDeliveryRequest',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('RatedDeliveryDetail',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('RedirectToHoldAtLocationRequestDetail',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('RerouteDeliveryDetail',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('ShippingDocumentDispositionDetail',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('ShippingDocumentEMailDetail',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('ShippingDocumentEMailRecipient',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('ShippingDocumentFormat',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('ShippingDocumentPrintDetail',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('ShippingDocumentStorageDetail',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('SignatureReleaseDocumentDetail',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('Surcharge',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('TaxpayerIdentification',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('TrackingId',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('TransactionDetail',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('UniqueTrackingNumber',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('UserDetail',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('ValidateDeliveryReply',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('ValidateDeliveryRequest',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('WebAuthenticationDetail',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('WebAuthenticationCredential',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT'),
+                                 ('VersionId',
+                                  '../../../Carriers '
+                                  'Doc/Fedex/2020-09/schemas/InFlightShipmentService_v1.xsd',
+                                  'CT')]}
 
 __all__ = [
     "Address",

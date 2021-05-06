@@ -2,33 +2,37 @@
 # -*- coding: utf-8 -*-
 
 #
-# Generated Fri Mar  6 15:54:34 2020 by generateDS.py version 2.35.15.
-# Python 3.8.1 (v3.8.1:1b293b6006, Dec 18 2019, 14:08:53)  [Clang 6.0 (clang-600.0.57)]
+# Generated Thu May  6 11:00:03 2021 by generateDS.py version 2.38.6.
+# Python 3.8.6 (v3.8.6:db455296be, Sep 23 2020, 13:31:39)  [Clang 6.0 (clang-600.0.57)]
 #
 # Command line options:
 #   ('--no-namespace-defs', '')
-#   ('-o', './python/close_service_v5.py')
+#   ('-o', './fedex_lib/close_service_v5.py')
 #
 # Command line arguments:
-#   ./schemas/CloseService_v5.xsd
+#   /Users/danielkobina/Workspace/Carriers Doc/Fedex/2020-09/schemas/CloseService_v5.xsd
 #
 # Command line:
-#   /Users/danielkobina/Documents/Open/.sandbox/bin/generateDS --no-namespace-defs -o "./python/close_service_v5.py" ./schemas/CloseService_v5.xsd
+#   /Users/danielkobina/Workspace/project/purplship-carriers/.venv/purplship-carriers/bin/generateDS --no-namespace-defs -o "./fedex_lib/close_service_v5.py" /Users/danielkobina/Workspace/Carriers Doc/Fedex/2020-09/schemas/CloseService_v5.xsd
 #
 # Current working directory (os.getcwd()):
-#   2020-02
+#   fedex
 #
 
+import sys
+try:
+    ModulenotfoundExp_ = ModuleNotFoundError
+except NameError:
+    ModulenotfoundExp_ = ImportError
 from six.moves import zip_longest
 import os
-import sys
 import re as re_
 import base64
 import datetime as datetime_
 import decimal as decimal_
 try:
     from lxml import etree as etree_
-except ImportError:
+except ModulenotfoundExp_ :
     from xml.etree import ElementTree as etree_
 
 
@@ -107,11 +111,11 @@ def parsexmlstring_(instring, parser=None, **kwargs):
 
 try:
     from generatedsnamespaces import GenerateDSNamespaceDefs as GenerateDSNamespaceDefs_
-except ImportError:
+except ModulenotfoundExp_ :
     GenerateDSNamespaceDefs_ = {}
 try:
     from generatedsnamespaces import GenerateDSNamespaceTypePrefixes as GenerateDSNamespaceTypePrefixes_
-except ImportError:
+except ModulenotfoundExp_ :
     GenerateDSNamespaceTypePrefixes_ = {}
 
 #
@@ -122,7 +126,7 @@ except ImportError:
 #
 try:
     from generatedscollector import GdsCollector as GdsCollector_
-except ImportError:
+except ModulenotfoundExp_ :
 
     class GdsCollector_(object):
 
@@ -156,7 +160,7 @@ except ImportError:
 
 try:
     from enum import Enum
-except ImportError:
+except ModulenotfoundExp_ :
     Enum = object
 
 #
@@ -168,7 +172,7 @@ except ImportError:
 
 try:
     from generatedssuper import GeneratedsSuper
-except ImportError as exp:
+except ModulenotfoundExp_ as exp:
     
     class GeneratedsSuper(object):
         __hash__ = object.__hash__
@@ -211,6 +215,8 @@ except ImportError as exp:
                 raise_parse_error(node, 'Requires integer value')
             return value
         def gds_format_integer_list(self, input_data, input_name=''):
+            if len(input_data) > 0 and not isinstance(input_data[0], BaseStrType_):
+                input_data = [str(s) for s in input_data]
             return '%s' % ' '.join(input_data)
         def gds_validate_integer_list(
                 self, input_data, node=None, input_name=''):
@@ -219,7 +225,7 @@ except ImportError as exp:
                 try:
                     int(value)
                 except (TypeError, ValueError):
-                    raise_parse_error(node, 'Requires sequence of integer valuess')
+                    raise_parse_error(node, 'Requires sequence of integer values')
             return values
         def gds_format_float(self, input_data, input_name=''):
             return ('%.15f' % input_data).rstrip('0')
@@ -236,6 +242,8 @@ except ImportError as exp:
                 raise_parse_error(node, 'Requires float value')
             return value
         def gds_format_float_list(self, input_data, input_name=''):
+            if len(input_data) > 0 and not isinstance(input_data[0], BaseStrType_):
+                input_data = [str(s) for s in input_data]
             return '%s' % ' '.join(input_data)
         def gds_validate_float_list(
                 self, input_data, node=None, input_name=''):
@@ -247,7 +255,12 @@ except ImportError as exp:
                     raise_parse_error(node, 'Requires sequence of float values')
             return values
         def gds_format_decimal(self, input_data, input_name=''):
-            return ('%s' % input_data).rstrip('0')
+            return_value = '%s' % input_data
+            if '.' in return_value:
+                return_value = return_value.rstrip('0')
+                if return_value.endswith('.'):
+                    return_value = return_value.rstrip('.')
+            return return_value
         def gds_parse_decimal(self, input_data, node=None, input_name=''):
             try:
                 decimal_value = decimal_.Decimal(input_data)
@@ -261,7 +274,9 @@ except ImportError as exp:
                 raise_parse_error(node, 'Requires decimal value')
             return value
         def gds_format_decimal_list(self, input_data, input_name=''):
-            return '%s' % ' '.join(input_data)
+            if len(input_data) > 0 and not isinstance(input_data[0], BaseStrType_):
+                input_data = [str(s) for s in input_data]
+            return ' '.join([self.gds_format_decimal(item) for item in input_data])
         def gds_validate_decimal_list(
                 self, input_data, node=None, input_name=''):
             values = input_data.split()
@@ -272,7 +287,7 @@ except ImportError as exp:
                     raise_parse_error(node, 'Requires sequence of decimal values')
             return values
         def gds_format_double(self, input_data, input_name=''):
-            return '%e' % input_data
+            return '%s' % input_data
         def gds_parse_double(self, input_data, node=None, input_name=''):
             try:
                 fval_ = float(input_data)
@@ -286,6 +301,8 @@ except ImportError as exp:
                 raise_parse_error(node, 'Requires double or float value')
             return value
         def gds_format_double_list(self, input_data, input_name=''):
+            if len(input_data) > 0 and not isinstance(input_data[0], BaseStrType_):
+                input_data = [str(s) for s in input_data]
             return '%s' % ' '.join(input_data)
         def gds_validate_double_list(
                 self, input_data, node=None, input_name=''):
@@ -315,11 +332,14 @@ except ImportError as exp:
                     '(one of True, 1, False, 0)')
             return input_data
         def gds_format_boolean_list(self, input_data, input_name=''):
+            if len(input_data) > 0 and not isinstance(input_data[0], BaseStrType_):
+                input_data = [str(s) for s in input_data]
             return '%s' % ' '.join(input_data)
         def gds_validate_boolean_list(
                 self, input_data, node=None, input_name=''):
             values = input_data.split()
             for value in values:
+                value = self.gds_parse_boolean(value, node, input_name)
                 if value not in (True, 1, False, 0, ):
                     raise_parse_error(
                         node,
@@ -766,7 +786,10 @@ def find_attr_value_(attr_name, node):
         value = attrs.get(attr_name)
     elif len(attr_parts) == 2:
         prefix, name = attr_parts
-        namespace = node.nsmap.get(prefix)
+        if prefix == 'xml':
+            namespace = 'http://www.w3.org/XML/1998/namespace'
+        else:
+            namespace = node.nsmap.get(prefix)
         if namespace is not None:
             value = attrs.get('{%s}%s' % (namespace, name, ))
     return value
@@ -847,7 +870,7 @@ class MixedContainer:
                 self.name,
                 base64.b64encode(self.value),
                 self.name))
-    def to_etree(self, element):
+    def to_etree(self, element, mapping_=None, nsmap_=None):
         if self.category == MixedContainer.CategoryText:
             # Prevent exporting empty content as empty lines.
             if self.value.strip():
@@ -867,7 +890,7 @@ class MixedContainer:
             subelement.text = self.to_etree_simple()
         else:    # category == MixedContainer.CategoryComplex
             self.value.to_etree(element)
-    def to_etree_simple(self):
+    def to_etree_simple(self, mapping_=None, nsmap_=None):
         if self.content_type == MixedContainer.TypeString:
             text = self.value
         elif (self.content_type == MixedContainer.TypeInteger or
@@ -945,7 +968,7 @@ def _cast(typ, value):
 #
 
 
-class CarrierCodeType(Enum):
+class CarrierCodeType(str, Enum):
     """Identification of a FedEx operating company (transportation)."""
     FDXC='FDXC'
     FDXE='FDXE'
@@ -955,13 +978,13 @@ class CarrierCodeType(Enum):
     FXSP='FXSP'
 
 
-class CloseActionType(Enum):
+class CloseActionType(str, Enum):
     CLOSE='CLOSE'
     PREVIEW_CLOSE_DOCUMENTS='PREVIEW_CLOSE_DOCUMENTS'
     REPRINT_CLOSE_DOCUMENTS='REPRINT_CLOSE_DOCUMENTS'
 
 
-class CloseDocumentType(Enum):
+class CloseDocumentType(str, Enum):
     COD_REPORT='COD_REPORT'
     DETAILED_DELIVERY_MANIFEST='DETAILED_DELIVERY_MANIFEST'
     HAZARDOUS_MATERIALS_CERTIFICATION='HAZARDOUS_MATERIALS_CERTIFICATION'
@@ -970,14 +993,14 @@ class CloseDocumentType(Enum):
     OP__950='OP_950'
 
 
-class CloseGroupingType(Enum):
+class CloseGroupingType(str, Enum):
     """Specifies how the shipment close requests are grouped."""
     MANIFEST_REFERENCE='MANIFEST_REFERENCE'
     SHIPPING_CYCLE='SHIPPING_CYCLE'
     TIME='TIME'
 
 
-class CloseReportType(Enum):
+class CloseReportType(str, Enum):
     ALL='ALL'
     COD='COD'
     HAZMAT='HAZMAT'
@@ -985,17 +1008,17 @@ class CloseReportType(Enum):
     MULTIWEIGHT='MULTIWEIGHT'
 
 
-class CloseWithDocumentsProcessingOptionType(Enum):
+class CloseWithDocumentsProcessingOptionType(str, Enum):
     ERROR_IF_OPEN_SHIPMENTS_FOUND='ERROR_IF_OPEN_SHIPMENTS_FOUND'
     WARNING_IF_OPEN_SHIPMENTS_FOUND='WARNING_IF_OPEN_SHIPMENTS_FOUND'
 
 
-class CustomerImageUsageType(Enum):
+class CustomerImageUsageType(str, Enum):
     LETTER_HEAD='LETTER_HEAD'
     SIGNATURE='SIGNATURE'
 
 
-class CustomerReferenceType(Enum):
+class CustomerReferenceType(str, Enum):
     BILL_OF_LADING='BILL_OF_LADING'
     CUSTOMER_REFERENCE='CUSTOMER_REFERENCE'
     DEPARTMENT_NUMBER='DEPARTMENT_NUMBER'
@@ -1009,7 +1032,7 @@ class CustomerReferenceType(Enum):
     STORE_NUMBER='STORE_NUMBER'
 
 
-class EMailNotificationRecipientType(Enum):
+class EMailNotificationRecipientType(str, Enum):
     BROKER='BROKER'
     OTHER='OTHER'
     RECIPIENT='RECIPIENT'
@@ -1017,7 +1040,7 @@ class EMailNotificationRecipientType(Enum):
     THIRD_PARTY='THIRD_PARTY'
 
 
-class ImageId(Enum):
+class ImageId(str, Enum):
     IMAGE__1='IMAGE_1'
     IMAGE__2='IMAGE_2'
     IMAGE__3='IMAGE_3'
@@ -1025,17 +1048,17 @@ class ImageId(Enum):
     IMAGE__5='IMAGE_5'
 
 
-class InternalImageType(Enum):
+class InternalImageType(str, Enum):
     LETTER_HEAD='LETTER_HEAD'
     SIGNATURE='SIGNATURE'
 
 
-class LinearUnits(Enum):
+class LinearUnits(str, Enum):
     CM='CM'
     IN='IN'
 
 
-class NotificationSeverityType(Enum):
+class NotificationSeverityType(str, Enum):
     ERROR='ERROR'
     FAILURE='FAILURE'
     NOTE='NOTE'
@@ -1043,13 +1066,13 @@ class NotificationSeverityType(Enum):
     WARNING='WARNING'
 
 
-class ReprintGroundCloseDocumentsOptionType(Enum):
+class ReprintGroundCloseDocumentsOptionType(str, Enum):
     """Identifies the requested options to reprinting Ground Close Documents"""
     BY_SHIP_DATE='BY_SHIP_DATE'
     BY_TRACKING_NUMBER='BY_TRACKING_NUMBER'
 
 
-class ShippingDocumentDispositionType(Enum):
+class ShippingDocumentDispositionType(str, Enum):
     """Specifies how to return a shipping document to the caller."""
     CONFIRMED='CONFIRMED'
     DEFERRED_QUEUED='DEFERRED_QUEUED'
@@ -1061,19 +1084,19 @@ class ShippingDocumentDispositionType(Enum):
     STORED='STORED'
 
 
-class ShippingDocumentEMailGroupingType(Enum):
+class ShippingDocumentEMailGroupingType(str, Enum):
     BY_RECIPIENT='BY_RECIPIENT'
     NONE='NONE'
 
 
-class ShippingDocumentGroupingType(Enum):
+class ShippingDocumentGroupingType(str, Enum):
     """Specifies how to organize all shipping documents of the same type."""
     CONSOLIDATED_BY_DOCUMENT_TYPE='CONSOLIDATED_BY_DOCUMENT_TYPE'
     CONSOLIDATED_BY_IMAGE_TYPE='CONSOLIDATED_BY_IMAGE_TYPE'
     INDIVIDUAL='INDIVIDUAL'
 
 
-class ShippingDocumentImageType(Enum):
+class ShippingDocumentImageType(str, Enum):
     """Specifies the image format used for a shipping document."""
     DIB='DIB'
     DOC='DOC'
@@ -1087,14 +1110,14 @@ class ShippingDocumentImageType(Enum):
     ZPLII='ZPLII'
 
 
-class ShippingDocumentNamingType(Enum):
+class ShippingDocumentNamingType(str, Enum):
     """Identifies the convention by which file names are constructed for STORED
     or DEFERRED documents."""
     FAST='FAST'
     LEGACY_FXRS='LEGACY_FXRS'
 
 
-class ShippingDocumentStockType(Enum):
+class ShippingDocumentStockType(str, Enum):
     """Specifies the type of paper (stock) on which a document will be
     printed."""
     OP__900_LG='OP_900_LG'
@@ -1131,7 +1154,7 @@ class ClientDetail(GeneratedsSuper):
         self.IntegratorId = IntegratorId
         self.IntegratorId_nsprefix_ = None
         self.Localization = Localization
-        self.Localization_nsprefix_ = None
+        self.Localization_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -1270,12 +1293,12 @@ class CloseDocument(GeneratedsSuper):
         self.ns_prefix_ = None
         self.Type = Type
         self.validate_CloseDocumentType(self.Type)
-        self.Type_nsprefix_ = None
+        self.Type_nsprefix_ = "ns"
         self.ShippingCycle = ShippingCycle
         self.ShippingCycle_nsprefix_ = None
         self.ShippingDocumentDisposition = ShippingDocumentDisposition
         self.validate_ShippingDocumentDispositionType(self.ShippingDocumentDisposition)
-        self.ShippingDocumentDisposition_nsprefix_ = None
+        self.ShippingDocumentDisposition_nsprefix_ = "ns"
         self.AccessReference = AccessReference
         self.AccessReference_nsprefix_ = None
         self.Resolution = Resolution
@@ -1286,7 +1309,7 @@ class CloseDocument(GeneratedsSuper):
             self.Parts = []
         else:
             self.Parts = Parts
-        self.Parts_nsprefix_ = None
+        self.Parts_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -1517,19 +1540,19 @@ class CloseDocumentFormat(GeneratedsSuper):
             self.Dispositions = []
         else:
             self.Dispositions = Dispositions
-        self.Dispositions_nsprefix_ = None
+        self.Dispositions_nsprefix_ = "ns"
         self.TopOfPageOffset = TopOfPageOffset
-        self.TopOfPageOffset_nsprefix_ = None
+        self.TopOfPageOffset_nsprefix_ = "ns"
         self.ImageType = ImageType
         self.validate_ShippingDocumentImageType(self.ImageType)
-        self.ImageType_nsprefix_ = None
+        self.ImageType_nsprefix_ = "ns"
         self.StockType = StockType
         self.validate_ShippingDocumentStockType(self.StockType)
-        self.StockType_nsprefix_ = None
+        self.StockType_nsprefix_ = "ns"
         self.ProvideInstructions = ProvideInstructions
         self.ProvideInstructions_nsprefix_ = None
         self.Localization = Localization
-        self.Localization_nsprefix_ = None
+        self.Localization_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -1742,15 +1765,15 @@ class CloseDocumentSpecification(GeneratedsSuper):
             self.CloseDocumentTypes = []
         else:
             self.CloseDocumentTypes = CloseDocumentTypes
-        self.CloseDocumentTypes_nsprefix_ = None
+        self.CloseDocumentTypes_nsprefix_ = "ns"
         self.DetailedDeliveryManifestDetail = DetailedDeliveryManifestDetail
-        self.DetailedDeliveryManifestDetail_nsprefix_ = None
+        self.DetailedDeliveryManifestDetail_nsprefix_ = "ns"
         self.HazardousMaterialsCertificationDetail = HazardousMaterialsCertificationDetail
-        self.HazardousMaterialsCertificationDetail_nsprefix_ = None
+        self.HazardousMaterialsCertificationDetail_nsprefix_ = "ns"
         self.ManifestDetail = ManifestDetail
-        self.ManifestDetail_nsprefix_ = None
+        self.ManifestDetail_nsprefix_ = "ns"
         self.Op950Detail = Op950Detail
-        self.Op950Detail_nsprefix_ = None
+        self.Op950Detail_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -1921,7 +1944,7 @@ class CloseManifestReferenceDetail(GeneratedsSuper):
         self.ns_prefix_ = None
         self.Type = Type
         self.validate_CustomerReferenceType(self.Type)
-        self.Type_nsprefix_ = None
+        self.Type_nsprefix_ = "ns"
         self.Value = Value
         self.Value_nsprefix_ = None
     def factory(*args_, **kwargs_):
@@ -2059,7 +2082,7 @@ class CloseSmartPostDetail(GeneratedsSuper):
         self.DestinationCountryCode_nsprefix_ = None
         self.PickupCarrier = PickupCarrier
         self.validate_CarrierCodeType(self.PickupCarrier)
-        self.PickupCarrier_nsprefix_ = None
+        self.PickupCarrier_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -2234,7 +2257,7 @@ class CloseWithDocumentsProcessingOptionsRequested(GeneratedsSuper):
             self.Options = []
         else:
             self.Options = Options
-        self.Options_nsprefix_ = None
+        self.Options_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -2353,21 +2376,21 @@ class CloseWithDocumentsReply(GeneratedsSuper):
         self.ns_prefix_ = None
         self.HighestSeverity = HighestSeverity
         self.validate_NotificationSeverityType(self.HighestSeverity)
-        self.HighestSeverity_nsprefix_ = None
+        self.HighestSeverity_nsprefix_ = "ns"
         if Notifications is None:
             self.Notifications = []
         else:
             self.Notifications = Notifications
-        self.Notifications_nsprefix_ = None
+        self.Notifications_nsprefix_ = "ns"
         self.TransactionDetail = TransactionDetail
-        self.TransactionDetail_nsprefix_ = None
+        self.TransactionDetail_nsprefix_ = "ns"
         self.Version = Version
-        self.Version_nsprefix_ = None
+        self.Version_nsprefix_ = "ns"
         if Documents is None:
             self.Documents = []
         else:
             self.Documents = Documents
-        self.Documents_nsprefix_ = None
+        self.Documents_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -2543,21 +2566,21 @@ class CloseWithDocumentsRequest(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.WebAuthenticationDetail = WebAuthenticationDetail
-        self.WebAuthenticationDetail_nsprefix_ = None
+        self.WebAuthenticationDetail_nsprefix_ = "ns"
         self.ClientDetail = ClientDetail
-        self.ClientDetail_nsprefix_ = None
+        self.ClientDetail_nsprefix_ = "ns"
         self.TransactionDetail = TransactionDetail
-        self.TransactionDetail_nsprefix_ = None
+        self.TransactionDetail_nsprefix_ = "ns"
         self.Version = Version
-        self.Version_nsprefix_ = None
+        self.Version_nsprefix_ = "ns"
         self.ActionType = ActionType
         self.validate_CloseActionType(self.ActionType)
-        self.ActionType_nsprefix_ = None
+        self.ActionType_nsprefix_ = "ns"
         self.ProcessingOptions = ProcessingOptions
-        self.ProcessingOptions_nsprefix_ = None
+        self.ProcessingOptions_nsprefix_ = "ns"
         self.CarrierCode = CarrierCode
         self.validate_CarrierCodeType(self.CarrierCode)
-        self.CarrierCode_nsprefix_ = None
+        self.CarrierCode_nsprefix_ = "ns"
         self.ShippingCycle = ShippingCycle
         self.ShippingCycle_nsprefix_ = None
         if isinstance(ReprintCloseDate, BaseStrType_):
@@ -2567,11 +2590,11 @@ class CloseWithDocumentsRequest(GeneratedsSuper):
         self.ReprintCloseDate = initvalue_
         self.ReprintCloseDate_nsprefix_ = None
         self.ManifestReferenceDetail = ManifestReferenceDetail
-        self.ManifestReferenceDetail_nsprefix_ = None
+        self.ManifestReferenceDetail_nsprefix_ = "ns"
         self.SmartPostDetail = SmartPostDetail
-        self.SmartPostDetail_nsprefix_ = None
+        self.SmartPostDetail_nsprefix_ = "ns"
         self.CloseDocumentSpecification = CloseDocumentSpecification
-        self.CloseDocumentSpecification_nsprefix_ = None
+        self.CloseDocumentSpecification_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -2849,15 +2872,15 @@ class CustomerImageUsage(GeneratedsSuper):
         self.ns_prefix_ = None
         self.Type = Type
         self.validate_CustomerImageUsageType(self.Type)
-        self.Type_nsprefix_ = None
+        self.Type_nsprefix_ = "ns"
         self.Id = Id
         self.validate_ImageId(self.Id)
-        self.Id_nsprefix_ = None
+        self.Id_nsprefix_ = "ns"
         self.InternalId = InternalId
         self.InternalId_nsprefix_ = None
         self.InternalImageType = InternalImageType
         self.validate_InternalImageType(self.InternalImageType)
-        self.InternalImageType_nsprefix_ = None
+        self.InternalImageType_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -3048,7 +3071,7 @@ class DetailedDeliveryManifestDetail(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.Format = Format
-        self.Format_nsprefix_ = None
+        self.Format_nsprefix_ = "ns"
         self.ClientTimeZoneOffset = ClientTimeZoneOffset
         self.ClientTimeZoneOffset_nsprefix_ = None
     def factory(*args_, **kwargs_):
@@ -3159,21 +3182,21 @@ class GroundCloseDocumentsReply(GeneratedsSuper):
         self.ns_prefix_ = None
         self.HighestSeverity = HighestSeverity
         self.validate_NotificationSeverityType(self.HighestSeverity)
-        self.HighestSeverity_nsprefix_ = None
+        self.HighestSeverity_nsprefix_ = "ns"
         if Notifications is None:
             self.Notifications = []
         else:
             self.Notifications = Notifications
-        self.Notifications_nsprefix_ = None
+        self.Notifications_nsprefix_ = "ns"
         self.TransactionDetail = TransactionDetail
-        self.TransactionDetail_nsprefix_ = None
+        self.TransactionDetail_nsprefix_ = "ns"
         self.Version = Version
-        self.Version_nsprefix_ = None
+        self.Version_nsprefix_ = "ns"
         if CloseDocuments is None:
             self.CloseDocuments = []
         else:
             self.CloseDocuments = CloseDocuments
-        self.CloseDocuments_nsprefix_ = None
+        self.CloseDocuments_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -3350,22 +3373,22 @@ class GroundCloseReply(GeneratedsSuper):
         self.ns_prefix_ = None
         self.HighestSeverity = HighestSeverity
         self.validate_NotificationSeverityType(self.HighestSeverity)
-        self.HighestSeverity_nsprefix_ = None
+        self.HighestSeverity_nsprefix_ = "ns"
         if Notifications is None:
             self.Notifications = []
         else:
             self.Notifications = Notifications
-        self.Notifications_nsprefix_ = None
+        self.Notifications_nsprefix_ = "ns"
         self.TransactionDetail = TransactionDetail
-        self.TransactionDetail_nsprefix_ = None
+        self.TransactionDetail_nsprefix_ = "ns"
         self.Version = Version
-        self.Version_nsprefix_ = None
+        self.Version_nsprefix_ = "ns"
         self.CodReport = CodReport
         self.CodReport_nsprefix_ = None
         self.HazMatCertificate = HazMatCertificate
         self.HazMatCertificate_nsprefix_ = None
         self.Manifest = Manifest
-        self.Manifest_nsprefix_ = None
+        self.Manifest_nsprefix_ = "ns"
         self.MultiweightReport = MultiweightReport
         self.MultiweightReport_nsprefix_ = None
     def factory(*args_, **kwargs_):
@@ -3601,16 +3624,16 @@ class GroundCloseReportsReprintReply(GeneratedsSuper):
         self.ns_prefix_ = None
         self.HighestSeverity = HighestSeverity
         self.validate_NotificationSeverityType(self.HighestSeverity)
-        self.HighestSeverity_nsprefix_ = None
+        self.HighestSeverity_nsprefix_ = "ns"
         if Notifications is None:
             self.Notifications = []
         else:
             self.Notifications = Notifications
-        self.Notifications_nsprefix_ = None
+        self.Notifications_nsprefix_ = "ns"
         self.TransactionDetail = TransactionDetail
-        self.TransactionDetail_nsprefix_ = None
+        self.TransactionDetail_nsprefix_ = "ns"
         self.Version = Version
-        self.Version_nsprefix_ = None
+        self.Version_nsprefix_ = "ns"
         self.CodReport = CodReport
         self.CodReport_nsprefix_ = None
         self.HazMatCertificate = HazMatCertificate
@@ -3619,7 +3642,7 @@ class GroundCloseReportsReprintReply(GeneratedsSuper):
             self.Manifests = []
         else:
             self.Manifests = Manifests
-        self.Manifests_nsprefix_ = None
+        self.Manifests_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -3837,13 +3860,13 @@ class GroundCloseReportsReprintRequest(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.WebAuthenticationDetail = WebAuthenticationDetail
-        self.WebAuthenticationDetail_nsprefix_ = None
+        self.WebAuthenticationDetail_nsprefix_ = "ns"
         self.ClientDetail = ClientDetail
-        self.ClientDetail_nsprefix_ = None
+        self.ClientDetail_nsprefix_ = "ns"
         self.TransactionDetail = TransactionDetail
-        self.TransactionDetail_nsprefix_ = None
+        self.TransactionDetail_nsprefix_ = "ns"
         self.Version = Version
-        self.Version_nsprefix_ = None
+        self.Version_nsprefix_ = "ns"
         if isinstance(ReportDate, BaseStrType_):
             initvalue_ = datetime_.datetime.strptime(ReportDate, '%Y-%m-%d').date()
         else:
@@ -3854,7 +3877,7 @@ class GroundCloseReportsReprintRequest(GeneratedsSuper):
         self.TrackingNumber_nsprefix_ = None
         self.CloseReportType = CloseReportType
         self.validate_CloseReportType(self.CloseReportType)
-        self.CloseReportType_nsprefix_ = None
+        self.CloseReportType_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -4047,16 +4070,16 @@ class GroundCloseRequest(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.WebAuthenticationDetail = WebAuthenticationDetail
-        self.WebAuthenticationDetail_nsprefix_ = None
+        self.WebAuthenticationDetail_nsprefix_ = "ns"
         self.ClientDetail = ClientDetail
-        self.ClientDetail_nsprefix_ = None
+        self.ClientDetail_nsprefix_ = "ns"
         self.TransactionDetail = TransactionDetail
-        self.TransactionDetail_nsprefix_ = None
+        self.TransactionDetail_nsprefix_ = "ns"
         self.Version = Version
-        self.Version_nsprefix_ = None
+        self.Version_nsprefix_ = "ns"
         self.CloseGrouping = CloseGrouping
         self.validate_CloseGroupingType(self.CloseGrouping)
-        self.CloseGrouping_nsprefix_ = None
+        self.CloseGrouping_nsprefix_ = "ns"
         if isinstance(TimeUpToWhichShipmentsAreToBeClosed, BaseStrType_):
             initvalue_ = datetime_.datetime.strptime(TimeUpToWhichShipmentsAreToBeClosed, '%Y-%m-%dT%H:%M:%S')
         else:
@@ -4064,7 +4087,7 @@ class GroundCloseRequest(GeneratedsSuper):
         self.TimeUpToWhichShipmentsAreToBeClosed = initvalue_
         self.TimeUpToWhichShipmentsAreToBeClosed_nsprefix_ = None
         self.ManifestReferenceDetail = ManifestReferenceDetail
-        self.ManifestReferenceDetail_nsprefix_ = None
+        self.ManifestReferenceDetail_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -4255,13 +4278,13 @@ class GroundCloseWithDocumentsRequest(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.WebAuthenticationDetail = WebAuthenticationDetail
-        self.WebAuthenticationDetail_nsprefix_ = None
+        self.WebAuthenticationDetail_nsprefix_ = "ns"
         self.ClientDetail = ClientDetail
-        self.ClientDetail_nsprefix_ = None
+        self.ClientDetail_nsprefix_ = "ns"
         self.TransactionDetail = TransactionDetail
-        self.TransactionDetail_nsprefix_ = None
+        self.TransactionDetail_nsprefix_ = "ns"
         self.Version = Version
-        self.Version_nsprefix_ = None
+        self.Version_nsprefix_ = "ns"
         if isinstance(CloseDate, BaseStrType_):
             initvalue_ = datetime_.datetime.strptime(CloseDate, '%Y-%m-%d').date()
         else:
@@ -4269,7 +4292,7 @@ class GroundCloseWithDocumentsRequest(GeneratedsSuper):
         self.CloseDate = initvalue_
         self.CloseDate_nsprefix_ = None
         self.CloseDocumentSpecification = CloseDocumentSpecification
-        self.CloseDocumentSpecification_nsprefix_ = None
+        self.CloseDocumentSpecification_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -4428,7 +4451,7 @@ class HazardousMaterialsCertificationDetail(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.Format = Format
-        self.Format_nsprefix_ = None
+        self.Format_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -4528,7 +4551,7 @@ class LinearMeasure(GeneratedsSuper):
         self.Value_nsprefix_ = None
         self.Units = Units
         self.validate_LinearUnits(self.Units)
-        self.Units_nsprefix_ = None
+        self.Units_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -4768,7 +4791,7 @@ class ManifestDetail(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.Format = Format
-        self.Format_nsprefix_ = None
+        self.Format_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -4982,7 +5005,7 @@ class Notification(GeneratedsSuper):
         self.ns_prefix_ = None
         self.Severity = Severity
         self.validate_NotificationSeverityType(self.Severity)
-        self.Severity_nsprefix_ = None
+        self.Severity_nsprefix_ = "ns"
         self.Source = Source
         self.Source_nsprefix_ = None
         self.Code = Code
@@ -4995,7 +5018,7 @@ class Notification(GeneratedsSuper):
             self.MessageParameters = []
         else:
             self.MessageParameters = MessageParameters
-        self.MessageParameters_nsprefix_ = None
+        self.MessageParameters_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -5300,12 +5323,12 @@ class Op950Detail(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.Format = Format
-        self.Format_nsprefix_ = None
+        self.Format_nsprefix_ = "ns"
         if CustomerImageUsages is None:
             self.CustomerImageUsages = []
         else:
             self.CustomerImageUsages = CustomerImageUsages
-        self.CustomerImageUsages_nsprefix_ = None
+        self.CustomerImageUsages_nsprefix_ = "ns"
         self.SignatureName = SignatureName
         self.SignatureName_nsprefix_ = None
     def factory(*args_, **kwargs_):
@@ -5434,16 +5457,16 @@ class ReprintGroundCloseDocumentsRequest(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.WebAuthenticationDetail = WebAuthenticationDetail
-        self.WebAuthenticationDetail_nsprefix_ = None
+        self.WebAuthenticationDetail_nsprefix_ = "ns"
         self.ClientDetail = ClientDetail
-        self.ClientDetail_nsprefix_ = None
+        self.ClientDetail_nsprefix_ = "ns"
         self.TransactionDetail = TransactionDetail
-        self.TransactionDetail_nsprefix_ = None
+        self.TransactionDetail_nsprefix_ = "ns"
         self.Version = Version
-        self.Version_nsprefix_ = None
+        self.Version_nsprefix_ = "ns"
         self.ReprintOption = ReprintOption
         self.validate_ReprintGroundCloseDocumentsOptionType(self.ReprintOption)
-        self.ReprintOption_nsprefix_ = None
+        self.ReprintOption_nsprefix_ = "ns"
         if isinstance(CloseDate, BaseStrType_):
             initvalue_ = datetime_.datetime.strptime(CloseDate, '%Y-%m-%d').date()
         else:
@@ -5453,7 +5476,7 @@ class ReprintGroundCloseDocumentsRequest(GeneratedsSuper):
         self.TrackingNumber = TrackingNumber
         self.TrackingNumber_nsprefix_ = None
         self.CloseDocumentSpecification = CloseDocumentSpecification
-        self.CloseDocumentSpecification_nsprefix_ = None
+        self.CloseDocumentSpecification_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -5662,16 +5685,16 @@ class ShippingDocumentDispositionDetail(GeneratedsSuper):
         self.ns_prefix_ = None
         self.DispositionType = DispositionType
         self.validate_ShippingDocumentDispositionType(self.DispositionType)
-        self.DispositionType_nsprefix_ = None
+        self.DispositionType_nsprefix_ = "ns"
         self.Grouping = Grouping
         self.validate_ShippingDocumentGroupingType(self.Grouping)
-        self.Grouping_nsprefix_ = None
+        self.Grouping_nsprefix_ = "ns"
         self.StorageDetail = StorageDetail
-        self.StorageDetail_nsprefix_ = None
+        self.StorageDetail_nsprefix_ = "ns"
         self.EMailDetail = EMailDetail
-        self.EMailDetail_nsprefix_ = None
+        self.EMailDetail_nsprefix_ = "ns"
         self.PrintDetail = PrintDetail
-        self.PrintDetail_nsprefix_ = None
+        self.PrintDetail_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -5858,12 +5881,12 @@ class ShippingDocumentEMailDetail(GeneratedsSuper):
             self.EMailRecipients = []
         else:
             self.EMailRecipients = EMailRecipients
-        self.EMailRecipients_nsprefix_ = None
+        self.EMailRecipients_nsprefix_ = "ns"
         self.Grouping = Grouping
         self.validate_ShippingDocumentEMailGroupingType(self.Grouping)
-        self.Grouping_nsprefix_ = None
+        self.Grouping_nsprefix_ = "ns"
         self.Localization = Localization
-        self.Localization_nsprefix_ = None
+        self.Localization_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -6009,7 +6032,7 @@ class ShippingDocumentEMailRecipient(GeneratedsSuper):
         self.ns_prefix_ = None
         self.RecipientType = RecipientType
         self.validate_EMailNotificationRecipientType(self.RecipientType)
-        self.RecipientType_nsprefix_ = None
+        self.RecipientType_nsprefix_ = "ns"
         self.Address = Address
         self.Address_nsprefix_ = None
     def factory(*args_, **kwargs_):
@@ -6360,7 +6383,7 @@ class ShippingDocumentStorageDetail(GeneratedsSuper):
         self.FilePath_nsprefix_ = None
         self.FileNaming = FileNaming
         self.validate_ShippingDocumentNamingType(self.FileNaming)
-        self.FileNaming_nsprefix_ = None
+        self.FileNaming_nsprefix_ = "ns"
         self.FileSuffix = FileSuffix
         self.FileSuffix_nsprefix_ = None
     def factory(*args_, **kwargs_):
@@ -6505,16 +6528,16 @@ class SmartPostCloseReply(GeneratedsSuper):
         self.ns_prefix_ = None
         self.HighestSeverity = HighestSeverity
         self.validate_NotificationSeverityType(self.HighestSeverity)
-        self.HighestSeverity_nsprefix_ = None
+        self.HighestSeverity_nsprefix_ = "ns"
         if Notifications is None:
             self.Notifications = []
         else:
             self.Notifications = Notifications
-        self.Notifications_nsprefix_ = None
+        self.Notifications_nsprefix_ = "ns"
         self.TransactionDetail = TransactionDetail
-        self.TransactionDetail_nsprefix_ = None
+        self.TransactionDetail_nsprefix_ = "ns"
         self.Version = Version
-        self.Version_nsprefix_ = None
+        self.Version_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -6671,13 +6694,13 @@ class SmartPostCloseRequest(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.WebAuthenticationDetail = WebAuthenticationDetail
-        self.WebAuthenticationDetail_nsprefix_ = None
+        self.WebAuthenticationDetail_nsprefix_ = "ns"
         self.ClientDetail = ClientDetail
-        self.ClientDetail_nsprefix_ = None
+        self.ClientDetail_nsprefix_ = "ns"
         self.TransactionDetail = TransactionDetail
-        self.TransactionDetail_nsprefix_ = None
+        self.TransactionDetail_nsprefix_ = "ns"
         self.Version = Version
-        self.Version_nsprefix_ = None
+        self.Version_nsprefix_ = "ns"
         self.HubId = HubId
         self.HubId_nsprefix_ = None
         self.CustomerManifestId = CustomerManifestId
@@ -6686,9 +6709,9 @@ class SmartPostCloseRequest(GeneratedsSuper):
         self.DestinationCountryCode_nsprefix_ = None
         self.PickUpCarrier = PickUpCarrier
         self.validate_CarrierCodeType(self.PickUpCarrier)
-        self.PickUpCarrier_nsprefix_ = None
+        self.PickUpCarrier_nsprefix_ = "ns"
         self.ManifestReferenceDetail = ManifestReferenceDetail
-        self.ManifestReferenceDetail_nsprefix_ = None
+        self.ManifestReferenceDetail_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -6912,7 +6935,7 @@ class TransactionDetail(GeneratedsSuper):
         self.CustomerTransactionId = CustomerTransactionId
         self.CustomerTransactionId_nsprefix_ = None
         self.Localization = Localization
-        self.Localization_nsprefix_ = None
+        self.Localization_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -7021,9 +7044,9 @@ class WebAuthenticationDetail(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.ParentCredential = ParentCredential
-        self.ParentCredential_nsprefix_ = None
+        self.ParentCredential_nsprefix_ = "ns"
         self.UserCredential = UserCredential
-        self.UserCredential_nsprefix_ = None
+        self.UserCredential_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -7461,7 +7484,8 @@ def parse(inFileName, silence=False, print_warnings=True):
     return rootObj
 
 
-def parseEtree(inFileName, silence=False, print_warnings=True):
+def parseEtree(inFileName, silence=False, print_warnings=True,
+               mapping=None, nsmap=None):
     parser = None
     doc = parsexml_(inFileName, parser)
     gds_collector = GdsCollector_()
@@ -7473,8 +7497,10 @@ def parseEtree(inFileName, silence=False, print_warnings=True):
     rootObj = rootClass.factory()
     rootObj.build(rootNode, gds_collector_=gds_collector)
     # Enable Python to collect the space used by the DOM.
-    mapping = {}
-    rootElement = rootObj.to_etree(None, name_=rootTag, mapping_=mapping)
+    if mapping is None:
+        mapping = {}
+    rootElement = rootObj.to_etree(
+        None, name_=rootTag, mapping_=mapping, nsmap_=nsmap)
     reverse_mapping = rootObj.gds_reverse_node_mapping(mapping)
     if not SaveElementTreeNode:
         doc = None
@@ -7575,6 +7601,243 @@ if __name__ == '__main__':
 
 RenameMappings_ = {
 }
+
+#
+# Mapping of namespaces to types defined in them
+# and the file in which each is defined.
+# simpleTypes are marked "ST" and complexTypes "CT".
+NamespaceToDefMappings_ = {'http://fedex.com/ws/close/v5': [('CarrierCodeType',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'ST'),
+                                  ('CloseActionType',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'ST'),
+                                  ('CloseDocumentType',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'ST'),
+                                  ('CloseGroupingType',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'ST'),
+                                  ('CloseReportType',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'ST'),
+                                  ('CloseWithDocumentsProcessingOptionType',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'ST'),
+                                  ('CustomerImageUsageType',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'ST'),
+                                  ('CustomerReferenceType',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'ST'),
+                                  ('EMailNotificationRecipientType',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'ST'),
+                                  ('ImageId',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'ST'),
+                                  ('InternalImageType',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'ST'),
+                                  ('LinearUnits',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'ST'),
+                                  ('NotificationSeverityType',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'ST'),
+                                  ('ReprintGroundCloseDocumentsOptionType',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'ST'),
+                                  ('ShippingDocumentDispositionType',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'ST'),
+                                  ('ShippingDocumentEMailGroupingType',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'ST'),
+                                  ('ShippingDocumentGroupingType',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'ST'),
+                                  ('ShippingDocumentImageType',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'ST'),
+                                  ('ShippingDocumentNamingType',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'ST'),
+                                  ('ShippingDocumentStockType',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'ST'),
+                                  ('ClientDetail',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'CT'),
+                                  ('CloseDocument',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'CT'),
+                                  ('CloseDocumentFormat',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'CT'),
+                                  ('CloseDocumentSpecification',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'CT'),
+                                  ('CloseManifestReferenceDetail',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'CT'),
+                                  ('CloseSmartPostDetail',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'CT'),
+                                  ('CloseWithDocumentsProcessingOptionsRequested',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'CT'),
+                                  ('CloseWithDocumentsReply',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'CT'),
+                                  ('CloseWithDocumentsRequest',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'CT'),
+                                  ('CustomerImageUsage',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'CT'),
+                                  ('DetailedDeliveryManifestDetail',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'CT'),
+                                  ('GroundCloseDocumentsReply',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'CT'),
+                                  ('GroundCloseReply',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'CT'),
+                                  ('GroundCloseReportsReprintReply',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'CT'),
+                                  ('GroundCloseReportsReprintRequest',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'CT'),
+                                  ('GroundCloseRequest',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'CT'),
+                                  ('GroundCloseWithDocumentsRequest',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'CT'),
+                                  ('HazardousMaterialsCertificationDetail',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'CT'),
+                                  ('LinearMeasure',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'CT'),
+                                  ('Localization',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'CT'),
+                                  ('ManifestDetail',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'CT'),
+                                  ('ManifestFile',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'CT'),
+                                  ('Notification',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'CT'),
+                                  ('NotificationParameter',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'CT'),
+                                  ('Op950Detail',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'CT'),
+                                  ('ReprintGroundCloseDocumentsRequest',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'CT'),
+                                  ('ShippingDocumentDispositionDetail',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'CT'),
+                                  ('ShippingDocumentEMailDetail',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'CT'),
+                                  ('ShippingDocumentEMailRecipient',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'CT'),
+                                  ('ShippingDocumentPart',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'CT'),
+                                  ('ShippingDocumentPrintDetail',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'CT'),
+                                  ('ShippingDocumentStorageDetail',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'CT'),
+                                  ('SmartPostCloseReply',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'CT'),
+                                  ('SmartPostCloseRequest',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'CT'),
+                                  ('TransactionDetail',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'CT'),
+                                  ('WebAuthenticationDetail',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'CT'),
+                                  ('WebAuthenticationCredential',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'CT'),
+                                  ('VersionId',
+                                   '../../../Carriers '
+                                   'Doc/Fedex/2020-09/schemas/CloseService_v5.xsd',
+                                   'CT')]}
 
 __all__ = [
     "ClientDetail",

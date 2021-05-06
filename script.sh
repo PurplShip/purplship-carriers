@@ -87,6 +87,7 @@ build() {
 }
 
 upload() {
+    pip install twine > /dev/null &&
 	twine upload "${DIST}/*"
 }
 

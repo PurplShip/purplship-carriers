@@ -2,33 +2,37 @@
 # -*- coding: utf-8 -*-
 
 #
-# Generated Fri Mar  6 15:54:38 2020 by generateDS.py version 2.35.15.
-# Python 3.8.1 (v3.8.1:1b293b6006, Dec 18 2019, 14:08:53)  [Clang 6.0 (clang-600.0.57)]
+# Generated Thu May  6 11:00:05 2021 by generateDS.py version 2.38.6.
+# Python 3.8.6 (v3.8.6:db455296be, Sep 23 2020, 13:31:39)  [Clang 6.0 (clang-600.0.57)]
 #
 # Command line options:
 #   ('--no-namespace-defs', '')
-#   ('-o', './python/pickup_service_v20.py')
+#   ('-o', './fedex_lib/pickup_service_v22.py')
 #
 # Command line arguments:
-#   ./schemas/PickupService_v20.xsd
+#   /Users/danielkobina/Workspace/Carriers Doc/Fedex/2020-09/schemas/PickupService_v22.xsd
 #
 # Command line:
-#   /Users/danielkobina/Documents/Open/.sandbox/bin/generateDS --no-namespace-defs -o "./python/pickup_service_v20.py" ./schemas/PickupService_v20.xsd
+#   /Users/danielkobina/Workspace/project/purplship-carriers/.venv/purplship-carriers/bin/generateDS --no-namespace-defs -o "./fedex_lib/pickup_service_v22.py" /Users/danielkobina/Workspace/Carriers Doc/Fedex/2020-09/schemas/PickupService_v22.xsd
 #
 # Current working directory (os.getcwd()):
-#   2020-02
+#   fedex
 #
 
+import sys
+try:
+    ModulenotfoundExp_ = ModuleNotFoundError
+except NameError:
+    ModulenotfoundExp_ = ImportError
 from six.moves import zip_longest
 import os
-import sys
 import re as re_
 import base64
 import datetime as datetime_
 import decimal as decimal_
 try:
     from lxml import etree as etree_
-except ImportError:
+except ModulenotfoundExp_ :
     from xml.etree import ElementTree as etree_
 
 
@@ -107,11 +111,11 @@ def parsexmlstring_(instring, parser=None, **kwargs):
 
 try:
     from generatedsnamespaces import GenerateDSNamespaceDefs as GenerateDSNamespaceDefs_
-except ImportError:
+except ModulenotfoundExp_ :
     GenerateDSNamespaceDefs_ = {}
 try:
     from generatedsnamespaces import GenerateDSNamespaceTypePrefixes as GenerateDSNamespaceTypePrefixes_
-except ImportError:
+except ModulenotfoundExp_ :
     GenerateDSNamespaceTypePrefixes_ = {}
 
 #
@@ -122,7 +126,7 @@ except ImportError:
 #
 try:
     from generatedscollector import GdsCollector as GdsCollector_
-except ImportError:
+except ModulenotfoundExp_ :
 
     class GdsCollector_(object):
 
@@ -156,7 +160,7 @@ except ImportError:
 
 try:
     from enum import Enum
-except ImportError:
+except ModulenotfoundExp_ :
     Enum = object
 
 #
@@ -168,7 +172,7 @@ except ImportError:
 
 try:
     from generatedssuper import GeneratedsSuper
-except ImportError as exp:
+except ModulenotfoundExp_ as exp:
     
     class GeneratedsSuper(object):
         __hash__ = object.__hash__
@@ -211,6 +215,8 @@ except ImportError as exp:
                 raise_parse_error(node, 'Requires integer value')
             return value
         def gds_format_integer_list(self, input_data, input_name=''):
+            if len(input_data) > 0 and not isinstance(input_data[0], BaseStrType_):
+                input_data = [str(s) for s in input_data]
             return '%s' % ' '.join(input_data)
         def gds_validate_integer_list(
                 self, input_data, node=None, input_name=''):
@@ -219,7 +225,7 @@ except ImportError as exp:
                 try:
                     int(value)
                 except (TypeError, ValueError):
-                    raise_parse_error(node, 'Requires sequence of integer valuess')
+                    raise_parse_error(node, 'Requires sequence of integer values')
             return values
         def gds_format_float(self, input_data, input_name=''):
             return ('%.15f' % input_data).rstrip('0')
@@ -236,6 +242,8 @@ except ImportError as exp:
                 raise_parse_error(node, 'Requires float value')
             return value
         def gds_format_float_list(self, input_data, input_name=''):
+            if len(input_data) > 0 and not isinstance(input_data[0], BaseStrType_):
+                input_data = [str(s) for s in input_data]
             return '%s' % ' '.join(input_data)
         def gds_validate_float_list(
                 self, input_data, node=None, input_name=''):
@@ -247,7 +255,12 @@ except ImportError as exp:
                     raise_parse_error(node, 'Requires sequence of float values')
             return values
         def gds_format_decimal(self, input_data, input_name=''):
-            return ('%s' % input_data).rstrip('0')
+            return_value = '%s' % input_data
+            if '.' in return_value:
+                return_value = return_value.rstrip('0')
+                if return_value.endswith('.'):
+                    return_value = return_value.rstrip('.')
+            return return_value
         def gds_parse_decimal(self, input_data, node=None, input_name=''):
             try:
                 decimal_value = decimal_.Decimal(input_data)
@@ -261,7 +274,9 @@ except ImportError as exp:
                 raise_parse_error(node, 'Requires decimal value')
             return value
         def gds_format_decimal_list(self, input_data, input_name=''):
-            return '%s' % ' '.join(input_data)
+            if len(input_data) > 0 and not isinstance(input_data[0], BaseStrType_):
+                input_data = [str(s) for s in input_data]
+            return ' '.join([self.gds_format_decimal(item) for item in input_data])
         def gds_validate_decimal_list(
                 self, input_data, node=None, input_name=''):
             values = input_data.split()
@@ -272,7 +287,7 @@ except ImportError as exp:
                     raise_parse_error(node, 'Requires sequence of decimal values')
             return values
         def gds_format_double(self, input_data, input_name=''):
-            return '%e' % input_data
+            return '%s' % input_data
         def gds_parse_double(self, input_data, node=None, input_name=''):
             try:
                 fval_ = float(input_data)
@@ -286,6 +301,8 @@ except ImportError as exp:
                 raise_parse_error(node, 'Requires double or float value')
             return value
         def gds_format_double_list(self, input_data, input_name=''):
+            if len(input_data) > 0 and not isinstance(input_data[0], BaseStrType_):
+                input_data = [str(s) for s in input_data]
             return '%s' % ' '.join(input_data)
         def gds_validate_double_list(
                 self, input_data, node=None, input_name=''):
@@ -315,11 +332,14 @@ except ImportError as exp:
                     '(one of True, 1, False, 0)')
             return input_data
         def gds_format_boolean_list(self, input_data, input_name=''):
+            if len(input_data) > 0 and not isinstance(input_data[0], BaseStrType_):
+                input_data = [str(s) for s in input_data]
             return '%s' % ' '.join(input_data)
         def gds_validate_boolean_list(
                 self, input_data, node=None, input_name=''):
             values = input_data.split()
             for value in values:
+                value = self.gds_parse_boolean(value, node, input_name)
                 if value not in (True, 1, False, 0, ):
                     raise_parse_error(
                         node,
@@ -766,7 +786,10 @@ def find_attr_value_(attr_name, node):
         value = attrs.get(attr_name)
     elif len(attr_parts) == 2:
         prefix, name = attr_parts
-        namespace = node.nsmap.get(prefix)
+        if prefix == 'xml':
+            namespace = 'http://www.w3.org/XML/1998/namespace'
+        else:
+            namespace = node.nsmap.get(prefix)
         if namespace is not None:
             value = attrs.get('{%s}%s' % (namespace, name, ))
     return value
@@ -847,7 +870,7 @@ class MixedContainer:
                 self.name,
                 base64.b64encode(self.value),
                 self.name))
-    def to_etree(self, element):
+    def to_etree(self, element, mapping_=None, nsmap_=None):
         if self.category == MixedContainer.CategoryText:
             # Prevent exporting empty content as empty lines.
             if self.value.strip():
@@ -867,7 +890,7 @@ class MixedContainer:
             subelement.text = self.to_etree_simple()
         else:    # category == MixedContainer.CategoryComplex
             self.value.to_etree(element)
-    def to_etree_simple(self):
+    def to_etree_simple(self, mapping_=None, nsmap_=None):
         if self.content_type == MixedContainer.TypeString:
             text = self.value
         elif (self.content_type == MixedContainer.TypeInteger or
@@ -945,14 +968,14 @@ def _cast(typ, value):
 #
 
 
-class AccessorRoleType(Enum):
+class AccessorRoleType(str, Enum):
     """Specifies the role that identifies the permissions the accessor of the
     pending shipment."""
     SHIPMENT_COMPLETOR='SHIPMENT_COMPLETOR'
     SHIPMENT_INITIATOR='SHIPMENT_INITIATOR'
 
 
-class AssociatedAccountNumberType(Enum):
+class AssociatedAccountNumberType(str, Enum):
     """This enumeration represents a kind of "legacy" account number from a
     FedEx operating entity."""
     FEDEX_EXPRESS='FEDEX_EXPRESS'
@@ -961,7 +984,14 @@ class AssociatedAccountNumberType(Enum):
     FEDEX_OFFICE='FEDEX_OFFICE'
 
 
-class BuildingPartCode(Enum):
+class AutoConfigurationType(str, Enum):
+    ENTERPRISE='ENTERPRISE'
+    SHIPPING_SERVICE_PROVIDER='SHIPPING_SERVICE_PROVIDER'
+    SOFTWARE_ONLY='SOFTWARE_ONLY'
+    TRADITIONAL='TRADITIONAL'
+
+
+class BuildingPartCode(str, Enum):
     APARTMENT='APARTMENT'
     BUILDING='BUILDING'
     DEPARTMENT='DEPARTMENT'
@@ -970,34 +1000,35 @@ class BuildingPartCode(Enum):
     SUITE='SUITE'
 
 
-class CarrierCodeType(Enum):
+class CarrierCodeType(str, Enum):
     """Identification of a FedEx operating company (transportation)."""
     FDXC='FDXC'
     FDXE='FDXE'
     FDXG='FDXG'
+    FDXO='FDXO'
     FXCC='FXCC'
     FXFR='FXFR'
     FXSP='FXSP'
 
 
-class ChargeBasisLevelType(Enum):
+class ChargeBasisLevelType(str, Enum):
     CURRENT_PACKAGE='CURRENT_PACKAGE'
     SUM_OF_PACKAGES='SUM_OF_PACKAGES'
 
 
-class CloseTimeType(Enum):
+class CloseTimeType(str, Enum):
     CUSTOMER_SPECIFIED='CUSTOMER_SPECIFIED'
     DEFAULT='DEFAULT'
 
 
-class CodAddTransportationChargeBasisType(Enum):
+class CodAddTransportationChargeBasisType(str, Enum):
     COD_SURCHARGE='COD_SURCHARGE'
     NET_CHARGE='NET_CHARGE'
     NET_FREIGHT='NET_FREIGHT'
     TOTAL_CUSTOMER_CHARGE='TOTAL_CUSTOMER_CHARGE'
 
 
-class CodCollectionType(Enum):
+class CodCollectionType(str, Enum):
     """Identifies the type of funds FedEx should collect upon shipment
     delivery."""
     ANY='ANY'
@@ -1007,32 +1038,55 @@ class CodCollectionType(Enum):
     PERSONAL_CHECK='PERSONAL_CHECK'
 
 
-class CodReturnReferenceIndicatorType(Enum):
+class CodReturnReferenceIndicatorType(str, Enum):
     INVOICE='INVOICE'
     PO='PO'
     REFERENCE='REFERENCE'
     TRACKING='TRACKING'
 
 
-class CountryRelationshipType(Enum):
+class CountryRelationshipType(str, Enum):
     """Describes relationship between origin and destination countries."""
     DOMESTIC='DOMESTIC'
     INTERNATIONAL='INTERNATIONAL'
 
 
-class CustomDeliveryWindowType(Enum):
+class CreatePickupRequestProcessingOptionType(str, Enum):
+    """Specifies the options to be applied when creating the pickup."""
+    ALLOW_RESTRICTIONS_WITH_EXCEPTIONS='ALLOW_RESTRICTIONS_WITH_EXCEPTIONS'
+    INELIGIBLE_FOR_HOME_DELIVERY='INELIGIBLE_FOR_HOME_DELIVERY'
+    ON_CALL_PICKUP='ON_CALL_PICKUP'
+    PACKAGE_RETURN_PROGRAM='PACKAGE_RETURN_PROGRAM'
+    PICKUP_FOR_RETURN='PICKUP_FOR_RETURN'
+
+
+class CustomDeliveryWindowType(str, Enum):
     AFTER='AFTER'
     BEFORE='BEFORE'
     BETWEEN='BETWEEN'
     ON='ON'
 
 
-class DangerousGoodsAccessibilityType(Enum):
+class CustomerReferenceType(str, Enum):
+    BILL_OF_LADING='BILL_OF_LADING'
+    CUSTOMER_REFERENCE='CUSTOMER_REFERENCE'
+    DEPARTMENT_NUMBER='DEPARTMENT_NUMBER'
+    ELECTRONIC_PRODUCT_CODE='ELECTRONIC_PRODUCT_CODE'
+    INTRACOUNTRY_REGULATORY_REFERENCE='INTRACOUNTRY_REGULATORY_REFERENCE'
+    INVOICE_NUMBER='INVOICE_NUMBER'
+    PACKING_SLIP_NUMBER='PACKING_SLIP_NUMBER'
+    P_O_NUMBER='P_O_NUMBER'
+    RMA_ASSOCIATION='RMA_ASSOCIATION'
+    SHIPMENT_INTEGRITY='SHIPMENT_INTEGRITY'
+    STORE_NUMBER='STORE_NUMBER'
+
+
+class DangerousGoodsAccessibilityType(str, Enum):
     ACCESSIBLE='ACCESSIBLE'
     INACCESSIBLE='INACCESSIBLE'
 
 
-class DayOfWeekType(Enum):
+class DayOfWeekType(str, Enum):
     FRI='FRI'
     MON='MON'
     SAT='SAT'
@@ -1042,29 +1096,35 @@ class DayOfWeekType(Enum):
     WED='WED'
 
 
-class DistanceUnits(Enum):
+class DistanceUnits(str, Enum):
     KM='KM'
     MI='MI'
 
 
-class EmailOptionType(Enum):
+class EmailOptionType(str, Enum):
     PRODUCE_PAPERLESS_SHIPPING_FORMAT='PRODUCE_PAPERLESS_SHIPPING_FORMAT'
     SUPPRESS_ACCESS_EMAILS='SUPPRESS_ACCESS_EMAILS'
     SUPPRESS_ADDITIONAL_LANGUAGES='SUPPRESS_ADDITIONAL_LANGUAGES'
 
 
-class EtdAttributeType(Enum):
+class EnterprisePermissionType(str, Enum):
+    ALLOWED='ALLOWED'
+    ALLOWED_BY_EXCEPTION='ALLOWED_BY_EXCEPTION'
+    DISALLOWED='DISALLOWED'
+
+
+class EtdAttributeType(str, Enum):
     POST_SHIPMENT_UPLOAD_REQUESTED='POST_SHIPMENT_UPLOAD_REQUESTED'
 
 
-class EtdConfirmationType(Enum):
+class EtdConfirmationType(str, Enum):
     """Specifies whether to confirm documents prior to processing a shipment
     with the ELECTRONIC_TRADE_DOCUMENTS special service."""
     CONFIRMED='CONFIRMED'
     DEFERRED='DEFERRED'
 
 
-class ExpressRegionCode(Enum):
+class ExpressRegionCode(str, Enum):
     """Indicates a FedEx Express operating region."""
     APAC='APAC'
     CA='CA'
@@ -1073,7 +1133,7 @@ class ExpressRegionCode(Enum):
     US='US'
 
 
-class FedExLocationType(Enum):
+class FedExLocationType(str, Enum):
     """Identifies a kind of FedEx facility."""
     FEDEX_AUTHORIZED_SHIP_CENTER='FEDEX_AUTHORIZED_SHIP_CENTER'
     FEDEX_EXPRESS_STATION='FEDEX_EXPRESS_STATION'
@@ -1082,23 +1142,25 @@ class FedExLocationType(Enum):
     FEDEX_GROUND_TERMINAL='FEDEX_GROUND_TERMINAL'
     FEDEX_HOME_DELIVERY_STATION='FEDEX_HOME_DELIVERY_STATION'
     FEDEX_OFFICE='FEDEX_OFFICE'
+    FEDEX_ONSITE='FEDEX_ONSITE'
     FEDEX_SELF_SERVICE_LOCATION='FEDEX_SELF_SERVICE_LOCATION'
     FEDEX_SHIPSITE='FEDEX_SHIPSITE'
+    FEDEX_SHIP_AND_GET='FEDEX_SHIP_AND_GET'
     FEDEX_SMART_POST_HUB='FEDEX_SMART_POST_HUB'
 
 
-class FlatbedTrailerOption(Enum):
+class FlatbedTrailerOption(str, Enum):
     OVER_DIMENSION='OVER_DIMENSION'
     TARP='TARP'
 
 
-class FreightGuaranteeType(Enum):
+class FreightGuaranteeType(str, Enum):
     GUARANTEED_DATE='GUARANTEED_DATE'
     GUARANTEED_MORNING='GUARANTEED_MORNING'
     GUARANTEED_TIME='GUARANTEED_TIME'
 
 
-class FreightServiceSchedulingType(Enum):
+class FreightServiceSchedulingType(str, Enum):
     """Specifies the type of service scheduling offered from a Freight or
     National Freight Service Center to a customer-supplied address."""
     LIMITED='LIMITED'
@@ -1106,13 +1168,13 @@ class FreightServiceSchedulingType(Enum):
     WILL_CALL='WILL_CALL'
 
 
-class FreightShipmentRoleType(Enum):
+class FreightShipmentRoleType(str, Enum):
     """Indicates the role of the party submitting the transaction."""
     CONSIGNEE='CONSIGNEE'
     SHIPPER='SHIPPER'
 
 
-class HazardousCommodityOptionType(Enum):
+class HazardousCommodityOptionType(str, Enum):
     """Indicates which kind of hazardous content is being reported."""
     BATTERY='BATTERY'
     HAZARDOUS_MATERIALS='HAZARDOUS_MATERIALS'
@@ -1122,7 +1184,7 @@ class HazardousCommodityOptionType(Enum):
     SMALL_QUANTITY_EXCEPTION='SMALL_QUANTITY_EXCEPTION'
 
 
-class HazardousCommodityRegulationType(Enum):
+class HazardousCommodityRegulationType(str, Enum):
     """Identifies the source of regulation for hazardous commodity data."""
     ADR='ADR'
     DOT='DOT'
@@ -1130,13 +1192,17 @@ class HazardousCommodityRegulationType(Enum):
     ORMD='ORMD'
 
 
-class HomeDeliveryPremiumType(Enum):
+class HomeDeliveryPremiumType(str, Enum):
     APPOINTMENT='APPOINTMENT'
     DATE_CERTAIN='DATE_CERTAIN'
     EVENING='EVENING'
 
 
-class InternationalControlledExportType(Enum):
+class IntermediateVersionType(str, Enum):
+    _0='0'
+
+
+class InternationalControlledExportType(str, Enum):
     DEA__036='DEA_036'
     DEA__236='DEA_236'
     DEA__486='DEA_486'
@@ -1150,12 +1216,20 @@ class InternationalControlledExportType(Enum):
     WAREHOUSE_WITHDRAWAL='WAREHOUSE_WITHDRAWAL'
 
 
-class LinearUnits(Enum):
+class LinearUnits(str, Enum):
     CM='CM'
     IN='IN'
 
 
-class NotificationEventType(Enum):
+class MajorVersionType(str, Enum):
+    _2_2='22'
+
+
+class MinorVersionType(str, Enum):
+    _0='0'
+
+
+class NotificationEventType(str, Enum):
     ON_DELIVERY='ON_DELIVERY'
     ON_ESTIMATED_DELIVERY='ON_ESTIMATED_DELIVERY'
     ON_EXCEPTION='ON_EXCEPTION'
@@ -1167,12 +1241,12 @@ class NotificationEventType(Enum):
     ON_TENDER='ON_TENDER'
 
 
-class NotificationFormatType(Enum):
+class NotificationFormatType(str, Enum):
     HTML='HTML'
     TEXT='TEXT'
 
 
-class NotificationSeverityType(Enum):
+class NotificationSeverityType(str, Enum):
     ERROR='ERROR'
     FAILURE='FAILURE'
     NOTE='NOTE'
@@ -1180,13 +1254,13 @@ class NotificationSeverityType(Enum):
     WARNING='WARNING'
 
 
-class NotificationType(Enum):
+class NotificationType(str, Enum):
     EMAIL='EMAIL'
     FAX='FAX'
     SMS_TEXT_MESSAGE='SMS_TEXT_MESSAGE'
 
 
-class PaymentType(Enum):
+class PaymentType(str, Enum):
     ACCOUNT='ACCOUNT'
     CASH='CASH'
     COLLECT='COLLECT'
@@ -1196,15 +1270,11 @@ class PaymentType(Enum):
     THIRD_PARTY='THIRD_PARTY'
 
 
-class PendingShipmentProcessingOptionType(Enum):
-    ALLOW_MODIFICATIONS='ALLOW_MODIFICATIONS'
-
-
-class PendingShipmentType(Enum):
+class PendingShipmentType(str, Enum):
     EMAIL='EMAIL'
 
 
-class PhysicalPackagingType(Enum):
+class PhysicalPackagingType(str, Enum):
     """This enumeration rationalizes the former FedEx Express international
     "admissibility package" types (based on ANSI X.12) and the FedEx
     Freight packaging types. The values represented are those common to
@@ -1242,14 +1312,14 @@ class PhysicalPackagingType(Enum):
     UNIT='UNIT'
 
 
-class PickupBuildingLocationType(Enum):
+class PickupBuildingLocationType(str, Enum):
     FRONT='FRONT'
     NONE='NONE'
     REAR='REAR'
     SIDE='SIDE'
 
 
-class PickupEventType(Enum):
+class PickupEventType(str, Enum):
     ASSIGNED_TO_DRIVER='ASSIGNED_TO_DRIVER'
     CANCELED='CANCELED'
     DRIVER_ARRIVED='DRIVER_ARRIVED'
@@ -1260,12 +1330,82 @@ class PickupEventType(Enum):
     SCHEDULED='SCHEDULED'
 
 
-class PickupRequestType(Enum):
+class PickupExceptionType(str, Enum):
+    ATTEMPTED_AFTER_CLOSE_TIME='ATTEMPTED_AFTER_CLOSE_TIME'
+    ATTEMPTED_OUT_OF_WINDOW='ATTEMPTED_OUT_OF_WINDOW'
+    BUSINESS_CLOSED='BUSINESS_CLOSED'
+    BUSINESS_ON_STRIKE='BUSINESS_ON_STRIKE'
+    CITY_NOT_IN_SERVICE_AREA='CITY_NOT_IN_SERVICE_AREA'
+    COMAIL_STOP='COMAIL_STOP'
+    COMMODITY_UNACCEPTABLE='COMMODITY_UNACCEPTABLE'
+    CORRECTIVE_PICKUP='CORRECTIVE_PICKUP'
+    COURIER_ATTEMPTED_PACKAGE_LEFT_BEHIND='COURIER_ATTEMPTED_PACKAGE_LEFT_BEHIND'
+    CUSTOMER_DELAY='CUSTOMER_DELAY'
+    CUSTOMER_DID_NOT_WAIT='CUSTOMER_DID_NOT_WAIT'
+    CUSTOMER_NOT_AT_PICKUP_LOCATION='CUSTOMER_NOT_AT_PICKUP_LOCATION'
+    CUSTOMER_SECURITY_DELAY='CUSTOMER_SECURITY_DELAY'
+    EXCEED_SERVICE_LIMITS='EXCEED_SERVICE_LIMITS'
+    FUTURE_DELIVERY_REQUESTED='FUTURE_DELIVERY_REQUESTED'
+    HAZARD_TO_COURIER='HAZARD_TO_COURIER'
+    HAZMAT_PICKUP_NOT_COMPLETED='HAZMAT_PICKUP_NOT_COMPLETED'
+    INCORRECT_ADDRESS='INCORRECT_ADDRESS'
+    INCORRECT_PICKUP_INFORMATION='INCORRECT_PICKUP_INFORMATION'
+    INCORRECT_ROUTE='INCORRECT_ROUTE'
+    INTERLINE_PICKUP='INTERLINE_PICKUP'
+    LOCAL_EVENT='LOCAL_EVENT'
+    MASS_PICKUP_SCAN='MASS_PICKUP_SCAN'
+    MASS_ROUTING_SCAN='MASS_ROUTING_SCAN'
+    MISSING_REGULATORY_PAPERWORK='MISSING_REGULATORY_PAPERWORK'
+    MULTIPLE_PICKUPS_SCHEDULED='MULTIPLE_PICKUPS_SCHEDULED'
+    NO_CREDIT_APPROVAL_BULK_SHIPMENT='NO_CREDIT_APPROVAL_BULK_SHIPMENT'
+    NO_PACKAGE='NO_PACKAGE'
+    NO_PICKUP_ATTEMPT_MADE='NO_PICKUP_ATTEMPT_MADE'
+    OTHER='OTHER'
+    PACKAGE_ALREADY_TENDERED='PACKAGE_ALREADY_TENDERED'
+    PACKAGE_MOVEMENT_NOT_SUPPORTED='PACKAGE_MOVEMENT_NOT_SUPPORTED'
+    PACKAGE_RECEIVED_AFTER_SHUTTLE_DEPARTED='PACKAGE_RECEIVED_AFTER_SHUTTLE_DEPARTED'
+    PACKAGE_RETRIEVAL='PACKAGE_RETRIEVAL'
+    PACKAGE_TENDERED_TO_OTHER_CARRIER='PACKAGE_TENDERED_TO_OTHER_CARRIER'
+    PACKAGE_TENDERED_TO_OTHER_FEDEX_CARRIER='PACKAGE_TENDERED_TO_OTHER_FEDEX_CARRIER'
+    PACKAGE_TRANSFERRED_TO_OTHER_CARRIER='PACKAGE_TRANSFERRED_TO_OTHER_CARRIER'
+    PAYMENT_RECEIVED='PAYMENT_RECEIVED'
+    PICKUP_CANCELLED='PICKUP_CANCELLED'
+    PICKUP_NOT_READY='PICKUP_NOT_READY'
+    PICKUP_ORIGIN_HOLIDAY='PICKUP_ORIGIN_HOLIDAY'
+    PICKUP_SUSPENDED='PICKUP_SUSPENDED'
+    PICKUP_TYPE_RESTRICTED='PICKUP_TYPE_RESTRICTED'
+    PICKUP_UPON_DELIVERY='PICKUP_UPON_DELIVERY'
+    PREROUTED_METER_PACKAGE='PREROUTED_METER_PACKAGE'
+    REROUTED='REROUTED'
+    SCHEDULED_PAST_CUTOFF='SCHEDULED_PAST_CUTOFF'
+    SYSTEM_OUTAGE_NO_PICKUP='SYSTEM_OUTAGE_NO_PICKUP'
+    TENDERED_BY_CARTAGE_AGENT='TENDERED_BY_CARTAGE_AGENT'
+    THIRD_PARTY_CALL_IN='THIRD_PARTY_CALL_IN'
+    UNABLE_TO_COLLECT_PAYMENT='UNABLE_TO_COLLECT_PAYMENT'
+    UNABLE_TO_SCAN_PACKAGE='UNABLE_TO_SCAN_PACKAGE'
+    UNEXPECTED_DELAY='UNEXPECTED_DELAY'
+    WEATHER_DELAY='WEATHER_DELAY'
+
+
+class PickupLookupConditionType(str, Enum):
+    ACCOUNT_NUMBER='ACCOUNT_NUMBER'
+    BEGIN_DATE='BEGIN_DATE'
+    COMPANY_NAME='COMPANY_NAME'
+    COUNTRY_CODE='COUNTRY_CODE'
+    COUNTRY_RELATIONSHIP='COUNTRY_RELATIONSHIP'
+    END_DATE='END_DATE'
+    INTERNAL_SYSTEM_TYPE='INTERNAL_SYSTEM_TYPE'
+    PICKUP_LOCATION_ID='PICKUP_LOCATION_ID'
+    POSTAL_CODE='POSTAL_CODE'
+    SERVICE_TYPE='SERVICE_TYPE'
+
+
+class PickupRequestType(str, Enum):
     FUTURE_DAY='FUTURE_DAY'
     SAME_DAY='SAME_DAY'
 
 
-class PickupServiceCategoryType(Enum):
+class PickupServiceCategoryType(str, Enum):
     """Specifies the service category for the pick up being scheduled."""
     FEDEX_DISTANCE_DEFERRED='FEDEX_DISTANCE_DEFERRED'
     FEDEX_NEXT_DAY_AFTERNOON='FEDEX_NEXT_DAY_AFTERNOON'
@@ -1277,22 +1417,42 @@ class PickupServiceCategoryType(Enum):
     SAME_DAY_CITY='SAME_DAY_CITY'
 
 
-class PickupType(Enum):
+class PickupServiceLevelType(str, Enum):
+    """These values control the level of validation performed on certain pickup
+    requests."""
+    EXTERNAL_EDITS='EXTERNAL_EDITS'
+    INTERNAL_EDITS='INTERNAL_EDITS'
+    IVRS_EDITS='IVRS_EDITS'
+    IVR_WITH_BIOMETRIC_AUTHENTICATION='IVR_WITH_BIOMETRIC_AUTHENTICATION'
+    TAG_EDITS='TAG_EDITS'
+    TRUSTED_PROXY='TRUSTED_PROXY'
+
+
+class PickupStatusType(str, Enum):
+    CANCELLED='CANCELLED'
+    COMPLETED='COMPLETED'
+    OPEN='OPEN'
+
+
+class PickupType(str, Enum):
     """These values indicate the type of pickup being requested."""
     ON_CALL='ON_CALL'
+    PACKAGE_RETURN_PROGRAM='PACKAGE_RETURN_PROGRAM'
+    REGULAR_STOP='REGULAR_STOP'
+    REGULAR_STOP_WITH_AUTO_CANCEL='REGULAR_STOP_WITH_AUTO_CANCEL'
     TAG='TAG'
 
 
-class PriorityAlertEnhancementType(Enum):
+class PriorityAlertEnhancementType(str, Enum):
     PRIORITY_ALERT_PLUS='PRIORITY_ALERT_PLUS'
 
 
-class RateLevelBasisType(Enum):
+class RateLevelBasisType(str, Enum):
     BUNDLED_RATE='BUNDLED_RATE'
     INDIVIDUAL_PACKAGE_RATE='INDIVIDUAL_PACKAGE_RATE'
 
 
-class RateTypeBasisType(Enum):
+class RateTypeBasisType(str, Enum):
     """Select the type of rate from which the element is to be selected."""
     ACCOUNT='ACCOUNT'
     ACTUAL='ACTUAL'
@@ -1301,7 +1461,7 @@ class RateTypeBasisType(Enum):
     LIST='LIST'
 
 
-class RecommendedDocumentType(Enum):
+class RecommendedDocumentType(str, Enum):
     """Type of documents that are recommended to be included with the
     shipment."""
     ANTIQUE_STATEMENT_EUROPEAN_UNION='ANTIQUE_STATEMENT_EUROPEAN_UNION'
@@ -1332,7 +1492,7 @@ class RecommendedDocumentType(Enum):
     UNITED_STATES_WATCH_REPAIR_DECLARATION='UNITED_STATES_WATCH_REPAIR_DECLARATION'
 
 
-class RequestedShippingDocumentType(Enum):
+class RequestedShippingDocumentType(str, Enum):
     CERTIFICATE_OF_ORIGIN='CERTIFICATE_OF_ORIGIN'
     COMMERCIAL_INVOICE='COMMERCIAL_INVOICE'
     CUSTOMER_SPECIFIED_LABELS='CUSTOMER_SPECIFIED_LABELS'
@@ -1350,7 +1510,12 @@ class RequestedShippingDocumentType(Enum):
     RETURN_INSTRUCTIONS='RETURN_INSTRUCTIONS'
 
 
-class ReturnEMailAllowedSpecialServiceType(Enum):
+class RestrictionsAndPrivilegesPolicyExceptionType(str, Enum):
+    POLICIES_NOT_FOUND='POLICIES_NOT_FOUND'
+    SERVICE_UNAVAILABLE='SERVICE_UNAVAILABLE'
+
+
+class ReturnEMailAllowedSpecialServiceType(str, Enum):
     """These values are used to control the availability of certain special
     services at the time when a customer uses the e-mail label link to
     create a return shipment."""
@@ -1358,7 +1523,7 @@ class ReturnEMailAllowedSpecialServiceType(Enum):
     SATURDAY_PICKUP='SATURDAY_PICKUP'
 
 
-class ReturnType(Enum):
+class ReturnType(str, Enum):
     FEDEX_TAG='FEDEX_TAG'
     NET_RETURN='NET_RETURN'
     PENDING='PENDING'
@@ -1366,30 +1531,45 @@ class ReturnType(Enum):
     VOICE_CALL_TAG='VOICE_CALL_TAG'
 
 
-class ShipmentDryIceProcessingOptionType(Enum):
+class ServiceIdType(str, Enum):
+    """Identifies the available set of callable FedEx services. This
+    information deals with the service being called by the web service
+    client, not the FedEx transportation service offerings. Set the value
+    to "wsi" if you are using the FedEx web services interface."""
+    DISP='disp'
+
+
+class ShipmentDryIceProcessingOptionType(str, Enum):
     SHIPMENT_LEVEL_DRY_ICE_ONLY='SHIPMENT_LEVEL_DRY_ICE_ONLY'
 
 
-class ShipmentNotificationAggregationType(Enum):
+class ShipmentNotificationAggregationType(str, Enum):
     PER_PACKAGE='PER_PACKAGE'
     PER_SHIPMENT='PER_SHIPMENT'
 
 
-class ShipmentNotificationRoleType(Enum):
+class ShipmentNotificationRoleType(str, Enum):
     BROKER='BROKER'
     OTHER='OTHER'
     RECIPIENT='RECIPIENT'
     SHIPPER='SHIPPER'
-    THIRD_PARTY='THIRD_PARTY'
 
 
-class SpecialEquipmentType(Enum):
+class SignatureOptionType(str, Enum):
+    ADULT='ADULT'
+    DIRECT='DIRECT'
+    INDIRECT='INDIRECT'
+    NO_SIGNATURE_REQUIRED='NO_SIGNATURE_REQUIRED'
+    SERVICE_DEFAULT='SERVICE_DEFAULT'
+
+
+class SpecialEquipmentType(str, Enum):
     """Identifies types of special equipment used in loading/unloading Freight
     shipments"""
     FORK_LIFT='FORK_LIFT'
 
 
-class TinType(Enum):
+class TinType(str, Enum):
     BUSINESS_NATIONAL='BUSINESS_NATIONAL'
     BUSINESS_STATE='BUSINESS_STATE'
     BUSINESS_UNION='BUSINESS_UNION'
@@ -1397,27 +1577,44 @@ class TinType(Enum):
     PERSONAL_STATE='PERSONAL_STATE'
 
 
-class TrackingIdType(Enum):
+class TrackingIdType(str, Enum):
     EXPRESS='EXPRESS'
     FEDEX='FEDEX'
     FREIGHT='FREIGHT'
     GROUND='GROUND'
+    INTERNAL='INTERNAL'
+    UNKNOWN='UNKNOWN'
     USPS='USPS'
 
 
-class TrailerSizeType(Enum):
+class TrailerSizeType(str, Enum):
     TRAILER__28_FT='TRAILER_28_FT'
     TRAILER__48_FT='TRAILER_48_FT'
     TRAILER__53_FT='TRAILER_53_FT'
 
 
-class TruckType(Enum):
+class TransactionSourceFormat(str, Enum):
+    API_CTS='API_CTS'
+    API_XML='API_XML'
+    DIRECT='DIRECT'
+    DIRECT_XML='DIRECT_XML'
+    FXRS_CTS='FXRS_CTS'
+    UNKNOWN='UNKNOWN'
+    WSI_XML='WSI_XML'
+
+
+class TruckType(str, Enum):
     DROP_TRAILER_AGREEMENT='DROP_TRAILER_AGREEMENT'
     LIFTGATE='LIFTGATE'
     TRACTOR_TRAILER_ACCESS='TRACTOR_TRAILER_ACCESS'
 
 
-class UploadDocumentIdProducer(Enum):
+class UpdatePickupRequestProcessingOptionType(str, Enum):
+    OVERRIDE_CUTOFF='OVERRIDE_CUTOFF'
+    REACTIVATE_CANCELLED_PICKUP='REACTIVATE_CANCELLED_PICKUP'
+
+
+class UploadDocumentIdProducer(str, Enum):
     """Specifies the application that is responsible for managing the document
     id."""
     CUSTOMER='CUSTOMER'
@@ -1429,7 +1626,7 @@ class UploadDocumentIdProducer(Enum):
     FEDEX_INET='FEDEX_INET'
 
 
-class UploadDocumentProducerType(Enum):
+class UploadDocumentProducerType(str, Enum):
     CUSTOMER='CUSTOMER'
     FEDEX_CAFE='FEDEX_CAFE'
     FEDEX_CLS='FEDEX_CLS'
@@ -1440,7 +1637,7 @@ class UploadDocumentProducerType(Enum):
     OTHER='OTHER'
 
 
-class UploadDocumentType(Enum):
+class UploadDocumentType(str, Enum):
     CERTIFICATE_OF_ORIGIN='CERTIFICATE_OF_ORIGIN'
     COMMERCIAL_INVOICE='COMMERCIAL_INVOICE'
     ETD_LABEL='ETD_LABEL'
@@ -1450,13 +1647,20 @@ class UploadDocumentType(Enum):
     PRO_FORMA_INVOICE='PRO_FORMA_INVOICE'
 
 
-class WeighingScaleType(Enum):
+class WebServiceEnvironment(str, Enum):
+    """Identifies the environment (level) for which an AuthenticationCredential
+    is valid, and within which transactions are received."""
+    PRODUCTION='PRODUCTION'
+    TEST='TEST'
+
+
+class WeighingScaleType(str, Enum):
     """Identifies types of scales used in weighing Freight shipments"""
     FEDEX_SCALE='FEDEX_SCALE'
     PUBLIC_SCALE='PUBLIC_SCALE'
 
 
-class WeightUnits(Enum):
+class WeightUnits(str, Enum):
     KG='KG'
     LB='LB'
 
@@ -1717,7 +1921,7 @@ class AssociatedAccount(GeneratedsSuper):
         self.ns_prefix_ = None
         self.Type = Type
         self.validate_AssociatedAccountNumberType(self.Type)
-        self.Type_nsprefix_ = None
+        self.Type_nsprefix_ = "ns"
         self.AccountNumber = AccountNumber
         self.AccountNumber_nsprefix_ = None
     def factory(*args_, **kwargs_):
@@ -1847,16 +2051,16 @@ class CancelPickupReply(GeneratedsSuper):
         self.ns_prefix_ = None
         self.HighestSeverity = HighestSeverity
         self.validate_NotificationSeverityType(self.HighestSeverity)
-        self.HighestSeverity_nsprefix_ = None
+        self.HighestSeverity_nsprefix_ = "ns"
         if Notifications is None:
             self.Notifications = []
         else:
             self.Notifications = Notifications
-        self.Notifications_nsprefix_ = None
+        self.Notifications_nsprefix_ = "ns"
         self.TransactionDetail = TransactionDetail
-        self.TransactionDetail_nsprefix_ = None
+        self.TransactionDetail_nsprefix_ = "ns"
         self.Version = Version
-        self.Version_nsprefix_ = None
+        self.Version_nsprefix_ = "ns"
         self.Message = Message
         self.Message_nsprefix_ = None
     def factory(*args_, **kwargs_):
@@ -2023,23 +2227,33 @@ class CancelPickupRequest(GeneratedsSuper):
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, WebAuthenticationDetail=None, ClientDetail=None, TransactionDetail=None, Version=None, CarrierCode=None, PickupConfirmationNumber=None, ScheduledDate=None, EndDate=None, Location=None, Remarks=None, ShippingChargesPayment=None, Reason=None, ContactName=None, PhoneNumber=None, PhoneExtension=None, gds_collector_=None, **kwargs_):
+    def __init__(self, WebAuthenticationDetail=None, ClientDetail=None, UserDetail=None, TransactionDetail=None, Version=None, ApplicationId=None, ServiceLevel=None, CarrierCode=None, PickupType=None, PickupConfirmationNumber=None, ScheduledDate=None, EndDate=None, Location=None, Remarks=None, ShippingChargesPayment=None, Reason=None, ContactName=None, PhoneNumber=None, PhoneExtension=None, RestrictionsAndPrivileges=None, gds_collector_=None, **kwargs_):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.WebAuthenticationDetail = WebAuthenticationDetail
-        self.WebAuthenticationDetail_nsprefix_ = None
+        self.WebAuthenticationDetail_nsprefix_ = "ns"
         self.ClientDetail = ClientDetail
-        self.ClientDetail_nsprefix_ = None
+        self.ClientDetail_nsprefix_ = "ns"
+        self.UserDetail = UserDetail
+        self.UserDetail_nsprefix_ = "ns"
         self.TransactionDetail = TransactionDetail
-        self.TransactionDetail_nsprefix_ = None
+        self.TransactionDetail_nsprefix_ = "ns"
         self.Version = Version
-        self.Version_nsprefix_ = None
+        self.Version_nsprefix_ = "ns"
+        self.ApplicationId = ApplicationId
+        self.ApplicationId_nsprefix_ = None
+        self.ServiceLevel = ServiceLevel
+        self.validate_PickupServiceLevelType(self.ServiceLevel)
+        self.ServiceLevel_nsprefix_ = "ns"
         self.CarrierCode = CarrierCode
         self.validate_CarrierCodeType(self.CarrierCode)
-        self.CarrierCode_nsprefix_ = None
+        self.CarrierCode_nsprefix_ = "ns"
+        self.PickupType = PickupType
+        self.validate_PickupType(self.PickupType)
+        self.PickupType_nsprefix_ = "ns"
         self.PickupConfirmationNumber = PickupConfirmationNumber
         self.PickupConfirmationNumber_nsprefix_ = None
         if isinstance(ScheduledDate, BaseStrType_):
@@ -2059,7 +2273,7 @@ class CancelPickupRequest(GeneratedsSuper):
         self.Remarks = Remarks
         self.Remarks_nsprefix_ = None
         self.ShippingChargesPayment = ShippingChargesPayment
-        self.ShippingChargesPayment_nsprefix_ = None
+        self.ShippingChargesPayment_nsprefix_ = "ns"
         self.Reason = Reason
         self.Reason_nsprefix_ = None
         self.ContactName = ContactName
@@ -2068,6 +2282,8 @@ class CancelPickupRequest(GeneratedsSuper):
         self.PhoneNumber_nsprefix_ = None
         self.PhoneExtension = PhoneExtension
         self.PhoneExtension_nsprefix_ = None
+        self.RestrictionsAndPrivileges = RestrictionsAndPrivileges
+        self.RestrictionsAndPrivileges_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -2091,6 +2307,10 @@ class CancelPickupRequest(GeneratedsSuper):
         return self.ClientDetail
     def set_ClientDetail(self, ClientDetail):
         self.ClientDetail = ClientDetail
+    def get_UserDetail(self):
+        return self.UserDetail
+    def set_UserDetail(self, UserDetail):
+        self.UserDetail = UserDetail
     def get_TransactionDetail(self):
         return self.TransactionDetail
     def set_TransactionDetail(self, TransactionDetail):
@@ -2099,10 +2319,22 @@ class CancelPickupRequest(GeneratedsSuper):
         return self.Version
     def set_Version(self, Version):
         self.Version = Version
+    def get_ApplicationId(self):
+        return self.ApplicationId
+    def set_ApplicationId(self, ApplicationId):
+        self.ApplicationId = ApplicationId
+    def get_ServiceLevel(self):
+        return self.ServiceLevel
+    def set_ServiceLevel(self, ServiceLevel):
+        self.ServiceLevel = ServiceLevel
     def get_CarrierCode(self):
         return self.CarrierCode
     def set_CarrierCode(self, CarrierCode):
         self.CarrierCode = CarrierCode
+    def get_PickupType(self):
+        return self.PickupType
+    def set_PickupType(self, PickupType):
+        self.PickupType = PickupType
     def get_PickupConfirmationNumber(self):
         return self.PickupConfirmationNumber
     def set_PickupConfirmationNumber(self, PickupConfirmationNumber):
@@ -2143,6 +2375,25 @@ class CancelPickupRequest(GeneratedsSuper):
         return self.PhoneExtension
     def set_PhoneExtension(self, PhoneExtension):
         self.PhoneExtension = PhoneExtension
+    def get_RestrictionsAndPrivileges(self):
+        return self.RestrictionsAndPrivileges
+    def set_RestrictionsAndPrivileges(self, RestrictionsAndPrivileges):
+        self.RestrictionsAndPrivileges = RestrictionsAndPrivileges
+    def validate_PickupServiceLevelType(self, value):
+        result = True
+        # Validate type PickupServiceLevelType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['EXTERNAL_EDITS', 'INTERNAL_EDITS', 'IVRS_EDITS', 'IVR_WITH_BIOMETRIC_AUTHENTICATION', 'TAG_EDITS', 'TRUSTED_PROXY']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on PickupServiceLevelType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
     def validate_CarrierCodeType(self, value):
         result = True
         # Validate type CarrierCodeType, a restriction on xs:string.
@@ -2152,19 +2403,38 @@ class CancelPickupRequest(GeneratedsSuper):
                 self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
                 return False
             value = value
-            enumerations = ['FDXC', 'FDXE', 'FDXG', 'FXCC', 'FXFR', 'FXSP']
+            enumerations = ['FDXC', 'FDXE', 'FDXG', 'FDXO', 'FXCC', 'FXFR', 'FXSP']
             if value not in enumerations:
                 lineno = self.gds_get_node_lineno_()
                 self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on CarrierCodeType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_PickupType(self, value):
+        result = True
+        # Validate type PickupType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['ON_CALL', 'PACKAGE_RETURN_PROGRAM', 'REGULAR_STOP', 'REGULAR_STOP_WITH_AUTO_CANCEL', 'TAG']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on PickupType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
                 result = False
         return result
     def hasContent_(self):
         if (
             self.WebAuthenticationDetail is not None or
             self.ClientDetail is not None or
+            self.UserDetail is not None or
             self.TransactionDetail is not None or
             self.Version is not None or
+            self.ApplicationId is not None or
+            self.ServiceLevel is not None or
             self.CarrierCode is not None or
+            self.PickupType is not None or
             self.PickupConfirmationNumber is not None or
             self.ScheduledDate is not None or
             self.EndDate is not None or
@@ -2174,7 +2444,8 @@ class CancelPickupRequest(GeneratedsSuper):
             self.Reason is not None or
             self.ContactName is not None or
             self.PhoneNumber is not None or
-            self.PhoneExtension is not None
+            self.PhoneExtension is not None or
+            self.RestrictionsAndPrivileges is not None
         ):
             return True
         else:
@@ -2215,16 +2486,31 @@ class CancelPickupRequest(GeneratedsSuper):
         if self.ClientDetail is not None:
             namespaceprefix_ = self.ClientDetail_nsprefix_ + ':' if (UseCapturedNS_ and self.ClientDetail_nsprefix_) else ''
             self.ClientDetail.export(outfile, level, namespaceprefix_, namespacedef_='', name_='ClientDetail', pretty_print=pretty_print)
+        if self.UserDetail is not None:
+            namespaceprefix_ = self.UserDetail_nsprefix_ + ':' if (UseCapturedNS_ and self.UserDetail_nsprefix_) else ''
+            self.UserDetail.export(outfile, level, namespaceprefix_, namespacedef_='', name_='UserDetail', pretty_print=pretty_print)
         if self.TransactionDetail is not None:
             namespaceprefix_ = self.TransactionDetail_nsprefix_ + ':' if (UseCapturedNS_ and self.TransactionDetail_nsprefix_) else ''
             self.TransactionDetail.export(outfile, level, namespaceprefix_, namespacedef_='', name_='TransactionDetail', pretty_print=pretty_print)
         if self.Version is not None:
             namespaceprefix_ = self.Version_nsprefix_ + ':' if (UseCapturedNS_ and self.Version_nsprefix_) else ''
             self.Version.export(outfile, level, namespaceprefix_, namespacedef_='', name_='Version', pretty_print=pretty_print)
+        if self.ApplicationId is not None:
+            namespaceprefix_ = self.ApplicationId_nsprefix_ + ':' if (UseCapturedNS_ and self.ApplicationId_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sApplicationId>%s</%sApplicationId>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.ApplicationId), input_name='ApplicationId')), namespaceprefix_ , eol_))
+        if self.ServiceLevel is not None:
+            namespaceprefix_ = self.ServiceLevel_nsprefix_ + ':' if (UseCapturedNS_ and self.ServiceLevel_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sServiceLevel>%s</%sServiceLevel>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.ServiceLevel), input_name='ServiceLevel')), namespaceprefix_ , eol_))
         if self.CarrierCode is not None:
             namespaceprefix_ = self.CarrierCode_nsprefix_ + ':' if (UseCapturedNS_ and self.CarrierCode_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
             outfile.write('<%sCarrierCode>%s</%sCarrierCode>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.CarrierCode), input_name='CarrierCode')), namespaceprefix_ , eol_))
+        if self.PickupType is not None:
+            namespaceprefix_ = self.PickupType_nsprefix_ + ':' if (UseCapturedNS_ and self.PickupType_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sPickupType>%s</%sPickupType>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.PickupType), input_name='PickupType')), namespaceprefix_ , eol_))
         if self.PickupConfirmationNumber is not None:
             namespaceprefix_ = self.PickupConfirmationNumber_nsprefix_ + ':' if (UseCapturedNS_ and self.PickupConfirmationNumber_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
@@ -2264,6 +2550,9 @@ class CancelPickupRequest(GeneratedsSuper):
             namespaceprefix_ = self.PhoneExtension_nsprefix_ + ':' if (UseCapturedNS_ and self.PhoneExtension_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
             outfile.write('<%sPhoneExtension>%s</%sPhoneExtension>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.PhoneExtension), input_name='PhoneExtension')), namespaceprefix_ , eol_))
+        if self.RestrictionsAndPrivileges is not None:
+            namespaceprefix_ = self.RestrictionsAndPrivileges_nsprefix_ + ':' if (UseCapturedNS_ and self.RestrictionsAndPrivileges_nsprefix_) else ''
+            self.RestrictionsAndPrivileges.export(outfile, level, namespaceprefix_, namespacedef_='', name_='RestrictionsAndPrivileges', pretty_print=pretty_print)
     def build(self, node, gds_collector_=None):
         self.gds_collector_ = gds_collector_
         if SaveElementTreeNode:
@@ -2288,6 +2577,11 @@ class CancelPickupRequest(GeneratedsSuper):
             obj_.build(child_, gds_collector_=gds_collector_)
             self.ClientDetail = obj_
             obj_.original_tagname_ = 'ClientDetail'
+        elif nodeName_ == 'UserDetail':
+            obj_ = UserDetail.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.UserDetail = obj_
+            obj_.original_tagname_ = 'UserDetail'
         elif nodeName_ == 'TransactionDetail':
             obj_ = TransactionDetail.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
@@ -2298,6 +2592,20 @@ class CancelPickupRequest(GeneratedsSuper):
             obj_.build(child_, gds_collector_=gds_collector_)
             self.Version = obj_
             obj_.original_tagname_ = 'Version'
+        elif nodeName_ == 'ApplicationId':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'ApplicationId')
+            value_ = self.gds_validate_string(value_, node, 'ApplicationId')
+            self.ApplicationId = value_
+            self.ApplicationId_nsprefix_ = child_.prefix
+        elif nodeName_ == 'ServiceLevel':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'ServiceLevel')
+            value_ = self.gds_validate_string(value_, node, 'ServiceLevel')
+            self.ServiceLevel = value_
+            self.ServiceLevel_nsprefix_ = child_.prefix
+            # validate type PickupServiceLevelType
+            self.validate_PickupServiceLevelType(self.ServiceLevel)
         elif nodeName_ == 'CarrierCode':
             value_ = child_.text
             value_ = self.gds_parse_string(value_, node, 'CarrierCode')
@@ -2306,6 +2614,14 @@ class CancelPickupRequest(GeneratedsSuper):
             self.CarrierCode_nsprefix_ = child_.prefix
             # validate type CarrierCodeType
             self.validate_CarrierCodeType(self.CarrierCode)
+        elif nodeName_ == 'PickupType':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'PickupType')
+            value_ = self.gds_validate_string(value_, node, 'PickupType')
+            self.PickupType = value_
+            self.PickupType_nsprefix_ = child_.prefix
+            # validate type PickupType
+            self.validate_PickupType(self.PickupType)
         elif nodeName_ == 'PickupConfirmationNumber':
             value_ = child_.text
             value_ = self.gds_parse_string(value_, node, 'PickupConfirmationNumber')
@@ -2363,6 +2679,11 @@ class CancelPickupRequest(GeneratedsSuper):
             value_ = self.gds_validate_string(value_, node, 'PhoneExtension')
             self.PhoneExtension = value_
             self.PhoneExtension_nsprefix_ = child_.prefix
+        elif nodeName_ == 'RestrictionsAndPrivileges':
+            obj_ = RestrictionsAndPrivilegesPolicyDetail.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.RestrictionsAndPrivileges = obj_
+            obj_.original_tagname_ = 'RestrictionsAndPrivileges'
 # end class CancelPickupRequest
 
 
@@ -2371,7 +2692,7 @@ class ClientDetail(GeneratedsSuper):
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, AccountNumber=None, MeterNumber=None, MeterInstance=None, IntegratorId=None, Region=None, Localization=None, gds_collector_=None, **kwargs_):
+    def __init__(self, AccountNumber=None, GroundShipperNumber=None, MeterNumber=None, MasterMeterNumber=None, MeterInstance=None, CompanyId=None, SoftwareId=None, SoftwareRelease=None, ClientProductId=None, ClientProductVersion=None, MiddlewareProductId=None, MiddlewareProductVersion=None, IntegratorId=None, Region=None, AutoConfigurationType=None, Localization=None, gds_collector_=None, **kwargs_):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
@@ -2379,17 +2700,38 @@ class ClientDetail(GeneratedsSuper):
         self.ns_prefix_ = None
         self.AccountNumber = AccountNumber
         self.AccountNumber_nsprefix_ = None
+        self.GroundShipperNumber = GroundShipperNumber
+        self.GroundShipperNumber_nsprefix_ = None
         self.MeterNumber = MeterNumber
         self.MeterNumber_nsprefix_ = None
+        self.MasterMeterNumber = MasterMeterNumber
+        self.MasterMeterNumber_nsprefix_ = None
         self.MeterInstance = MeterInstance
         self.MeterInstance_nsprefix_ = None
+        self.CompanyId = CompanyId
+        self.CompanyId_nsprefix_ = None
+        self.SoftwareId = SoftwareId
+        self.SoftwareId_nsprefix_ = None
+        self.SoftwareRelease = SoftwareRelease
+        self.SoftwareRelease_nsprefix_ = None
+        self.ClientProductId = ClientProductId
+        self.ClientProductId_nsprefix_ = None
+        self.ClientProductVersion = ClientProductVersion
+        self.ClientProductVersion_nsprefix_ = None
+        self.MiddlewareProductId = MiddlewareProductId
+        self.MiddlewareProductId_nsprefix_ = None
+        self.MiddlewareProductVersion = MiddlewareProductVersion
+        self.MiddlewareProductVersion_nsprefix_ = None
         self.IntegratorId = IntegratorId
         self.IntegratorId_nsprefix_ = None
         self.Region = Region
         self.validate_ExpressRegionCode(self.Region)
-        self.Region_nsprefix_ = None
+        self.Region_nsprefix_ = "ns"
+        self.AutoConfigurationType = AutoConfigurationType
+        self.validate_AutoConfigurationType(self.AutoConfigurationType)
+        self.AutoConfigurationType_nsprefix_ = "ns"
         self.Localization = Localization
-        self.Localization_nsprefix_ = None
+        self.Localization_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -2409,14 +2751,50 @@ class ClientDetail(GeneratedsSuper):
         return self.AccountNumber
     def set_AccountNumber(self, AccountNumber):
         self.AccountNumber = AccountNumber
+    def get_GroundShipperNumber(self):
+        return self.GroundShipperNumber
+    def set_GroundShipperNumber(self, GroundShipperNumber):
+        self.GroundShipperNumber = GroundShipperNumber
     def get_MeterNumber(self):
         return self.MeterNumber
     def set_MeterNumber(self, MeterNumber):
         self.MeterNumber = MeterNumber
+    def get_MasterMeterNumber(self):
+        return self.MasterMeterNumber
+    def set_MasterMeterNumber(self, MasterMeterNumber):
+        self.MasterMeterNumber = MasterMeterNumber
     def get_MeterInstance(self):
         return self.MeterInstance
     def set_MeterInstance(self, MeterInstance):
         self.MeterInstance = MeterInstance
+    def get_CompanyId(self):
+        return self.CompanyId
+    def set_CompanyId(self, CompanyId):
+        self.CompanyId = CompanyId
+    def get_SoftwareId(self):
+        return self.SoftwareId
+    def set_SoftwareId(self, SoftwareId):
+        self.SoftwareId = SoftwareId
+    def get_SoftwareRelease(self):
+        return self.SoftwareRelease
+    def set_SoftwareRelease(self, SoftwareRelease):
+        self.SoftwareRelease = SoftwareRelease
+    def get_ClientProductId(self):
+        return self.ClientProductId
+    def set_ClientProductId(self, ClientProductId):
+        self.ClientProductId = ClientProductId
+    def get_ClientProductVersion(self):
+        return self.ClientProductVersion
+    def set_ClientProductVersion(self, ClientProductVersion):
+        self.ClientProductVersion = ClientProductVersion
+    def get_MiddlewareProductId(self):
+        return self.MiddlewareProductId
+    def set_MiddlewareProductId(self, MiddlewareProductId):
+        self.MiddlewareProductId = MiddlewareProductId
+    def get_MiddlewareProductVersion(self):
+        return self.MiddlewareProductVersion
+    def set_MiddlewareProductVersion(self, MiddlewareProductVersion):
+        self.MiddlewareProductVersion = MiddlewareProductVersion
     def get_IntegratorId(self):
         return self.IntegratorId
     def set_IntegratorId(self, IntegratorId):
@@ -2425,6 +2803,10 @@ class ClientDetail(GeneratedsSuper):
         return self.Region
     def set_Region(self, Region):
         self.Region = Region
+    def get_AutoConfigurationType(self):
+        return self.AutoConfigurationType
+    def set_AutoConfigurationType(self, AutoConfigurationType):
+        self.AutoConfigurationType = AutoConfigurationType
     def get_Localization(self):
         return self.Localization
     def set_Localization(self, Localization):
@@ -2444,13 +2826,38 @@ class ClientDetail(GeneratedsSuper):
                 self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on ExpressRegionCode' % {"value" : encode_str_2_3(value), "lineno": lineno} )
                 result = False
         return result
+    def validate_AutoConfigurationType(self, value):
+        result = True
+        # Validate type AutoConfigurationType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['ENTERPRISE', 'SHIPPING_SERVICE_PROVIDER', 'SOFTWARE_ONLY', 'TRADITIONAL']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on AutoConfigurationType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
     def hasContent_(self):
         if (
             self.AccountNumber is not None or
+            self.GroundShipperNumber is not None or
             self.MeterNumber is not None or
+            self.MasterMeterNumber is not None or
             self.MeterInstance is not None or
+            self.CompanyId is not None or
+            self.SoftwareId is not None or
+            self.SoftwareRelease is not None or
+            self.ClientProductId is not None or
+            self.ClientProductVersion is not None or
+            self.MiddlewareProductId is not None or
+            self.MiddlewareProductVersion is not None or
             self.IntegratorId is not None or
             self.Region is not None or
+            self.AutoConfigurationType is not None or
             self.Localization is not None
         ):
             return True
@@ -2490,14 +2897,50 @@ class ClientDetail(GeneratedsSuper):
             namespaceprefix_ = self.AccountNumber_nsprefix_ + ':' if (UseCapturedNS_ and self.AccountNumber_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
             outfile.write('<%sAccountNumber>%s</%sAccountNumber>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.AccountNumber), input_name='AccountNumber')), namespaceprefix_ , eol_))
+        if self.GroundShipperNumber is not None:
+            namespaceprefix_ = self.GroundShipperNumber_nsprefix_ + ':' if (UseCapturedNS_ and self.GroundShipperNumber_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sGroundShipperNumber>%s</%sGroundShipperNumber>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.GroundShipperNumber), input_name='GroundShipperNumber')), namespaceprefix_ , eol_))
         if self.MeterNumber is not None:
             namespaceprefix_ = self.MeterNumber_nsprefix_ + ':' if (UseCapturedNS_ and self.MeterNumber_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
             outfile.write('<%sMeterNumber>%s</%sMeterNumber>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.MeterNumber), input_name='MeterNumber')), namespaceprefix_ , eol_))
+        if self.MasterMeterNumber is not None:
+            namespaceprefix_ = self.MasterMeterNumber_nsprefix_ + ':' if (UseCapturedNS_ and self.MasterMeterNumber_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sMasterMeterNumber>%s</%sMasterMeterNumber>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.MasterMeterNumber), input_name='MasterMeterNumber')), namespaceprefix_ , eol_))
         if self.MeterInstance is not None:
             namespaceprefix_ = self.MeterInstance_nsprefix_ + ':' if (UseCapturedNS_ and self.MeterInstance_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
             outfile.write('<%sMeterInstance>%s</%sMeterInstance>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.MeterInstance), input_name='MeterInstance')), namespaceprefix_ , eol_))
+        if self.CompanyId is not None:
+            namespaceprefix_ = self.CompanyId_nsprefix_ + ':' if (UseCapturedNS_ and self.CompanyId_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sCompanyId>%s</%sCompanyId>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.CompanyId), input_name='CompanyId')), namespaceprefix_ , eol_))
+        if self.SoftwareId is not None:
+            namespaceprefix_ = self.SoftwareId_nsprefix_ + ':' if (UseCapturedNS_ and self.SoftwareId_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sSoftwareId>%s</%sSoftwareId>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.SoftwareId), input_name='SoftwareId')), namespaceprefix_ , eol_))
+        if self.SoftwareRelease is not None:
+            namespaceprefix_ = self.SoftwareRelease_nsprefix_ + ':' if (UseCapturedNS_ and self.SoftwareRelease_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sSoftwareRelease>%s</%sSoftwareRelease>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.SoftwareRelease), input_name='SoftwareRelease')), namespaceprefix_ , eol_))
+        if self.ClientProductId is not None:
+            namespaceprefix_ = self.ClientProductId_nsprefix_ + ':' if (UseCapturedNS_ and self.ClientProductId_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sClientProductId>%s</%sClientProductId>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.ClientProductId), input_name='ClientProductId')), namespaceprefix_ , eol_))
+        if self.ClientProductVersion is not None:
+            namespaceprefix_ = self.ClientProductVersion_nsprefix_ + ':' if (UseCapturedNS_ and self.ClientProductVersion_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sClientProductVersion>%s</%sClientProductVersion>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.ClientProductVersion), input_name='ClientProductVersion')), namespaceprefix_ , eol_))
+        if self.MiddlewareProductId is not None:
+            namespaceprefix_ = self.MiddlewareProductId_nsprefix_ + ':' if (UseCapturedNS_ and self.MiddlewareProductId_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sMiddlewareProductId>%s</%sMiddlewareProductId>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.MiddlewareProductId), input_name='MiddlewareProductId')), namespaceprefix_ , eol_))
+        if self.MiddlewareProductVersion is not None:
+            namespaceprefix_ = self.MiddlewareProductVersion_nsprefix_ + ':' if (UseCapturedNS_ and self.MiddlewareProductVersion_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sMiddlewareProductVersion>%s</%sMiddlewareProductVersion>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.MiddlewareProductVersion), input_name='MiddlewareProductVersion')), namespaceprefix_ , eol_))
         if self.IntegratorId is not None:
             namespaceprefix_ = self.IntegratorId_nsprefix_ + ':' if (UseCapturedNS_ and self.IntegratorId_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
@@ -2506,6 +2949,10 @@ class ClientDetail(GeneratedsSuper):
             namespaceprefix_ = self.Region_nsprefix_ + ':' if (UseCapturedNS_ and self.Region_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
             outfile.write('<%sRegion>%s</%sRegion>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Region), input_name='Region')), namespaceprefix_ , eol_))
+        if self.AutoConfigurationType is not None:
+            namespaceprefix_ = self.AutoConfigurationType_nsprefix_ + ':' if (UseCapturedNS_ and self.AutoConfigurationType_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sAutoConfigurationType>%s</%sAutoConfigurationType>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.AutoConfigurationType), input_name='AutoConfigurationType')), namespaceprefix_ , eol_))
         if self.Localization is not None:
             namespaceprefix_ = self.Localization_nsprefix_ + ':' if (UseCapturedNS_ and self.Localization_nsprefix_) else ''
             self.Localization.export(outfile, level, namespaceprefix_, namespacedef_='', name_='Localization', pretty_print=pretty_print)
@@ -2529,18 +2976,72 @@ class ClientDetail(GeneratedsSuper):
             value_ = self.gds_validate_string(value_, node, 'AccountNumber')
             self.AccountNumber = value_
             self.AccountNumber_nsprefix_ = child_.prefix
+        elif nodeName_ == 'GroundShipperNumber':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'GroundShipperNumber')
+            value_ = self.gds_validate_string(value_, node, 'GroundShipperNumber')
+            self.GroundShipperNumber = value_
+            self.GroundShipperNumber_nsprefix_ = child_.prefix
         elif nodeName_ == 'MeterNumber':
             value_ = child_.text
             value_ = self.gds_parse_string(value_, node, 'MeterNumber')
             value_ = self.gds_validate_string(value_, node, 'MeterNumber')
             self.MeterNumber = value_
             self.MeterNumber_nsprefix_ = child_.prefix
+        elif nodeName_ == 'MasterMeterNumber':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'MasterMeterNumber')
+            value_ = self.gds_validate_string(value_, node, 'MasterMeterNumber')
+            self.MasterMeterNumber = value_
+            self.MasterMeterNumber_nsprefix_ = child_.prefix
         elif nodeName_ == 'MeterInstance':
             value_ = child_.text
             value_ = self.gds_parse_string(value_, node, 'MeterInstance')
             value_ = self.gds_validate_string(value_, node, 'MeterInstance')
             self.MeterInstance = value_
             self.MeterInstance_nsprefix_ = child_.prefix
+        elif nodeName_ == 'CompanyId':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'CompanyId')
+            value_ = self.gds_validate_string(value_, node, 'CompanyId')
+            self.CompanyId = value_
+            self.CompanyId_nsprefix_ = child_.prefix
+        elif nodeName_ == 'SoftwareId':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'SoftwareId')
+            value_ = self.gds_validate_string(value_, node, 'SoftwareId')
+            self.SoftwareId = value_
+            self.SoftwareId_nsprefix_ = child_.prefix
+        elif nodeName_ == 'SoftwareRelease':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'SoftwareRelease')
+            value_ = self.gds_validate_string(value_, node, 'SoftwareRelease')
+            self.SoftwareRelease = value_
+            self.SoftwareRelease_nsprefix_ = child_.prefix
+        elif nodeName_ == 'ClientProductId':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'ClientProductId')
+            value_ = self.gds_validate_string(value_, node, 'ClientProductId')
+            self.ClientProductId = value_
+            self.ClientProductId_nsprefix_ = child_.prefix
+        elif nodeName_ == 'ClientProductVersion':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'ClientProductVersion')
+            value_ = self.gds_validate_string(value_, node, 'ClientProductVersion')
+            self.ClientProductVersion = value_
+            self.ClientProductVersion_nsprefix_ = child_.prefix
+        elif nodeName_ == 'MiddlewareProductId':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'MiddlewareProductId')
+            value_ = self.gds_validate_string(value_, node, 'MiddlewareProductId')
+            self.MiddlewareProductId = value_
+            self.MiddlewareProductId_nsprefix_ = child_.prefix
+        elif nodeName_ == 'MiddlewareProductVersion':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'MiddlewareProductVersion')
+            value_ = self.gds_validate_string(value_, node, 'MiddlewareProductVersion')
+            self.MiddlewareProductVersion = value_
+            self.MiddlewareProductVersion_nsprefix_ = child_.prefix
         elif nodeName_ == 'IntegratorId':
             value_ = child_.text
             value_ = self.gds_parse_string(value_, node, 'IntegratorId')
@@ -2555,6 +3056,14 @@ class ClientDetail(GeneratedsSuper):
             self.Region_nsprefix_ = child_.prefix
             # validate type ExpressRegionCode
             self.validate_ExpressRegionCode(self.Region)
+        elif nodeName_ == 'AutoConfigurationType':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'AutoConfigurationType')
+            value_ = self.gds_validate_string(value_, node, 'AutoConfigurationType')
+            self.AutoConfigurationType = value_
+            self.AutoConfigurationType_nsprefix_ = child_.prefix
+            # validate type AutoConfigurationType
+            self.validate_AutoConfigurationType(self.AutoConfigurationType)
         elif nodeName_ == 'Localization':
             obj_ = Localization.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
@@ -2575,16 +3084,16 @@ class CodAddTransportationChargesDetail(GeneratedsSuper):
         self.ns_prefix_ = None
         self.RateTypeBasis = RateTypeBasis
         self.validate_RateTypeBasisType(self.RateTypeBasis)
-        self.RateTypeBasis_nsprefix_ = None
+        self.RateTypeBasis_nsprefix_ = "ns"
         self.ChargeBasis = ChargeBasis
         self.validate_CodAddTransportationChargeBasisType(self.ChargeBasis)
-        self.ChargeBasis_nsprefix_ = None
+        self.ChargeBasis_nsprefix_ = "ns"
         self.ChargeBasisLevel = ChargeBasisLevel
         self.validate_ChargeBasisLevelType(self.ChargeBasisLevel)
-        self.ChargeBasisLevel_nsprefix_ = None
+        self.ChargeBasisLevel_nsprefix_ = "ns"
         self.RateLevelBasis = RateLevelBasis
         self.validate_RateLevelBasisType(self.RateLevelBasis)
-        self.RateLevelBasis_nsprefix_ = None
+        self.RateLevelBasis_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -2794,23 +3303,23 @@ class CodDetail(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.CodCollectionAmount = CodCollectionAmount
-        self.CodCollectionAmount_nsprefix_ = None
+        self.CodCollectionAmount_nsprefix_ = "ns"
         self.AddTransportationChargesDetail = AddTransportationChargesDetail
-        self.AddTransportationChargesDetail_nsprefix_ = None
+        self.AddTransportationChargesDetail_nsprefix_ = "ns"
         self.CollectionType = CollectionType
         self.validate_CodCollectionType(self.CollectionType)
-        self.CollectionType_nsprefix_ = None
+        self.CollectionType_nsprefix_ = "ns"
         self.CodRecipient = CodRecipient
-        self.CodRecipient_nsprefix_ = None
+        self.CodRecipient_nsprefix_ = "ns"
         self.FinancialInstitutionContactAndAddress = FinancialInstitutionContactAndAddress
-        self.FinancialInstitutionContactAndAddress_nsprefix_ = None
+        self.FinancialInstitutionContactAndAddress_nsprefix_ = "ns"
         self.RemitToName = RemitToName
         self.RemitToName_nsprefix_ = None
         self.ReferenceIndicator = ReferenceIndicator
         self.validate_CodReturnReferenceIndicatorType(self.ReferenceIndicator)
-        self.ReferenceIndicator_nsprefix_ = None
+        self.ReferenceIndicator_nsprefix_ = "ns"
         self.ReturnTrackingId = ReturnTrackingId
-        self.ReturnTrackingId_nsprefix_ = None
+        self.ReturnTrackingId_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -3035,21 +3544,21 @@ class CompletedFreightPickupDetail(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.Origin = Origin
-        self.Origin_nsprefix_ = None
+        self.Origin_nsprefix_ = "ns"
         if LineItems is None:
             self.LineItems = []
         else:
             self.LineItems = LineItems
-        self.LineItems_nsprefix_ = None
+        self.LineItems_nsprefix_ = "ns"
         self.TotalPieces = TotalPieces
         self.TotalPieces_nsprefix_ = None
         self.TotalWeight = TotalWeight
-        self.TotalWeight_nsprefix_ = None
+        self.TotalWeight_nsprefix_ = "ns"
         self.TotalHandlingUnits = TotalHandlingUnits
         self.TotalHandlingUnits_nsprefix_ = None
         self.Status = Status
         self.validate_PickupEventType(self.Status)
-        self.Status_nsprefix_ = None
+        self.Status_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -3244,7 +3753,7 @@ class CompletedFreightPickupLineItem(GeneratedsSuper):
         self.SequenceNumber = SequenceNumber
         self.SequenceNumber_nsprefix_ = None
         self.Destination = Destination
-        self.Destination_nsprefix_ = None
+        self.Destination_nsprefix_ = "ns"
         self.TotalTravelTime = TotalTravelTime
         self.TotalTravelTime_nsprefix_ = None
         if isinstance(EtaDeliveryTimestamp, BaseStrType_):
@@ -3638,9 +4147,9 @@ class ContactAndAddress(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.Contact = Contact
-        self.Contact_nsprefix_ = None
+        self.Contact_nsprefix_ = "ns"
         self.Address = Address
-        self.Address_nsprefix_ = None
+        self.Address_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -3747,16 +4256,16 @@ class CreatePickupReply(GeneratedsSuper):
         self.ns_prefix_ = None
         self.HighestSeverity = HighestSeverity
         self.validate_NotificationSeverityType(self.HighestSeverity)
-        self.HighestSeverity_nsprefix_ = None
+        self.HighestSeverity_nsprefix_ = "ns"
         if Notifications is None:
             self.Notifications = []
         else:
             self.Notifications = Notifications
-        self.Notifications_nsprefix_ = None
+        self.Notifications_nsprefix_ = "ns"
         self.TransactionDetail = TransactionDetail
-        self.TransactionDetail_nsprefix_ = None
+        self.TransactionDetail_nsprefix_ = "ns"
         self.Version = Version
-        self.Version_nsprefix_ = None
+        self.Version_nsprefix_ = "ns"
         self.PickupConfirmationNumber = PickupConfirmationNumber
         self.PickupConfirmationNumber_nsprefix_ = None
         self.Location = Location
@@ -3774,7 +4283,7 @@ class CreatePickupReply(GeneratedsSuper):
         self.LastAccessTime = initvalue_
         self.LastAccessTime_nsprefix_ = None
         self.CompletedFreightPickupDetail = CompletedFreightPickupDetail
-        self.CompletedFreightPickupDetail_nsprefix_ = None
+        self.CompletedFreightPickupDetail_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -4026,40 +4535,65 @@ class CreatePickupRequest(GeneratedsSuper):
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, WebAuthenticationDetail=None, ClientDetail=None, TransactionDetail=None, Version=None, AssociatedAccountNumber=None, TrackingNumber=None, OriginDetail=None, PickupServiceCategory=None, FreightPickupDetail=None, ExpressFreightDetail=None, PackageCount=None, TotalWeight=None, CarrierCode=None, OversizePackageCount=None, Remarks=None, CommodityDescription=None, CountryRelationship=None, gds_collector_=None, **kwargs_):
+    def __init__(self, WebAuthenticationDetail=None, ClientDetail=None, UserDetail=None, TransactionDetail=None, Version=None, ApplicationId=None, ServiceLevel=None, ProcessingOptions=None, SupportedFeatures=None, AssociatedAccountNumber=None, TrackingNumber=None, OriginDetail=None, PickupServiceCategory=None, FreightPickupDetail=None, ExpressFreightDetail=None, RequestedExpressPickupDetails=None, PickupType=None, PackageCount=None, TotalWeight=None, CarrierCode=None, OversizePackageCount=None, Remarks=None, CommodityDescription=None, CountryRelationship=None, RestrictionsAndPrivileges=None, gds_collector_=None, **kwargs_):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.WebAuthenticationDetail = WebAuthenticationDetail
-        self.WebAuthenticationDetail_nsprefix_ = None
+        self.WebAuthenticationDetail_nsprefix_ = "ns"
         self.ClientDetail = ClientDetail
-        self.ClientDetail_nsprefix_ = None
+        self.ClientDetail_nsprefix_ = "ns"
+        self.UserDetail = UserDetail
+        self.UserDetail_nsprefix_ = "ns"
         self.TransactionDetail = TransactionDetail
-        self.TransactionDetail_nsprefix_ = None
+        self.TransactionDetail_nsprefix_ = "ns"
         self.Version = Version
-        self.Version_nsprefix_ = None
+        self.Version_nsprefix_ = "ns"
+        self.ApplicationId = ApplicationId
+        self.ApplicationId_nsprefix_ = None
+        self.ServiceLevel = ServiceLevel
+        self.validate_PickupServiceLevelType(self.ServiceLevel)
+        self.ServiceLevel_nsprefix_ = "ns"
+        if ProcessingOptions is None:
+            self.ProcessingOptions = []
+        else:
+            self.ProcessingOptions = ProcessingOptions
+        self.ProcessingOptions_nsprefix_ = "ns"
+        if SupportedFeatures is None:
+            self.SupportedFeatures = []
+        else:
+            self.SupportedFeatures = SupportedFeatures
+        self.SupportedFeatures_nsprefix_ = "ns"
         self.AssociatedAccountNumber = AssociatedAccountNumber
-        self.AssociatedAccountNumber_nsprefix_ = None
+        self.AssociatedAccountNumber_nsprefix_ = "ns"
         self.TrackingNumber = TrackingNumber
         self.TrackingNumber_nsprefix_ = None
         self.OriginDetail = OriginDetail
-        self.OriginDetail_nsprefix_ = None
+        self.OriginDetail_nsprefix_ = "ns"
         self.PickupServiceCategory = PickupServiceCategory
         self.validate_PickupServiceCategoryType(self.PickupServiceCategory)
-        self.PickupServiceCategory_nsprefix_ = None
+        self.PickupServiceCategory_nsprefix_ = "ns"
         self.FreightPickupDetail = FreightPickupDetail
-        self.FreightPickupDetail_nsprefix_ = None
+        self.FreightPickupDetail_nsprefix_ = "ns"
         self.ExpressFreightDetail = ExpressFreightDetail
-        self.ExpressFreightDetail_nsprefix_ = None
+        self.ExpressFreightDetail_nsprefix_ = "ns"
+        if RequestedExpressPickupDetails is None:
+            self.RequestedExpressPickupDetails = []
+        else:
+            self.RequestedExpressPickupDetails = RequestedExpressPickupDetails
+        self.RequestedExpressPickupDetails_nsprefix_ = "ns"
+        self.PickupType = PickupType
+        self.validate_PickupType(self.PickupType)
+        self.PickupType_nsprefix_ = "ns"
         self.PackageCount = PackageCount
         self.PackageCount_nsprefix_ = None
         self.TotalWeight = TotalWeight
-        self.TotalWeight_nsprefix_ = None
+        self.TotalWeight_nsprefix_ = "ns"
         self.CarrierCode = CarrierCode
         self.validate_CarrierCodeType(self.CarrierCode)
-        self.CarrierCode_nsprefix_ = None
+        self.CarrierCode_nsprefix_ = "ns"
         self.OversizePackageCount = OversizePackageCount
         self.OversizePackageCount_nsprefix_ = None
         self.Remarks = Remarks
@@ -4068,7 +4602,9 @@ class CreatePickupRequest(GeneratedsSuper):
         self.CommodityDescription_nsprefix_ = None
         self.CountryRelationship = CountryRelationship
         self.validate_CountryRelationshipType(self.CountryRelationship)
-        self.CountryRelationship_nsprefix_ = None
+        self.CountryRelationship_nsprefix_ = "ns"
+        self.RestrictionsAndPrivileges = RestrictionsAndPrivileges
+        self.RestrictionsAndPrivileges_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -4092,6 +4628,10 @@ class CreatePickupRequest(GeneratedsSuper):
         return self.ClientDetail
     def set_ClientDetail(self, ClientDetail):
         self.ClientDetail = ClientDetail
+    def get_UserDetail(self):
+        return self.UserDetail
+    def set_UserDetail(self, UserDetail):
+        self.UserDetail = UserDetail
     def get_TransactionDetail(self):
         return self.TransactionDetail
     def set_TransactionDetail(self, TransactionDetail):
@@ -4100,6 +4640,34 @@ class CreatePickupRequest(GeneratedsSuper):
         return self.Version
     def set_Version(self, Version):
         self.Version = Version
+    def get_ApplicationId(self):
+        return self.ApplicationId
+    def set_ApplicationId(self, ApplicationId):
+        self.ApplicationId = ApplicationId
+    def get_ServiceLevel(self):
+        return self.ServiceLevel
+    def set_ServiceLevel(self, ServiceLevel):
+        self.ServiceLevel = ServiceLevel
+    def get_ProcessingOptions(self):
+        return self.ProcessingOptions
+    def set_ProcessingOptions(self, ProcessingOptions):
+        self.ProcessingOptions = ProcessingOptions
+    def add_ProcessingOptions(self, value):
+        self.ProcessingOptions.append(value)
+    def insert_ProcessingOptions_at(self, index, value):
+        self.ProcessingOptions.insert(index, value)
+    def replace_ProcessingOptions_at(self, index, value):
+        self.ProcessingOptions[index] = value
+    def get_SupportedFeatures(self):
+        return self.SupportedFeatures
+    def set_SupportedFeatures(self, SupportedFeatures):
+        self.SupportedFeatures = SupportedFeatures
+    def add_SupportedFeatures(self, value):
+        self.SupportedFeatures.append(value)
+    def insert_SupportedFeatures_at(self, index, value):
+        self.SupportedFeatures.insert(index, value)
+    def replace_SupportedFeatures_at(self, index, value):
+        self.SupportedFeatures[index] = value
     def get_AssociatedAccountNumber(self):
         return self.AssociatedAccountNumber
     def set_AssociatedAccountNumber(self, AssociatedAccountNumber):
@@ -4124,6 +4692,20 @@ class CreatePickupRequest(GeneratedsSuper):
         return self.ExpressFreightDetail
     def set_ExpressFreightDetail(self, ExpressFreightDetail):
         self.ExpressFreightDetail = ExpressFreightDetail
+    def get_RequestedExpressPickupDetails(self):
+        return self.RequestedExpressPickupDetails
+    def set_RequestedExpressPickupDetails(self, RequestedExpressPickupDetails):
+        self.RequestedExpressPickupDetails = RequestedExpressPickupDetails
+    def add_RequestedExpressPickupDetails(self, value):
+        self.RequestedExpressPickupDetails.append(value)
+    def insert_RequestedExpressPickupDetails_at(self, index, value):
+        self.RequestedExpressPickupDetails.insert(index, value)
+    def replace_RequestedExpressPickupDetails_at(self, index, value):
+        self.RequestedExpressPickupDetails[index] = value
+    def get_PickupType(self):
+        return self.PickupType
+    def set_PickupType(self, PickupType):
+        self.PickupType = PickupType
     def get_PackageCount(self):
         return self.PackageCount
     def set_PackageCount(self, PackageCount):
@@ -4152,6 +4734,40 @@ class CreatePickupRequest(GeneratedsSuper):
         return self.CountryRelationship
     def set_CountryRelationship(self, CountryRelationship):
         self.CountryRelationship = CountryRelationship
+    def get_RestrictionsAndPrivileges(self):
+        return self.RestrictionsAndPrivileges
+    def set_RestrictionsAndPrivileges(self, RestrictionsAndPrivileges):
+        self.RestrictionsAndPrivileges = RestrictionsAndPrivileges
+    def validate_PickupServiceLevelType(self, value):
+        result = True
+        # Validate type PickupServiceLevelType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['EXTERNAL_EDITS', 'INTERNAL_EDITS', 'IVRS_EDITS', 'IVR_WITH_BIOMETRIC_AUTHENTICATION', 'TAG_EDITS', 'TRUSTED_PROXY']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on PickupServiceLevelType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_CreatePickupRequestProcessingOptionType(self, value):
+        result = True
+        # Validate type CreatePickupRequestProcessingOptionType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['ALLOW_RESTRICTIONS_WITH_EXCEPTIONS', 'INELIGIBLE_FOR_HOME_DELIVERY', 'ON_CALL_PICKUP', 'PACKAGE_RETURN_PROGRAM', 'PICKUP_FOR_RETURN']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on CreatePickupRequestProcessingOptionType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
     def validate_PickupServiceCategoryType(self, value):
         result = True
         # Validate type PickupServiceCategoryType, a restriction on xs:string.
@@ -4167,6 +4783,21 @@ class CreatePickupRequest(GeneratedsSuper):
                 self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on PickupServiceCategoryType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
                 result = False
         return result
+    def validate_PickupType(self, value):
+        result = True
+        # Validate type PickupType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['ON_CALL', 'PACKAGE_RETURN_PROGRAM', 'REGULAR_STOP', 'REGULAR_STOP_WITH_AUTO_CANCEL', 'TAG']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on PickupType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
     def validate_CarrierCodeType(self, value):
         result = True
         # Validate type CarrierCodeType, a restriction on xs:string.
@@ -4176,7 +4807,7 @@ class CreatePickupRequest(GeneratedsSuper):
                 self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
                 return False
             value = value
-            enumerations = ['FDXC', 'FDXE', 'FDXG', 'FXCC', 'FXFR', 'FXSP']
+            enumerations = ['FDXC', 'FDXE', 'FDXG', 'FDXO', 'FXCC', 'FXFR', 'FXSP']
             if value not in enumerations:
                 lineno = self.gds_get_node_lineno_()
                 self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on CarrierCodeType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
@@ -4201,21 +4832,29 @@ class CreatePickupRequest(GeneratedsSuper):
         if (
             self.WebAuthenticationDetail is not None or
             self.ClientDetail is not None or
+            self.UserDetail is not None or
             self.TransactionDetail is not None or
             self.Version is not None or
+            self.ApplicationId is not None or
+            self.ServiceLevel is not None or
+            self.ProcessingOptions or
+            self.SupportedFeatures or
             self.AssociatedAccountNumber is not None or
             self.TrackingNumber is not None or
             self.OriginDetail is not None or
             self.PickupServiceCategory is not None or
             self.FreightPickupDetail is not None or
             self.ExpressFreightDetail is not None or
+            self.RequestedExpressPickupDetails or
+            self.PickupType is not None or
             self.PackageCount is not None or
             self.TotalWeight is not None or
             self.CarrierCode is not None or
             self.OversizePackageCount is not None or
             self.Remarks is not None or
             self.CommodityDescription is not None or
-            self.CountryRelationship is not None
+            self.CountryRelationship is not None or
+            self.RestrictionsAndPrivileges is not None
         ):
             return True
         else:
@@ -4256,12 +4895,30 @@ class CreatePickupRequest(GeneratedsSuper):
         if self.ClientDetail is not None:
             namespaceprefix_ = self.ClientDetail_nsprefix_ + ':' if (UseCapturedNS_ and self.ClientDetail_nsprefix_) else ''
             self.ClientDetail.export(outfile, level, namespaceprefix_, namespacedef_='', name_='ClientDetail', pretty_print=pretty_print)
+        if self.UserDetail is not None:
+            namespaceprefix_ = self.UserDetail_nsprefix_ + ':' if (UseCapturedNS_ and self.UserDetail_nsprefix_) else ''
+            self.UserDetail.export(outfile, level, namespaceprefix_, namespacedef_='', name_='UserDetail', pretty_print=pretty_print)
         if self.TransactionDetail is not None:
             namespaceprefix_ = self.TransactionDetail_nsprefix_ + ':' if (UseCapturedNS_ and self.TransactionDetail_nsprefix_) else ''
             self.TransactionDetail.export(outfile, level, namespaceprefix_, namespacedef_='', name_='TransactionDetail', pretty_print=pretty_print)
         if self.Version is not None:
             namespaceprefix_ = self.Version_nsprefix_ + ':' if (UseCapturedNS_ and self.Version_nsprefix_) else ''
             self.Version.export(outfile, level, namespaceprefix_, namespacedef_='', name_='Version', pretty_print=pretty_print)
+        if self.ApplicationId is not None:
+            namespaceprefix_ = self.ApplicationId_nsprefix_ + ':' if (UseCapturedNS_ and self.ApplicationId_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sApplicationId>%s</%sApplicationId>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.ApplicationId), input_name='ApplicationId')), namespaceprefix_ , eol_))
+        if self.ServiceLevel is not None:
+            namespaceprefix_ = self.ServiceLevel_nsprefix_ + ':' if (UseCapturedNS_ and self.ServiceLevel_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sServiceLevel>%s</%sServiceLevel>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.ServiceLevel), input_name='ServiceLevel')), namespaceprefix_ , eol_))
+        for ProcessingOptions_ in self.ProcessingOptions:
+            namespaceprefix_ = self.ProcessingOptions_nsprefix_ + ':' if (UseCapturedNS_ and self.ProcessingOptions_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sProcessingOptions>%s</%sProcessingOptions>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(ProcessingOptions_), input_name='ProcessingOptions')), namespaceprefix_ , eol_))
+        for SupportedFeatures_ in self.SupportedFeatures:
+            namespaceprefix_ = self.SupportedFeatures_nsprefix_ + ':' if (UseCapturedNS_ and self.SupportedFeatures_nsprefix_) else ''
+            SupportedFeatures_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='SupportedFeatures', pretty_print=pretty_print)
         if self.AssociatedAccountNumber is not None:
             namespaceprefix_ = self.AssociatedAccountNumber_nsprefix_ + ':' if (UseCapturedNS_ and self.AssociatedAccountNumber_nsprefix_) else ''
             self.AssociatedAccountNumber.export(outfile, level, namespaceprefix_, namespacedef_='', name_='AssociatedAccountNumber', pretty_print=pretty_print)
@@ -4282,6 +4939,13 @@ class CreatePickupRequest(GeneratedsSuper):
         if self.ExpressFreightDetail is not None:
             namespaceprefix_ = self.ExpressFreightDetail_nsprefix_ + ':' if (UseCapturedNS_ and self.ExpressFreightDetail_nsprefix_) else ''
             self.ExpressFreightDetail.export(outfile, level, namespaceprefix_, namespacedef_='', name_='ExpressFreightDetail', pretty_print=pretty_print)
+        for RequestedExpressPickupDetails_ in self.RequestedExpressPickupDetails:
+            namespaceprefix_ = self.RequestedExpressPickupDetails_nsprefix_ + ':' if (UseCapturedNS_ and self.RequestedExpressPickupDetails_nsprefix_) else ''
+            RequestedExpressPickupDetails_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='RequestedExpressPickupDetails', pretty_print=pretty_print)
+        if self.PickupType is not None:
+            namespaceprefix_ = self.PickupType_nsprefix_ + ':' if (UseCapturedNS_ and self.PickupType_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sPickupType>%s</%sPickupType>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.PickupType), input_name='PickupType')), namespaceprefix_ , eol_))
         if self.PackageCount is not None:
             namespaceprefix_ = self.PackageCount_nsprefix_ + ':' if (UseCapturedNS_ and self.PackageCount_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
@@ -4309,6 +4973,9 @@ class CreatePickupRequest(GeneratedsSuper):
             namespaceprefix_ = self.CountryRelationship_nsprefix_ + ':' if (UseCapturedNS_ and self.CountryRelationship_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
             outfile.write('<%sCountryRelationship>%s</%sCountryRelationship>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.CountryRelationship), input_name='CountryRelationship')), namespaceprefix_ , eol_))
+        if self.RestrictionsAndPrivileges is not None:
+            namespaceprefix_ = self.RestrictionsAndPrivileges_nsprefix_ + ':' if (UseCapturedNS_ and self.RestrictionsAndPrivileges_nsprefix_) else ''
+            self.RestrictionsAndPrivileges.export(outfile, level, namespaceprefix_, namespacedef_='', name_='RestrictionsAndPrivileges', pretty_print=pretty_print)
     def build(self, node, gds_collector_=None):
         self.gds_collector_ = gds_collector_
         if SaveElementTreeNode:
@@ -4333,6 +5000,11 @@ class CreatePickupRequest(GeneratedsSuper):
             obj_.build(child_, gds_collector_=gds_collector_)
             self.ClientDetail = obj_
             obj_.original_tagname_ = 'ClientDetail'
+        elif nodeName_ == 'UserDetail':
+            obj_ = UserDetail.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.UserDetail = obj_
+            obj_.original_tagname_ = 'UserDetail'
         elif nodeName_ == 'TransactionDetail':
             obj_ = TransactionDetail.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
@@ -4343,6 +5015,33 @@ class CreatePickupRequest(GeneratedsSuper):
             obj_.build(child_, gds_collector_=gds_collector_)
             self.Version = obj_
             obj_.original_tagname_ = 'Version'
+        elif nodeName_ == 'ApplicationId':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'ApplicationId')
+            value_ = self.gds_validate_string(value_, node, 'ApplicationId')
+            self.ApplicationId = value_
+            self.ApplicationId_nsprefix_ = child_.prefix
+        elif nodeName_ == 'ServiceLevel':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'ServiceLevel')
+            value_ = self.gds_validate_string(value_, node, 'ServiceLevel')
+            self.ServiceLevel = value_
+            self.ServiceLevel_nsprefix_ = child_.prefix
+            # validate type PickupServiceLevelType
+            self.validate_PickupServiceLevelType(self.ServiceLevel)
+        elif nodeName_ == 'ProcessingOptions':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'ProcessingOptions')
+            value_ = self.gds_validate_string(value_, node, 'ProcessingOptions')
+            self.ProcessingOptions.append(value_)
+            self.ProcessingOptions_nsprefix_ = child_.prefix
+            # validate type CreatePickupRequestProcessingOptionType
+            self.validate_CreatePickupRequestProcessingOptionType(self.ProcessingOptions[-1])
+        elif nodeName_ == 'SupportedFeatures':
+            obj_ = VariationOptionDetail.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.SupportedFeatures.append(obj_)
+            obj_.original_tagname_ = 'SupportedFeatures'
         elif nodeName_ == 'AssociatedAccountNumber':
             obj_ = AssociatedAccount.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
@@ -4377,6 +5076,19 @@ class CreatePickupRequest(GeneratedsSuper):
             obj_.build(child_, gds_collector_=gds_collector_)
             self.ExpressFreightDetail = obj_
             obj_.original_tagname_ = 'ExpressFreightDetail'
+        elif nodeName_ == 'RequestedExpressPickupDetails':
+            obj_ = RequestedPickupShipmentDetail.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.RequestedExpressPickupDetails.append(obj_)
+            obj_.original_tagname_ = 'RequestedExpressPickupDetails'
+        elif nodeName_ == 'PickupType':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'PickupType')
+            value_ = self.gds_validate_string(value_, node, 'PickupType')
+            self.PickupType = value_
+            self.PickupType_nsprefix_ = child_.prefix
+            # validate type PickupType
+            self.validate_PickupType(self.PickupType)
         elif nodeName_ == 'PackageCount' and child_.text:
             sval_ = child_.text
             ival_ = self.gds_parse_integer(sval_, node, 'PackageCount')
@@ -4426,6 +5138,11 @@ class CreatePickupRequest(GeneratedsSuper):
             self.CountryRelationship_nsprefix_ = child_.prefix
             # validate type CountryRelationshipType
             self.validate_CountryRelationshipType(self.CountryRelationship)
+        elif nodeName_ == 'RestrictionsAndPrivileges':
+            obj_ = RestrictionsAndPrivilegesPolicyDetail.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.RestrictionsAndPrivileges = obj_
+            obj_.original_tagname_ = 'RestrictionsAndPrivileges'
 # end class CreatePickupRequest
 
 
@@ -4441,7 +5158,7 @@ class CustomDeliveryWindowDetail(GeneratedsSuper):
         self.ns_prefix_ = None
         self.Type = Type
         self.validate_CustomDeliveryWindowType(self.Type)
-        self.Type_nsprefix_ = None
+        self.Type_nsprefix_ = "ns"
         if isinstance(RequestTime, BaseStrType_):
             initvalue_ = datetime_.datetime.strptime(RequestTime, '%H:%M:%S').time()
         else:
@@ -4449,7 +5166,7 @@ class CustomDeliveryWindowDetail(GeneratedsSuper):
         self.RequestTime = initvalue_
         self.RequestTime_nsprefix_ = None
         self.RequestRange = RequestRange
-        self.RequestRange_nsprefix_ = None
+        self.RequestRange_nsprefix_ = "ns"
         if isinstance(RequestDate, BaseStrType_):
             initvalue_ = datetime_.datetime.strptime(RequestDate, '%Y-%m-%d').date()
         else:
@@ -4597,6 +5314,136 @@ class CustomDeliveryWindowDetail(GeneratedsSuper):
 # end class CustomDeliveryWindowDetail
 
 
+class CustomerReference(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, CustomerReferenceType=None, Value=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.CustomerReferenceType = CustomerReferenceType
+        self.validate_CustomerReferenceType(self.CustomerReferenceType)
+        self.CustomerReferenceType_nsprefix_ = "ns"
+        self.Value = Value
+        self.Value_nsprefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, CustomerReference)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if CustomerReference.subclass:
+            return CustomerReference.subclass(*args_, **kwargs_)
+        else:
+            return CustomerReference(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_CustomerReferenceType(self):
+        return self.CustomerReferenceType
+    def set_CustomerReferenceType(self, CustomerReferenceType):
+        self.CustomerReferenceType = CustomerReferenceType
+    def get_Value(self):
+        return self.Value
+    def set_Value(self, Value):
+        self.Value = Value
+    def validate_CustomerReferenceType(self, value):
+        result = True
+        # Validate type CustomerReferenceType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['BILL_OF_LADING', 'CUSTOMER_REFERENCE', 'DEPARTMENT_NUMBER', 'ELECTRONIC_PRODUCT_CODE', 'INTRACOUNTRY_REGULATORY_REFERENCE', 'INVOICE_NUMBER', 'PACKING_SLIP_NUMBER', 'P_O_NUMBER', 'RMA_ASSOCIATION', 'SHIPMENT_INTEGRITY', 'STORE_NUMBER']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on CustomerReferenceType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def hasContent_(self):
+        if (
+            self.CustomerReferenceType is not None or
+            self.Value is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='CustomerReference', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('CustomerReference')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'CustomerReference':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='CustomerReference')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='CustomerReference', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='CustomerReference'):
+        pass
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='CustomerReference', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.CustomerReferenceType is not None:
+            namespaceprefix_ = self.CustomerReferenceType_nsprefix_ + ':' if (UseCapturedNS_ and self.CustomerReferenceType_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sCustomerReferenceType>%s</%sCustomerReferenceType>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.CustomerReferenceType), input_name='CustomerReferenceType')), namespaceprefix_ , eol_))
+        if self.Value is not None:
+            namespaceprefix_ = self.Value_nsprefix_ + ':' if (UseCapturedNS_ and self.Value_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sValue>%s</%sValue>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Value), input_name='Value')), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'CustomerReferenceType':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'CustomerReferenceType')
+            value_ = self.gds_validate_string(value_, node, 'CustomerReferenceType')
+            self.CustomerReferenceType = value_
+            self.CustomerReferenceType_nsprefix_ = child_.prefix
+            # validate type CustomerReferenceType
+            self.validate_CustomerReferenceType(self.CustomerReferenceType)
+        elif nodeName_ == 'Value':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Value')
+            value_ = self.gds_validate_string(value_, node, 'Value')
+            self.Value = value_
+            self.Value_nsprefix_ = child_.prefix
+# end class CustomerReference
+
+
 class DateRange(GeneratedsSuper):
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
@@ -4726,9 +5573,9 @@ class DeliveryOnInvoiceAcceptanceDetail(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.Recipient = Recipient
-        self.Recipient_nsprefix_ = None
+        self.Recipient_nsprefix_ = "ns"
         self.TrackingId = TrackingId
-        self.TrackingId_nsprefix_ = None
+        self.TrackingId_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -4938,7 +5785,7 @@ class Dimensions(GeneratedsSuper):
         self.Height_nsprefix_ = None
         self.Units = Units
         self.validate_LinearUnits(self.Units)
-        self.Units_nsprefix_ = None
+        self.Units_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -5106,7 +5953,7 @@ class Distance(GeneratedsSuper):
         self.Value_nsprefix_ = None
         self.Units = Units
         self.validate_DistanceUnits(self.Units)
-        self.Units_nsprefix_ = None
+        self.Units_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -5350,7 +6197,7 @@ class EMailLabelDetail(GeneratedsSuper):
             self.Recipients = []
         else:
             self.Recipients = Recipients
-        self.Recipients_nsprefix_ = None
+        self.Recipients_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -5470,11 +6317,11 @@ class EMailRecipient(GeneratedsSuper):
         self.EmailAddress_nsprefix_ = None
         self.Role = Role
         self.validate_AccessorRoleType(self.Role)
-        self.Role_nsprefix_ = None
+        self.Role_nsprefix_ = "ns"
         self.OptionsRequested = OptionsRequested
-        self.OptionsRequested_nsprefix_ = None
+        self.OptionsRequested_nsprefix_ = "ns"
         self.Localization = Localization
-        self.Localization_nsprefix_ = None
+        self.Localization_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -5632,7 +6479,7 @@ class EmailOptionsRequested(GeneratedsSuper):
             self.Options = []
         else:
             self.Options = Options
-        self.Options_nsprefix_ = None
+        self.Options_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -5739,6 +6586,186 @@ class EmailOptionsRequested(GeneratedsSuper):
 # end class EmailOptionsRequested
 
 
+class EnterprisePrivilegeDetail(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, Id=None, Permission=None, CarrierCode=None, EffectiveDateRange=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.Id = Id
+        self.Id_nsprefix_ = None
+        self.Permission = Permission
+        self.validate_EnterprisePermissionType(self.Permission)
+        self.Permission_nsprefix_ = "ns"
+        self.CarrierCode = CarrierCode
+        self.validate_CarrierCodeType(self.CarrierCode)
+        self.CarrierCode_nsprefix_ = "ns"
+        self.EffectiveDateRange = EffectiveDateRange
+        self.EffectiveDateRange_nsprefix_ = "ns"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, EnterprisePrivilegeDetail)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if EnterprisePrivilegeDetail.subclass:
+            return EnterprisePrivilegeDetail.subclass(*args_, **kwargs_)
+        else:
+            return EnterprisePrivilegeDetail(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_Id(self):
+        return self.Id
+    def set_Id(self, Id):
+        self.Id = Id
+    def get_Permission(self):
+        return self.Permission
+    def set_Permission(self, Permission):
+        self.Permission = Permission
+    def get_CarrierCode(self):
+        return self.CarrierCode
+    def set_CarrierCode(self, CarrierCode):
+        self.CarrierCode = CarrierCode
+    def get_EffectiveDateRange(self):
+        return self.EffectiveDateRange
+    def set_EffectiveDateRange(self, EffectiveDateRange):
+        self.EffectiveDateRange = EffectiveDateRange
+    def validate_EnterprisePermissionType(self, value):
+        result = True
+        # Validate type EnterprisePermissionType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['ALLOWED', 'ALLOWED_BY_EXCEPTION', 'DISALLOWED']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on EnterprisePermissionType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_CarrierCodeType(self, value):
+        result = True
+        # Validate type CarrierCodeType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['FDXC', 'FDXE', 'FDXG', 'FDXO', 'FXCC', 'FXFR', 'FXSP']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on CarrierCodeType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def hasContent_(self):
+        if (
+            self.Id is not None or
+            self.Permission is not None or
+            self.CarrierCode is not None or
+            self.EffectiveDateRange is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='EnterprisePrivilegeDetail', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('EnterprisePrivilegeDetail')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'EnterprisePrivilegeDetail':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='EnterprisePrivilegeDetail')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='EnterprisePrivilegeDetail', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='EnterprisePrivilegeDetail'):
+        pass
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='EnterprisePrivilegeDetail', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.Id is not None:
+            namespaceprefix_ = self.Id_nsprefix_ + ':' if (UseCapturedNS_ and self.Id_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sId>%s</%sId>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Id), input_name='Id')), namespaceprefix_ , eol_))
+        if self.Permission is not None:
+            namespaceprefix_ = self.Permission_nsprefix_ + ':' if (UseCapturedNS_ and self.Permission_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sPermission>%s</%sPermission>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Permission), input_name='Permission')), namespaceprefix_ , eol_))
+        if self.CarrierCode is not None:
+            namespaceprefix_ = self.CarrierCode_nsprefix_ + ':' if (UseCapturedNS_ and self.CarrierCode_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sCarrierCode>%s</%sCarrierCode>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.CarrierCode), input_name='CarrierCode')), namespaceprefix_ , eol_))
+        if self.EffectiveDateRange is not None:
+            namespaceprefix_ = self.EffectiveDateRange_nsprefix_ + ':' if (UseCapturedNS_ and self.EffectiveDateRange_nsprefix_) else ''
+            self.EffectiveDateRange.export(outfile, level, namespaceprefix_, namespacedef_='', name_='EffectiveDateRange', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'Id':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Id')
+            value_ = self.gds_validate_string(value_, node, 'Id')
+            self.Id = value_
+            self.Id_nsprefix_ = child_.prefix
+        elif nodeName_ == 'Permission':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Permission')
+            value_ = self.gds_validate_string(value_, node, 'Permission')
+            self.Permission = value_
+            self.Permission_nsprefix_ = child_.prefix
+            # validate type EnterprisePermissionType
+            self.validate_EnterprisePermissionType(self.Permission)
+        elif nodeName_ == 'CarrierCode':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'CarrierCode')
+            value_ = self.gds_validate_string(value_, node, 'CarrierCode')
+            self.CarrierCode = value_
+            self.CarrierCode_nsprefix_ = child_.prefix
+            # validate type CarrierCodeType
+            self.validate_CarrierCodeType(self.CarrierCode)
+        elif nodeName_ == 'EffectiveDateRange':
+            obj_ = DateRange.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.EffectiveDateRange = obj_
+            obj_.original_tagname_ = 'EffectiveDateRange'
+# end class EnterprisePrivilegeDetail
+
+
 class EtdDetail(GeneratedsSuper):
     """Electronic Trade document references used with the ETD special
     service."""
@@ -5753,27 +6780,27 @@ class EtdDetail(GeneratedsSuper):
         self.ns_prefix_ = None
         self.Confirmation = Confirmation
         self.validate_EtdConfirmationType(self.Confirmation)
-        self.Confirmation_nsprefix_ = None
+        self.Confirmation_nsprefix_ = "ns"
         if Attributes is None:
             self.Attributes = []
         else:
             self.Attributes = Attributes
-        self.Attributes_nsprefix_ = None
+        self.Attributes_nsprefix_ = "ns"
         if RequestedDocumentCopies is None:
             self.RequestedDocumentCopies = []
         else:
             self.RequestedDocumentCopies = RequestedDocumentCopies
-        self.RequestedDocumentCopies_nsprefix_ = None
+        self.RequestedDocumentCopies_nsprefix_ = "ns"
         if Documents is None:
             self.Documents = []
         else:
             self.Documents = Documents
-        self.Documents_nsprefix_ = None
+        self.Documents_nsprefix_ = "ns"
         if DocumentReferences is None:
             self.DocumentReferences = []
         else:
             self.DocumentReferences = DocumentReferences
-        self.DocumentReferences_nsprefix_ = None
+        self.DocumentReferences_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -5992,24 +7019,26 @@ class ExpressFreightPickupDetail(GeneratedsSuper):
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, Service=None, BookingNumber=None, Dimensions=None, TruckType=None, TrailerSize=None, gds_collector_=None, **kwargs_):
+    def __init__(self, ServiceCode=None, Service=None, BookingNumber=None, Dimensions=None, TruckType=None, TrailerSize=None, gds_collector_=None, **kwargs_):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
+        self.ServiceCode = ServiceCode
+        self.ServiceCode_nsprefix_ = None
         self.Service = Service
         self.Service_nsprefix_ = None
         self.BookingNumber = BookingNumber
         self.BookingNumber_nsprefix_ = None
         self.Dimensions = Dimensions
-        self.Dimensions_nsprefix_ = None
+        self.Dimensions_nsprefix_ = "ns"
         self.TruckType = TruckType
         self.validate_TruckType(self.TruckType)
-        self.TruckType_nsprefix_ = None
+        self.TruckType_nsprefix_ = "ns"
         self.TrailerSize = TrailerSize
         self.validate_TrailerSizeType(self.TrailerSize)
-        self.TrailerSize_nsprefix_ = None
+        self.TrailerSize_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -6025,6 +7054,10 @@ class ExpressFreightPickupDetail(GeneratedsSuper):
         return self.ns_prefix_
     def set_ns_prefix_(self, ns_prefix):
         self.ns_prefix_ = ns_prefix
+    def get_ServiceCode(self):
+        return self.ServiceCode
+    def set_ServiceCode(self, ServiceCode):
+        self.ServiceCode = ServiceCode
     def get_Service(self):
         return self.Service
     def set_Service(self, Service):
@@ -6077,6 +7110,7 @@ class ExpressFreightPickupDetail(GeneratedsSuper):
         return result
     def hasContent_(self):
         if (
+            self.ServiceCode is not None or
             self.Service is not None or
             self.BookingNumber is not None or
             self.Dimensions is not None or
@@ -6116,6 +7150,10 @@ class ExpressFreightPickupDetail(GeneratedsSuper):
             eol_ = '\n'
         else:
             eol_ = ''
+        if self.ServiceCode is not None:
+            namespaceprefix_ = self.ServiceCode_nsprefix_ + ':' if (UseCapturedNS_ and self.ServiceCode_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sServiceCode>%s</%sServiceCode>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.ServiceCode), input_name='ServiceCode')), namespaceprefix_ , eol_))
         if self.Service is not None:
             namespaceprefix_ = self.Service_nsprefix_ + ':' if (UseCapturedNS_ and self.Service_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
@@ -6149,7 +7187,13 @@ class ExpressFreightPickupDetail(GeneratedsSuper):
     def buildAttributes(self, node, attrs, already_processed):
         pass
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
-        if nodeName_ == 'Service':
+        if nodeName_ == 'ServiceCode':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'ServiceCode')
+            value_ = self.gds_validate_string(value_, node, 'ServiceCode')
+            self.ServiceCode = value_
+            self.ServiceCode_nsprefix_ = child_.prefix
+        elif nodeName_ == 'Service':
             value_ = child_.text
             value_ = self.gds_parse_string(value_, node, 'Service')
             value_ = self.gds_validate_string(value_, node, 'Service')
@@ -6392,7 +7436,7 @@ class FlatbedTrailerDetail(GeneratedsSuper):
             self.Options = []
         else:
             self.Options = Options
-        self.Options_nsprefix_ = None
+        self.Options_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -6511,7 +7555,7 @@ class FreightGuaranteeDetail(GeneratedsSuper):
         self.ns_prefix_ = None
         self.Type = Type
         self.validate_FreightGuaranteeType(self.Type)
-        self.Type_nsprefix_ = None
+        self.Type_nsprefix_ = "ns"
         if isinstance(Date, BaseStrType_):
             initvalue_ = datetime_.datetime.strptime(Date, '%Y-%m-%d').date()
         else:
@@ -6663,22 +7707,22 @@ class FreightPickupDetail(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.ApprovedBy = ApprovedBy
-        self.ApprovedBy_nsprefix_ = None
+        self.ApprovedBy_nsprefix_ = "ns"
         self.Payment = Payment
         self.validate_PaymentType(self.Payment)
-        self.Payment_nsprefix_ = None
+        self.Payment_nsprefix_ = "ns"
         self.Role = Role
         self.validate_FreightShipmentRoleType(self.Role)
-        self.Role_nsprefix_ = None
+        self.Role_nsprefix_ = "ns"
         self.AlternateBilling = AlternateBilling
-        self.AlternateBilling_nsprefix_ = None
+        self.AlternateBilling_nsprefix_ = "ns"
         self.SubmittedBy = SubmittedBy
-        self.SubmittedBy_nsprefix_ = None
+        self.SubmittedBy_nsprefix_ = "ns"
         if LineItems is None:
             self.LineItems = []
         else:
             self.LineItems = LineItems
-        self.LineItems_nsprefix_ = None
+        self.LineItems_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -6886,14 +7930,14 @@ class FreightPickupLineItem(GeneratedsSuper):
         self.SequenceNumber = SequenceNumber
         self.SequenceNumber_nsprefix_ = None
         self.Destination = Destination
-        self.Destination_nsprefix_ = None
+        self.Destination_nsprefix_ = "ns"
         self.Packaging = Packaging
         self.validate_PhysicalPackagingType(self.Packaging)
-        self.Packaging_nsprefix_ = None
+        self.Packaging_nsprefix_ = "ns"
         self.Pieces = Pieces
         self.Pieces_nsprefix_ = None
         self.Weight = Weight
-        self.Weight_nsprefix_ = None
+        self.Weight_nsprefix_ = "ns"
         self.TotalHandlingUnits = TotalHandlingUnits
         self.TotalHandlingUnits_nsprefix_ = None
         self.PurchaseOrderNumber = PurchaseOrderNumber
@@ -6901,7 +7945,7 @@ class FreightPickupLineItem(GeneratedsSuper):
         self.JustOneMore = JustOneMore
         self.JustOneMore_nsprefix_ = None
         self.SpecialServicesRequested = SpecialServicesRequested
-        self.SpecialServicesRequested_nsprefix_ = None
+        self.SpecialServicesRequested_nsprefix_ = "ns"
         self.Description = Description
         self.Description_nsprefix_ = None
     def factory(*args_, **kwargs_):
@@ -7187,23 +8231,23 @@ class FreightServiceCenterDetail(GeneratedsSuper):
         self.LocalService = LocalService
         self.LocalService_nsprefix_ = None
         self.LocalDistance = LocalDistance
-        self.LocalDistance_nsprefix_ = None
+        self.LocalDistance_nsprefix_ = "ns"
         self.LocalDuration = LocalDuration
         self.LocalDuration_nsprefix_ = None
         self.LocalServiceScheduling = LocalServiceScheduling
         self.validate_FreightServiceSchedulingType(self.LocalServiceScheduling)
-        self.LocalServiceScheduling_nsprefix_ = None
+        self.LocalServiceScheduling_nsprefix_ = "ns"
         if LimitedServiceDays is None:
             self.LimitedServiceDays = []
         else:
             self.LimitedServiceDays = LimitedServiceDays
-        self.LimitedServiceDays_nsprefix_ = None
+        self.LimitedServiceDays_nsprefix_ = "ns"
         self.GatewayLocationId = GatewayLocationId
         self.GatewayLocationId_nsprefix_ = None
         self.Location = Location
         self.Location_nsprefix_ = None
         self.ContactAndAddress = ContactAndAddress
-        self.ContactAndAddress_nsprefix_ = None
+        self.ContactAndAddress_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -7486,10 +8530,10 @@ class HoldAtLocationDetail(GeneratedsSuper):
         self.PhoneNumber = PhoneNumber
         self.PhoneNumber_nsprefix_ = None
         self.LocationContactAndAddress = LocationContactAndAddress
-        self.LocationContactAndAddress_nsprefix_ = None
+        self.LocationContactAndAddress_nsprefix_ = "ns"
         self.LocationType = LocationType
         self.validate_FedExLocationType(self.LocationType)
-        self.LocationType_nsprefix_ = None
+        self.LocationType_nsprefix_ = "ns"
         self.LocationId = LocationId
         self.LocationId_nsprefix_ = None
         self.LocationNumber = LocationNumber
@@ -7538,7 +8582,7 @@ class HoldAtLocationDetail(GeneratedsSuper):
                 self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
                 return False
             value = value
-            enumerations = ['FEDEX_AUTHORIZED_SHIP_CENTER', 'FEDEX_EXPRESS_STATION', 'FEDEX_FACILITY', 'FEDEX_FREIGHT_SERVICE_CENTER', 'FEDEX_GROUND_TERMINAL', 'FEDEX_HOME_DELIVERY_STATION', 'FEDEX_OFFICE', 'FEDEX_SELF_SERVICE_LOCATION', 'FEDEX_SHIPSITE', 'FEDEX_SMART_POST_HUB']
+            enumerations = ['FEDEX_AUTHORIZED_SHIP_CENTER', 'FEDEX_EXPRESS_STATION', 'FEDEX_FACILITY', 'FEDEX_FREIGHT_SERVICE_CENTER', 'FEDEX_GROUND_TERMINAL', 'FEDEX_HOME_DELIVERY_STATION', 'FEDEX_OFFICE', 'FEDEX_ONSITE', 'FEDEX_SELF_SERVICE_LOCATION', 'FEDEX_SHIPSITE', 'FEDEX_SHIP_AND_GET', 'FEDEX_SMART_POST_HUB']
             if value not in enumerations:
                 lineno = self.gds_get_node_lineno_()
                 self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on FedExLocationType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
@@ -7664,7 +8708,7 @@ class HomeDeliveryPremiumDetail(GeneratedsSuper):
         self.ns_prefix_ = None
         self.HomeDeliveryPremiumType = HomeDeliveryPremiumType
         self.validate_HomeDeliveryPremiumType(self.HomeDeliveryPremiumType)
-        self.HomeDeliveryPremiumType_nsprefix_ = None
+        self.HomeDeliveryPremiumType_nsprefix_ = "ns"
         if isinstance(Date, BaseStrType_):
             initvalue_ = datetime_.datetime.strptime(Date, '%Y-%m-%d').date()
         else:
@@ -7814,7 +8858,7 @@ class InternationalControlledExportDetail(GeneratedsSuper):
         self.ns_prefix_ = None
         self.Type = Type
         self.validate_InternationalControlledExportType(self.Type)
-        self.Type_nsprefix_ = None
+        self.Type_nsprefix_ = "ns"
         self.ForeignTradeZoneCode = ForeignTradeZoneCode
         self.ForeignTradeZoneCode_nsprefix_ = None
         self.EntryNumber = EntryNumber
@@ -8536,9 +9580,10 @@ class Notification(GeneratedsSuper):
         self.ns_prefix_ = None
         self.Severity = Severity
         self.validate_NotificationSeverityType(self.Severity)
-        self.Severity_nsprefix_ = None
+        self.Severity_nsprefix_ = "ns"
         self.Source = Source
-        self.Source_nsprefix_ = None
+        self.validate_ServiceIdType(self.Source)
+        self.Source_nsprefix_ = "ns"
         self.Code = Code
         self.Code_nsprefix_ = None
         self.Message = Message
@@ -8549,7 +9594,7 @@ class Notification(GeneratedsSuper):
             self.MessageParameters = []
         else:
             self.MessageParameters = MessageParameters
-        self.MessageParameters_nsprefix_ = None
+        self.MessageParameters_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -8608,6 +9653,21 @@ class Notification(GeneratedsSuper):
             if value not in enumerations:
                 lineno = self.gds_get_node_lineno_()
                 self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on NotificationSeverityType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_ServiceIdType(self, value):
+        result = True
+        # Validate type ServiceIdType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['disp']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on ServiceIdType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
                 result = False
         return result
     def hasContent_(self):
@@ -8703,6 +9763,8 @@ class Notification(GeneratedsSuper):
             value_ = self.gds_validate_string(value_, node, 'Source')
             self.Source = value_
             self.Source_nsprefix_ = child_.prefix
+            # validate type ServiceIdType
+            self.validate_ServiceIdType(self.Source)
         elif nodeName_ == 'Code':
             value_ = child_.text
             value_ = self.gds_parse_string(value_, node, 'Code')
@@ -8741,15 +9803,15 @@ class NotificationDetail(GeneratedsSuper):
         self.ns_prefix_ = None
         self.NotificationType = NotificationType
         self.validate_NotificationType(self.NotificationType)
-        self.NotificationType_nsprefix_ = None
+        self.NotificationType_nsprefix_ = "ns"
         self.EmailDetail = EmailDetail
-        self.EmailDetail_nsprefix_ = None
+        self.EmailDetail_nsprefix_ = "ns"
         self.FaxDetail = FaxDetail
-        self.FaxDetail_nsprefix_ = None
+        self.FaxDetail_nsprefix_ = "ns"
         self.SmsDetail = SmsDetail
-        self.SmsDetail_nsprefix_ = None
+        self.SmsDetail_nsprefix_ = "ns"
         self.Localization = Localization
-        self.Localization_nsprefix_ = None
+        self.Localization_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -9014,6 +10076,287 @@ class NotificationParameter(GeneratedsSuper):
 # end class NotificationParameter
 
 
+class PagingRequestDetail(GeneratedsSuper):
+    """Specifies the details needed organise results using paging mechanism."""
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, Id=None, PagingToken=None, MaximumResultsPerPage=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.Id = Id
+        self.Id_nsprefix_ = None
+        self.PagingToken = PagingToken
+        self.PagingToken_nsprefix_ = None
+        self.MaximumResultsPerPage = MaximumResultsPerPage
+        self.MaximumResultsPerPage_nsprefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, PagingRequestDetail)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if PagingRequestDetail.subclass:
+            return PagingRequestDetail.subclass(*args_, **kwargs_)
+        else:
+            return PagingRequestDetail(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_Id(self):
+        return self.Id
+    def set_Id(self, Id):
+        self.Id = Id
+    def get_PagingToken(self):
+        return self.PagingToken
+    def set_PagingToken(self, PagingToken):
+        self.PagingToken = PagingToken
+    def get_MaximumResultsPerPage(self):
+        return self.MaximumResultsPerPage
+    def set_MaximumResultsPerPage(self, MaximumResultsPerPage):
+        self.MaximumResultsPerPage = MaximumResultsPerPage
+    def hasContent_(self):
+        if (
+            self.Id is not None or
+            self.PagingToken is not None or
+            self.MaximumResultsPerPage is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='PagingRequestDetail', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('PagingRequestDetail')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'PagingRequestDetail':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='PagingRequestDetail')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='PagingRequestDetail', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='PagingRequestDetail'):
+        pass
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='PagingRequestDetail', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.Id is not None:
+            namespaceprefix_ = self.Id_nsprefix_ + ':' if (UseCapturedNS_ and self.Id_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sId>%s</%sId>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Id), input_name='Id')), namespaceprefix_ , eol_))
+        if self.PagingToken is not None:
+            namespaceprefix_ = self.PagingToken_nsprefix_ + ':' if (UseCapturedNS_ and self.PagingToken_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sPagingToken>%s</%sPagingToken>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.PagingToken), input_name='PagingToken')), namespaceprefix_ , eol_))
+        if self.MaximumResultsPerPage is not None:
+            namespaceprefix_ = self.MaximumResultsPerPage_nsprefix_ + ':' if (UseCapturedNS_ and self.MaximumResultsPerPage_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sMaximumResultsPerPage>%s</%sMaximumResultsPerPage>%s' % (namespaceprefix_ , self.gds_format_integer(self.MaximumResultsPerPage, input_name='MaximumResultsPerPage'), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'Id':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Id')
+            value_ = self.gds_validate_string(value_, node, 'Id')
+            self.Id = value_
+            self.Id_nsprefix_ = child_.prefix
+        elif nodeName_ == 'PagingToken':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'PagingToken')
+            value_ = self.gds_validate_string(value_, node, 'PagingToken')
+            self.PagingToken = value_
+            self.PagingToken_nsprefix_ = child_.prefix
+        elif nodeName_ == 'MaximumResultsPerPage' and child_.text:
+            sval_ = child_.text
+            ival_ = self.gds_parse_integer(sval_, node, 'MaximumResultsPerPage')
+            if ival_ < 0:
+                raise_parse_error(child_, 'requires nonNegativeInteger')
+            ival_ = self.gds_validate_integer(ival_, node, 'MaximumResultsPerPage')
+            self.MaximumResultsPerPage = ival_
+            self.MaximumResultsPerPage_nsprefix_ = child_.prefix
+# end class PagingRequestDetail
+
+
+class PagingResultsDetail(GeneratedsSuper):
+    """Specifies details when results are organised using paging mechanism."""
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, Id=None, MoreDataAvailable=None, PagingToken=None, TotalResultsAvailable=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.Id = Id
+        self.Id_nsprefix_ = None
+        self.MoreDataAvailable = MoreDataAvailable
+        self.MoreDataAvailable_nsprefix_ = None
+        self.PagingToken = PagingToken
+        self.PagingToken_nsprefix_ = None
+        self.TotalResultsAvailable = TotalResultsAvailable
+        self.TotalResultsAvailable_nsprefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, PagingResultsDetail)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if PagingResultsDetail.subclass:
+            return PagingResultsDetail.subclass(*args_, **kwargs_)
+        else:
+            return PagingResultsDetail(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_Id(self):
+        return self.Id
+    def set_Id(self, Id):
+        self.Id = Id
+    def get_MoreDataAvailable(self):
+        return self.MoreDataAvailable
+    def set_MoreDataAvailable(self, MoreDataAvailable):
+        self.MoreDataAvailable = MoreDataAvailable
+    def get_PagingToken(self):
+        return self.PagingToken
+    def set_PagingToken(self, PagingToken):
+        self.PagingToken = PagingToken
+    def get_TotalResultsAvailable(self):
+        return self.TotalResultsAvailable
+    def set_TotalResultsAvailable(self, TotalResultsAvailable):
+        self.TotalResultsAvailable = TotalResultsAvailable
+    def hasContent_(self):
+        if (
+            self.Id is not None or
+            self.MoreDataAvailable is not None or
+            self.PagingToken is not None or
+            self.TotalResultsAvailable is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='PagingResultsDetail', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('PagingResultsDetail')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'PagingResultsDetail':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='PagingResultsDetail')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='PagingResultsDetail', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='PagingResultsDetail'):
+        pass
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='PagingResultsDetail', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.Id is not None:
+            namespaceprefix_ = self.Id_nsprefix_ + ':' if (UseCapturedNS_ and self.Id_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sId>%s</%sId>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Id), input_name='Id')), namespaceprefix_ , eol_))
+        if self.MoreDataAvailable is not None:
+            namespaceprefix_ = self.MoreDataAvailable_nsprefix_ + ':' if (UseCapturedNS_ and self.MoreDataAvailable_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sMoreDataAvailable>%s</%sMoreDataAvailable>%s' % (namespaceprefix_ , self.gds_format_boolean(self.MoreDataAvailable, input_name='MoreDataAvailable'), namespaceprefix_ , eol_))
+        if self.PagingToken is not None:
+            namespaceprefix_ = self.PagingToken_nsprefix_ + ':' if (UseCapturedNS_ and self.PagingToken_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sPagingToken>%s</%sPagingToken>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.PagingToken), input_name='PagingToken')), namespaceprefix_ , eol_))
+        if self.TotalResultsAvailable is not None:
+            namespaceprefix_ = self.TotalResultsAvailable_nsprefix_ + ':' if (UseCapturedNS_ and self.TotalResultsAvailable_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sTotalResultsAvailable>%s</%sTotalResultsAvailable>%s' % (namespaceprefix_ , self.gds_format_integer(self.TotalResultsAvailable, input_name='TotalResultsAvailable'), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'Id':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Id')
+            value_ = self.gds_validate_string(value_, node, 'Id')
+            self.Id = value_
+            self.Id_nsprefix_ = child_.prefix
+        elif nodeName_ == 'MoreDataAvailable':
+            sval_ = child_.text
+            ival_ = self.gds_parse_boolean(sval_, node, 'MoreDataAvailable')
+            ival_ = self.gds_validate_boolean(ival_, node, 'MoreDataAvailable')
+            self.MoreDataAvailable = ival_
+            self.MoreDataAvailable_nsprefix_ = child_.prefix
+        elif nodeName_ == 'PagingToken':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'PagingToken')
+            value_ = self.gds_validate_string(value_, node, 'PagingToken')
+            self.PagingToken = value_
+            self.PagingToken_nsprefix_ = child_.prefix
+        elif nodeName_ == 'TotalResultsAvailable' and child_.text:
+            sval_ = child_.text
+            ival_ = self.gds_parse_integer(sval_, node, 'TotalResultsAvailable')
+            if ival_ < 0:
+                raise_parse_error(child_, 'requires nonNegativeInteger')
+            ival_ = self.gds_validate_integer(ival_, node, 'TotalResultsAvailable')
+            self.TotalResultsAvailable = ival_
+            self.TotalResultsAvailable_nsprefix_ = child_.prefix
+# end class PagingResultsDetail
+
+
 class PalletShrinkwrapDetail(GeneratedsSuper):
     """Specifications for pallets to be shrinkwrapped as part of a Freight
     shipment."""
@@ -9227,11 +10570,11 @@ class Party(GeneratedsSuper):
             self.Tins = []
         else:
             self.Tins = Tins
-        self.Tins_nsprefix_ = None
+        self.Tins_nsprefix_ = "ns"
         self.Contact = Contact
-        self.Contact_nsprefix_ = None
+        self.Contact_nsprefix_ = "ns"
         self.Address = Address
-        self.Address_nsprefix_ = None
+        self.Address_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -9372,11 +10715,11 @@ class Payment(GeneratedsSuper):
         self.ns_prefix_ = None
         self.PaymentType = PaymentType
         self.validate_PaymentType(self.PaymentType)
-        self.PaymentType_nsprefix_ = None
+        self.PaymentType_nsprefix_ = "ns"
         self.Payor = Payor
-        self.Payor_nsprefix_ = None
+        self.Payor_nsprefix_ = "ns"
         self.Amount = Amount
-        self.Amount_nsprefix_ = None
+        self.Amount_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -9514,12 +10857,12 @@ class Payor(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.ResponsibleParty = ResponsibleParty
-        self.ResponsibleParty_nsprefix_ = None
+        self.ResponsibleParty_nsprefix_ = "ns"
         if AssociatedAccounts is None:
             self.AssociatedAccounts = []
         else:
             self.AssociatedAccounts = AssociatedAccounts
-        self.AssociatedAccounts_nsprefix_ = None
+        self.AssociatedAccounts_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -9626,7 +10969,7 @@ class PendingShipmentDetail(GeneratedsSuper):
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, Type=None, ExpirationDate=None, EmailLabelDetail=None, ProcessingOptions=None, RecommendedDocumentSpecification=None, DocumentReferences=None, gds_collector_=None, **kwargs_):
+    def __init__(self, Type=None, ExpirationDate=None, EmailLabelDetail=None, RecommendedDocumentSpecification=None, DocumentReferences=None, gds_collector_=None, **kwargs_):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
@@ -9634,7 +10977,7 @@ class PendingShipmentDetail(GeneratedsSuper):
         self.ns_prefix_ = None
         self.Type = Type
         self.validate_PendingShipmentType(self.Type)
-        self.Type_nsprefix_ = None
+        self.Type_nsprefix_ = "ns"
         if isinstance(ExpirationDate, BaseStrType_):
             initvalue_ = datetime_.datetime.strptime(ExpirationDate, '%Y-%m-%d').date()
         else:
@@ -9642,16 +10985,14 @@ class PendingShipmentDetail(GeneratedsSuper):
         self.ExpirationDate = initvalue_
         self.ExpirationDate_nsprefix_ = None
         self.EmailLabelDetail = EmailLabelDetail
-        self.EmailLabelDetail_nsprefix_ = None
-        self.ProcessingOptions = ProcessingOptions
-        self.ProcessingOptions_nsprefix_ = None
+        self.EmailLabelDetail_nsprefix_ = "ns"
         self.RecommendedDocumentSpecification = RecommendedDocumentSpecification
-        self.RecommendedDocumentSpecification_nsprefix_ = None
+        self.RecommendedDocumentSpecification_nsprefix_ = "ns"
         if DocumentReferences is None:
             self.DocumentReferences = []
         else:
             self.DocumentReferences = DocumentReferences
-        self.DocumentReferences_nsprefix_ = None
+        self.DocumentReferences_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -9679,10 +11020,6 @@ class PendingShipmentDetail(GeneratedsSuper):
         return self.EmailLabelDetail
     def set_EmailLabelDetail(self, EmailLabelDetail):
         self.EmailLabelDetail = EmailLabelDetail
-    def get_ProcessingOptions(self):
-        return self.ProcessingOptions
-    def set_ProcessingOptions(self, ProcessingOptions):
-        self.ProcessingOptions = ProcessingOptions
     def get_RecommendedDocumentSpecification(self):
         return self.RecommendedDocumentSpecification
     def set_RecommendedDocumentSpecification(self, RecommendedDocumentSpecification):
@@ -9717,7 +11054,6 @@ class PendingShipmentDetail(GeneratedsSuper):
             self.Type is not None or
             self.ExpirationDate is not None or
             self.EmailLabelDetail is not None or
-            self.ProcessingOptions is not None or
             self.RecommendedDocumentSpecification is not None or
             self.DocumentReferences
         ):
@@ -9765,9 +11101,6 @@ class PendingShipmentDetail(GeneratedsSuper):
         if self.EmailLabelDetail is not None:
             namespaceprefix_ = self.EmailLabelDetail_nsprefix_ + ':' if (UseCapturedNS_ and self.EmailLabelDetail_nsprefix_) else ''
             self.EmailLabelDetail.export(outfile, level, namespaceprefix_, namespacedef_='', name_='EmailLabelDetail', pretty_print=pretty_print)
-        if self.ProcessingOptions is not None:
-            namespaceprefix_ = self.ProcessingOptions_nsprefix_ + ':' if (UseCapturedNS_ and self.ProcessingOptions_nsprefix_) else ''
-            self.ProcessingOptions.export(outfile, level, namespaceprefix_, namespacedef_='', name_='ProcessingOptions', pretty_print=pretty_print)
         if self.RecommendedDocumentSpecification is not None:
             namespaceprefix_ = self.RecommendedDocumentSpecification_nsprefix_ + ':' if (UseCapturedNS_ and self.RecommendedDocumentSpecification_nsprefix_) else ''
             self.RecommendedDocumentSpecification.export(outfile, level, namespaceprefix_, namespacedef_='', name_='RecommendedDocumentSpecification', pretty_print=pretty_print)
@@ -9806,11 +11139,6 @@ class PendingShipmentDetail(GeneratedsSuper):
             obj_.build(child_, gds_collector_=gds_collector_)
             self.EmailLabelDetail = obj_
             obj_.original_tagname_ = 'EmailLabelDetail'
-        elif nodeName_ == 'ProcessingOptions':
-            obj_ = PendingShipmentProcessingOptionsRequested.factory(parent_object_=self)
-            obj_.build(child_, gds_collector_=gds_collector_)
-            self.ProcessingOptions = obj_
-            obj_.original_tagname_ = 'ProcessingOptions'
         elif nodeName_ == 'RecommendedDocumentSpecification':
             obj_ = RecommendedDocumentSpecification.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
@@ -9822,127 +11150,6 @@ class PendingShipmentDetail(GeneratedsSuper):
             self.DocumentReferences.append(obj_)
             obj_.original_tagname_ = 'DocumentReferences'
 # end class PendingShipmentDetail
-
-
-class PendingShipmentProcessingOptionsRequested(GeneratedsSuper):
-    __hash__ = GeneratedsSuper.__hash__
-    subclass = None
-    superclass = None
-    def __init__(self, Options=None, gds_collector_=None, **kwargs_):
-        self.gds_collector_ = gds_collector_
-        self.gds_elementtree_node_ = None
-        self.original_tagname_ = None
-        self.parent_object_ = kwargs_.get('parent_object_')
-        self.ns_prefix_ = None
-        if Options is None:
-            self.Options = []
-        else:
-            self.Options = Options
-        self.Options_nsprefix_ = None
-    def factory(*args_, **kwargs_):
-        if CurrentSubclassModule_ is not None:
-            subclass = getSubclassFromModule_(
-                CurrentSubclassModule_, PendingShipmentProcessingOptionsRequested)
-            if subclass is not None:
-                return subclass(*args_, **kwargs_)
-        if PendingShipmentProcessingOptionsRequested.subclass:
-            return PendingShipmentProcessingOptionsRequested.subclass(*args_, **kwargs_)
-        else:
-            return PendingShipmentProcessingOptionsRequested(*args_, **kwargs_)
-    factory = staticmethod(factory)
-    def get_ns_prefix_(self):
-        return self.ns_prefix_
-    def set_ns_prefix_(self, ns_prefix):
-        self.ns_prefix_ = ns_prefix
-    def get_Options(self):
-        return self.Options
-    def set_Options(self, Options):
-        self.Options = Options
-    def add_Options(self, value):
-        self.Options.append(value)
-    def insert_Options_at(self, index, value):
-        self.Options.insert(index, value)
-    def replace_Options_at(self, index, value):
-        self.Options[index] = value
-    def validate_PendingShipmentProcessingOptionType(self, value):
-        result = True
-        # Validate type PendingShipmentProcessingOptionType, a restriction on xs:string.
-        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
-            if not isinstance(value, str):
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
-                return False
-            value = value
-            enumerations = ['ALLOW_MODIFICATIONS']
-            if value not in enumerations:
-                lineno = self.gds_get_node_lineno_()
-                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on PendingShipmentProcessingOptionType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
-                result = False
-        return result
-    def hasContent_(self):
-        if (
-            self.Options
-        ):
-            return True
-        else:
-            return False
-    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='PendingShipmentProcessingOptionsRequested', pretty_print=True):
-        imported_ns_def_ = GenerateDSNamespaceDefs_.get('PendingShipmentProcessingOptionsRequested')
-        if imported_ns_def_ is not None:
-            namespacedef_ = imported_ns_def_
-        if pretty_print:
-            eol_ = '\n'
-        else:
-            eol_ = ''
-        if self.original_tagname_ is not None and name_ == 'PendingShipmentProcessingOptionsRequested':
-            name_ = self.original_tagname_
-        if UseCapturedNS_ and self.ns_prefix_:
-            namespaceprefix_ = self.ns_prefix_ + ':'
-        showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
-        already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='PendingShipmentProcessingOptionsRequested')
-        if self.hasContent_():
-            outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='PendingShipmentProcessingOptionsRequested', pretty_print=pretty_print)
-            showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
-        else:
-            outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='PendingShipmentProcessingOptionsRequested'):
-        pass
-    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='PendingShipmentProcessingOptionsRequested', fromsubclass_=False, pretty_print=True):
-        if pretty_print:
-            eol_ = '\n'
-        else:
-            eol_ = ''
-        for Options_ in self.Options:
-            namespaceprefix_ = self.Options_nsprefix_ + ':' if (UseCapturedNS_ and self.Options_nsprefix_) else ''
-            showIndent(outfile, level, pretty_print)
-            outfile.write('<%sOptions>%s</%sOptions>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(Options_), input_name='Options')), namespaceprefix_ , eol_))
-    def build(self, node, gds_collector_=None):
-        self.gds_collector_ = gds_collector_
-        if SaveElementTreeNode:
-            self.gds_elementtree_node_ = node
-        already_processed = set()
-        self.ns_prefix_ = node.prefix
-        self.buildAttributes(node, node.attrib, already_processed)
-        for child in node:
-            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
-        return self
-    def buildAttributes(self, node, attrs, already_processed):
-        pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
-        if nodeName_ == 'Options':
-            value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'Options')
-            value_ = self.gds_validate_string(value_, node, 'Options')
-            self.Options.append(value_)
-            self.Options_nsprefix_ = child_.prefix
-            # validate type PendingShipmentProcessingOptionType
-            self.validate_PendingShipmentProcessingOptionType(self.Options[-1])
-# end class PendingShipmentProcessingOptionsRequested
 
 
 class PickupAvailabilityReply(GeneratedsSuper):
@@ -9957,16 +11164,16 @@ class PickupAvailabilityReply(GeneratedsSuper):
         self.ns_prefix_ = None
         self.HighestSeverity = HighestSeverity
         self.validate_NotificationSeverityType(self.HighestSeverity)
-        self.HighestSeverity_nsprefix_ = None
+        self.HighestSeverity_nsprefix_ = "ns"
         if Notifications is None:
             self.Notifications = []
         else:
             self.Notifications = Notifications
-        self.Notifications_nsprefix_ = None
+        self.Notifications_nsprefix_ = "ns"
         self.TransactionDetail = TransactionDetail
-        self.TransactionDetail_nsprefix_ = None
+        self.TransactionDetail_nsprefix_ = "ns"
         self.Version = Version
-        self.Version_nsprefix_ = None
+        self.Version_nsprefix_ = "ns"
         if isinstance(RequestTimestamp, BaseStrType_):
             initvalue_ = datetime_.datetime.strptime(RequestTimestamp, '%Y-%m-%dT%H:%M:%S')
         else:
@@ -9977,10 +11184,10 @@ class PickupAvailabilityReply(GeneratedsSuper):
             self.Options = []
         else:
             self.Options = Options
-        self.Options_nsprefix_ = None
+        self.Options_nsprefix_ = "ns"
         self.CloseTimeType = CloseTimeType
         self.validate_CloseTimeType(self.CloseTimeType)
-        self.CloseTimeType_nsprefix_ = None
+        self.CloseTimeType_nsprefix_ = "ns"
         if isinstance(CloseTime, BaseStrType_):
             initvalue_ = datetime_.datetime.strptime(CloseTime, '%H:%M:%S').time()
         else:
@@ -10255,32 +11462,36 @@ class PickupAvailabilityRequest(GeneratedsSuper):
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, WebAuthenticationDetail=None, ClientDetail=None, TransactionDetail=None, Version=None, PickupType=None, AccountNumber=None, PickupAddress=None, PickupRequestType=None, DispatchDate=None, NumberOfBusinessDays=None, PackageReadyTime=None, CustomerCloseTime=None, Carriers=None, ShipmentAttributes=None, PackageDetails=None, gds_collector_=None, **kwargs_):
+    def __init__(self, WebAuthenticationDetail=None, ClientDetail=None, UserDetail=None, TransactionDetail=None, Version=None, ApplicationId=None, PickupType=None, AccountNumber=None, PickupAddress=None, PickupRequestType=None, DispatchDate=None, NumberOfBusinessDays=None, PackageReadyTime=None, CustomerCloseTime=None, Carriers=None, ShipmentAttributes=None, PackageDetails=None, gds_collector_=None, **kwargs_):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.WebAuthenticationDetail = WebAuthenticationDetail
-        self.WebAuthenticationDetail_nsprefix_ = None
+        self.WebAuthenticationDetail_nsprefix_ = "ns"
         self.ClientDetail = ClientDetail
-        self.ClientDetail_nsprefix_ = None
+        self.ClientDetail_nsprefix_ = "ns"
+        self.UserDetail = UserDetail
+        self.UserDetail_nsprefix_ = "ns"
         self.TransactionDetail = TransactionDetail
-        self.TransactionDetail_nsprefix_ = None
+        self.TransactionDetail_nsprefix_ = "ns"
         self.Version = Version
-        self.Version_nsprefix_ = None
+        self.Version_nsprefix_ = "ns"
+        self.ApplicationId = ApplicationId
+        self.ApplicationId_nsprefix_ = None
         self.PickupType = PickupType
         self.validate_PickupType(self.PickupType)
-        self.PickupType_nsprefix_ = None
+        self.PickupType_nsprefix_ = "ns"
         self.AccountNumber = AccountNumber
-        self.AccountNumber_nsprefix_ = None
+        self.AccountNumber_nsprefix_ = "ns"
         self.PickupAddress = PickupAddress
-        self.PickupAddress_nsprefix_ = None
+        self.PickupAddress_nsprefix_ = "ns"
         if PickupRequestType is None:
             self.PickupRequestType = []
         else:
             self.PickupRequestType = PickupRequestType
-        self.PickupRequestType_nsprefix_ = None
+        self.PickupRequestType_nsprefix_ = "ns"
         if isinstance(DispatchDate, BaseStrType_):
             initvalue_ = datetime_.datetime.strptime(DispatchDate, '%Y-%m-%d').date()
         else:
@@ -10305,14 +11516,14 @@ class PickupAvailabilityRequest(GeneratedsSuper):
             self.Carriers = []
         else:
             self.Carriers = Carriers
-        self.Carriers_nsprefix_ = None
+        self.Carriers_nsprefix_ = "ns"
         self.ShipmentAttributes = ShipmentAttributes
-        self.ShipmentAttributes_nsprefix_ = None
+        self.ShipmentAttributes_nsprefix_ = "ns"
         if PackageDetails is None:
             self.PackageDetails = []
         else:
             self.PackageDetails = PackageDetails
-        self.PackageDetails_nsprefix_ = None
+        self.PackageDetails_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -10336,6 +11547,10 @@ class PickupAvailabilityRequest(GeneratedsSuper):
         return self.ClientDetail
     def set_ClientDetail(self, ClientDetail):
         self.ClientDetail = ClientDetail
+    def get_UserDetail(self):
+        return self.UserDetail
+    def set_UserDetail(self, UserDetail):
+        self.UserDetail = UserDetail
     def get_TransactionDetail(self):
         return self.TransactionDetail
     def set_TransactionDetail(self, TransactionDetail):
@@ -10344,6 +11559,10 @@ class PickupAvailabilityRequest(GeneratedsSuper):
         return self.Version
     def set_Version(self, Version):
         self.Version = Version
+    def get_ApplicationId(self):
+        return self.ApplicationId
+    def set_ApplicationId(self, ApplicationId):
+        self.ApplicationId = ApplicationId
     def get_PickupType(self):
         return self.PickupType
     def set_PickupType(self, PickupType):
@@ -10415,7 +11634,7 @@ class PickupAvailabilityRequest(GeneratedsSuper):
                 self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
                 return False
             value = value
-            enumerations = ['ON_CALL', 'TAG']
+            enumerations = ['ON_CALL', 'PACKAGE_RETURN_PROGRAM', 'REGULAR_STOP', 'REGULAR_STOP_WITH_AUTO_CANCEL', 'TAG']
             if value not in enumerations:
                 lineno = self.gds_get_node_lineno_()
                 self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on PickupType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
@@ -10445,7 +11664,7 @@ class PickupAvailabilityRequest(GeneratedsSuper):
                 self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
                 return False
             value = value
-            enumerations = ['FDXC', 'FDXE', 'FDXG', 'FXCC', 'FXFR', 'FXSP']
+            enumerations = ['FDXC', 'FDXE', 'FDXG', 'FDXO', 'FXCC', 'FXFR', 'FXSP']
             if value not in enumerations:
                 lineno = self.gds_get_node_lineno_()
                 self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on CarrierCodeType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
@@ -10455,8 +11674,10 @@ class PickupAvailabilityRequest(GeneratedsSuper):
         if (
             self.WebAuthenticationDetail is not None or
             self.ClientDetail is not None or
+            self.UserDetail is not None or
             self.TransactionDetail is not None or
             self.Version is not None or
+            self.ApplicationId is not None or
             self.PickupType is not None or
             self.AccountNumber is not None or
             self.PickupAddress is not None or
@@ -10508,12 +11729,19 @@ class PickupAvailabilityRequest(GeneratedsSuper):
         if self.ClientDetail is not None:
             namespaceprefix_ = self.ClientDetail_nsprefix_ + ':' if (UseCapturedNS_ and self.ClientDetail_nsprefix_) else ''
             self.ClientDetail.export(outfile, level, namespaceprefix_, namespacedef_='', name_='ClientDetail', pretty_print=pretty_print)
+        if self.UserDetail is not None:
+            namespaceprefix_ = self.UserDetail_nsprefix_ + ':' if (UseCapturedNS_ and self.UserDetail_nsprefix_) else ''
+            self.UserDetail.export(outfile, level, namespaceprefix_, namespacedef_='', name_='UserDetail', pretty_print=pretty_print)
         if self.TransactionDetail is not None:
             namespaceprefix_ = self.TransactionDetail_nsprefix_ + ':' if (UseCapturedNS_ and self.TransactionDetail_nsprefix_) else ''
             self.TransactionDetail.export(outfile, level, namespaceprefix_, namespacedef_='', name_='TransactionDetail', pretty_print=pretty_print)
         if self.Version is not None:
             namespaceprefix_ = self.Version_nsprefix_ + ':' if (UseCapturedNS_ and self.Version_nsprefix_) else ''
             self.Version.export(outfile, level, namespaceprefix_, namespacedef_='', name_='Version', pretty_print=pretty_print)
+        if self.ApplicationId is not None:
+            namespaceprefix_ = self.ApplicationId_nsprefix_ + ':' if (UseCapturedNS_ and self.ApplicationId_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sApplicationId>%s</%sApplicationId>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.ApplicationId), input_name='ApplicationId')), namespaceprefix_ , eol_))
         if self.PickupType is not None:
             namespaceprefix_ = self.PickupType_nsprefix_ + ':' if (UseCapturedNS_ and self.PickupType_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
@@ -10578,6 +11806,11 @@ class PickupAvailabilityRequest(GeneratedsSuper):
             obj_.build(child_, gds_collector_=gds_collector_)
             self.ClientDetail = obj_
             obj_.original_tagname_ = 'ClientDetail'
+        elif nodeName_ == 'UserDetail':
+            obj_ = UserDetail.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.UserDetail = obj_
+            obj_.original_tagname_ = 'UserDetail'
         elif nodeName_ == 'TransactionDetail':
             obj_ = TransactionDetail.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
@@ -10588,6 +11821,12 @@ class PickupAvailabilityRequest(GeneratedsSuper):
             obj_.build(child_, gds_collector_=gds_collector_)
             self.Version = obj_
             obj_.original_tagname_ = 'Version'
+        elif nodeName_ == 'ApplicationId':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'ApplicationId')
+            value_ = self.gds_validate_string(value_, node, 'ApplicationId')
+            self.ApplicationId = value_
+            self.ApplicationId_nsprefix_ = child_.prefix
         elif nodeName_ == 'PickupType':
             value_ = child_.text
             value_ = self.gds_parse_string(value_, node, 'PickupType')
@@ -10670,15 +11909,15 @@ class PickupDangerousGoodsDetail(GeneratedsSuper):
         self.ns_prefix_ = None
         self.Regulation = Regulation
         self.validate_HazardousCommodityRegulationType(self.Regulation)
-        self.Regulation_nsprefix_ = None
+        self.Regulation_nsprefix_ = "ns"
         self.Accessibility = Accessibility
         self.validate_DangerousGoodsAccessibilityType(self.Accessibility)
-        self.Accessibility_nsprefix_ = None
+        self.Accessibility_nsprefix_ = "ns"
         if Options is None:
             self.Options = []
         else:
             self.Options = Options
-        self.Options_nsprefix_ = None
+        self.Options_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -10849,6 +12088,2539 @@ class PickupDangerousGoodsDetail(GeneratedsSuper):
 # end class PickupDangerousGoodsDetail
 
 
+class PickupHistoryDetailReply(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, HighestSeverity=None, Notifications=None, TransactionDetail=None, Version=None, AssociatedAccountNumbers=None, OriginDetail=None, ExpressFreightDetail=None, PackageCount=None, TotalWeight=None, CarrierCode=None, OversizePackageCount=None, Remarks=None, CommodityDescription=None, LatestEvent=None, TagDetail=None, FreightPickupDetail=None, CountryRelationship=None, PickupType=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.HighestSeverity = HighestSeverity
+        self.validate_NotificationSeverityType(self.HighestSeverity)
+        self.HighestSeverity_nsprefix_ = "ns"
+        if Notifications is None:
+            self.Notifications = []
+        else:
+            self.Notifications = Notifications
+        self.Notifications_nsprefix_ = "ns"
+        self.TransactionDetail = TransactionDetail
+        self.TransactionDetail_nsprefix_ = "ns"
+        self.Version = Version
+        self.Version_nsprefix_ = "ns"
+        if AssociatedAccountNumbers is None:
+            self.AssociatedAccountNumbers = []
+        else:
+            self.AssociatedAccountNumbers = AssociatedAccountNumbers
+        self.AssociatedAccountNumbers_nsprefix_ = "ns"
+        self.OriginDetail = OriginDetail
+        self.OriginDetail_nsprefix_ = "ns"
+        self.ExpressFreightDetail = ExpressFreightDetail
+        self.ExpressFreightDetail_nsprefix_ = "ns"
+        self.PackageCount = PackageCount
+        self.PackageCount_nsprefix_ = None
+        self.TotalWeight = TotalWeight
+        self.TotalWeight_nsprefix_ = "ns"
+        self.CarrierCode = CarrierCode
+        self.validate_CarrierCodeType(self.CarrierCode)
+        self.CarrierCode_nsprefix_ = "ns"
+        self.OversizePackageCount = OversizePackageCount
+        self.OversizePackageCount_nsprefix_ = None
+        self.Remarks = Remarks
+        self.Remarks_nsprefix_ = None
+        self.CommodityDescription = CommodityDescription
+        self.CommodityDescription_nsprefix_ = None
+        self.LatestEvent = LatestEvent
+        self.LatestEvent_nsprefix_ = "ns"
+        self.TagDetail = TagDetail
+        self.TagDetail_nsprefix_ = "ns"
+        self.FreightPickupDetail = FreightPickupDetail
+        self.FreightPickupDetail_nsprefix_ = "ns"
+        self.CountryRelationship = CountryRelationship
+        self.validate_CountryRelationshipType(self.CountryRelationship)
+        self.CountryRelationship_nsprefix_ = "ns"
+        self.PickupType = PickupType
+        self.validate_PickupType(self.PickupType)
+        self.PickupType_nsprefix_ = "ns"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, PickupHistoryDetailReply)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if PickupHistoryDetailReply.subclass:
+            return PickupHistoryDetailReply.subclass(*args_, **kwargs_)
+        else:
+            return PickupHistoryDetailReply(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_HighestSeverity(self):
+        return self.HighestSeverity
+    def set_HighestSeverity(self, HighestSeverity):
+        self.HighestSeverity = HighestSeverity
+    def get_Notifications(self):
+        return self.Notifications
+    def set_Notifications(self, Notifications):
+        self.Notifications = Notifications
+    def add_Notifications(self, value):
+        self.Notifications.append(value)
+    def insert_Notifications_at(self, index, value):
+        self.Notifications.insert(index, value)
+    def replace_Notifications_at(self, index, value):
+        self.Notifications[index] = value
+    def get_TransactionDetail(self):
+        return self.TransactionDetail
+    def set_TransactionDetail(self, TransactionDetail):
+        self.TransactionDetail = TransactionDetail
+    def get_Version(self):
+        return self.Version
+    def set_Version(self, Version):
+        self.Version = Version
+    def get_AssociatedAccountNumbers(self):
+        return self.AssociatedAccountNumbers
+    def set_AssociatedAccountNumbers(self, AssociatedAccountNumbers):
+        self.AssociatedAccountNumbers = AssociatedAccountNumbers
+    def add_AssociatedAccountNumbers(self, value):
+        self.AssociatedAccountNumbers.append(value)
+    def insert_AssociatedAccountNumbers_at(self, index, value):
+        self.AssociatedAccountNumbers.insert(index, value)
+    def replace_AssociatedAccountNumbers_at(self, index, value):
+        self.AssociatedAccountNumbers[index] = value
+    def get_OriginDetail(self):
+        return self.OriginDetail
+    def set_OriginDetail(self, OriginDetail):
+        self.OriginDetail = OriginDetail
+    def get_ExpressFreightDetail(self):
+        return self.ExpressFreightDetail
+    def set_ExpressFreightDetail(self, ExpressFreightDetail):
+        self.ExpressFreightDetail = ExpressFreightDetail
+    def get_PackageCount(self):
+        return self.PackageCount
+    def set_PackageCount(self, PackageCount):
+        self.PackageCount = PackageCount
+    def get_TotalWeight(self):
+        return self.TotalWeight
+    def set_TotalWeight(self, TotalWeight):
+        self.TotalWeight = TotalWeight
+    def get_CarrierCode(self):
+        return self.CarrierCode
+    def set_CarrierCode(self, CarrierCode):
+        self.CarrierCode = CarrierCode
+    def get_OversizePackageCount(self):
+        return self.OversizePackageCount
+    def set_OversizePackageCount(self, OversizePackageCount):
+        self.OversizePackageCount = OversizePackageCount
+    def get_Remarks(self):
+        return self.Remarks
+    def set_Remarks(self, Remarks):
+        self.Remarks = Remarks
+    def get_CommodityDescription(self):
+        return self.CommodityDescription
+    def set_CommodityDescription(self, CommodityDescription):
+        self.CommodityDescription = CommodityDescription
+    def get_LatestEvent(self):
+        return self.LatestEvent
+    def set_LatestEvent(self, LatestEvent):
+        self.LatestEvent = LatestEvent
+    def get_TagDetail(self):
+        return self.TagDetail
+    def set_TagDetail(self, TagDetail):
+        self.TagDetail = TagDetail
+    def get_FreightPickupDetail(self):
+        return self.FreightPickupDetail
+    def set_FreightPickupDetail(self, FreightPickupDetail):
+        self.FreightPickupDetail = FreightPickupDetail
+    def get_CountryRelationship(self):
+        return self.CountryRelationship
+    def set_CountryRelationship(self, CountryRelationship):
+        self.CountryRelationship = CountryRelationship
+    def get_PickupType(self):
+        return self.PickupType
+    def set_PickupType(self, PickupType):
+        self.PickupType = PickupType
+    def validate_NotificationSeverityType(self, value):
+        result = True
+        # Validate type NotificationSeverityType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['ERROR', 'FAILURE', 'NOTE', 'SUCCESS', 'WARNING']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on NotificationSeverityType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_CarrierCodeType(self, value):
+        result = True
+        # Validate type CarrierCodeType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['FDXC', 'FDXE', 'FDXG', 'FDXO', 'FXCC', 'FXFR', 'FXSP']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on CarrierCodeType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_CountryRelationshipType(self, value):
+        result = True
+        # Validate type CountryRelationshipType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['DOMESTIC', 'INTERNATIONAL']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on CountryRelationshipType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_PickupType(self, value):
+        result = True
+        # Validate type PickupType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['ON_CALL', 'PACKAGE_RETURN_PROGRAM', 'REGULAR_STOP', 'REGULAR_STOP_WITH_AUTO_CANCEL', 'TAG']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on PickupType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def hasContent_(self):
+        if (
+            self.HighestSeverity is not None or
+            self.Notifications or
+            self.TransactionDetail is not None or
+            self.Version is not None or
+            self.AssociatedAccountNumbers or
+            self.OriginDetail is not None or
+            self.ExpressFreightDetail is not None or
+            self.PackageCount is not None or
+            self.TotalWeight is not None or
+            self.CarrierCode is not None or
+            self.OversizePackageCount is not None or
+            self.Remarks is not None or
+            self.CommodityDescription is not None or
+            self.LatestEvent is not None or
+            self.TagDetail is not None or
+            self.FreightPickupDetail is not None or
+            self.CountryRelationship is not None or
+            self.PickupType is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='PickupHistoryDetailReply', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('PickupHistoryDetailReply')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'PickupHistoryDetailReply':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='PickupHistoryDetailReply')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='PickupHistoryDetailReply', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='PickupHistoryDetailReply'):
+        pass
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='PickupHistoryDetailReply', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.HighestSeverity is not None:
+            namespaceprefix_ = self.HighestSeverity_nsprefix_ + ':' if (UseCapturedNS_ and self.HighestSeverity_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sHighestSeverity>%s</%sHighestSeverity>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.HighestSeverity), input_name='HighestSeverity')), namespaceprefix_ , eol_))
+        for Notifications_ in self.Notifications:
+            namespaceprefix_ = self.Notifications_nsprefix_ + ':' if (UseCapturedNS_ and self.Notifications_nsprefix_) else ''
+            Notifications_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='Notifications', pretty_print=pretty_print)
+        if self.TransactionDetail is not None:
+            namespaceprefix_ = self.TransactionDetail_nsprefix_ + ':' if (UseCapturedNS_ and self.TransactionDetail_nsprefix_) else ''
+            self.TransactionDetail.export(outfile, level, namespaceprefix_, namespacedef_='', name_='TransactionDetail', pretty_print=pretty_print)
+        if self.Version is not None:
+            namespaceprefix_ = self.Version_nsprefix_ + ':' if (UseCapturedNS_ and self.Version_nsprefix_) else ''
+            self.Version.export(outfile, level, namespaceprefix_, namespacedef_='', name_='Version', pretty_print=pretty_print)
+        for AssociatedAccountNumbers_ in self.AssociatedAccountNumbers:
+            namespaceprefix_ = self.AssociatedAccountNumbers_nsprefix_ + ':' if (UseCapturedNS_ and self.AssociatedAccountNumbers_nsprefix_) else ''
+            AssociatedAccountNumbers_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='AssociatedAccountNumbers', pretty_print=pretty_print)
+        if self.OriginDetail is not None:
+            namespaceprefix_ = self.OriginDetail_nsprefix_ + ':' if (UseCapturedNS_ and self.OriginDetail_nsprefix_) else ''
+            self.OriginDetail.export(outfile, level, namespaceprefix_, namespacedef_='', name_='OriginDetail', pretty_print=pretty_print)
+        if self.ExpressFreightDetail is not None:
+            namespaceprefix_ = self.ExpressFreightDetail_nsprefix_ + ':' if (UseCapturedNS_ and self.ExpressFreightDetail_nsprefix_) else ''
+            self.ExpressFreightDetail.export(outfile, level, namespaceprefix_, namespacedef_='', name_='ExpressFreightDetail', pretty_print=pretty_print)
+        if self.PackageCount is not None:
+            namespaceprefix_ = self.PackageCount_nsprefix_ + ':' if (UseCapturedNS_ and self.PackageCount_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sPackageCount>%s</%sPackageCount>%s' % (namespaceprefix_ , self.gds_format_integer(self.PackageCount, input_name='PackageCount'), namespaceprefix_ , eol_))
+        if self.TotalWeight is not None:
+            namespaceprefix_ = self.TotalWeight_nsprefix_ + ':' if (UseCapturedNS_ and self.TotalWeight_nsprefix_) else ''
+            self.TotalWeight.export(outfile, level, namespaceprefix_, namespacedef_='', name_='TotalWeight', pretty_print=pretty_print)
+        if self.CarrierCode is not None:
+            namespaceprefix_ = self.CarrierCode_nsprefix_ + ':' if (UseCapturedNS_ and self.CarrierCode_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sCarrierCode>%s</%sCarrierCode>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.CarrierCode), input_name='CarrierCode')), namespaceprefix_ , eol_))
+        if self.OversizePackageCount is not None:
+            namespaceprefix_ = self.OversizePackageCount_nsprefix_ + ':' if (UseCapturedNS_ and self.OversizePackageCount_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sOversizePackageCount>%s</%sOversizePackageCount>%s' % (namespaceprefix_ , self.gds_format_integer(self.OversizePackageCount, input_name='OversizePackageCount'), namespaceprefix_ , eol_))
+        if self.Remarks is not None:
+            namespaceprefix_ = self.Remarks_nsprefix_ + ':' if (UseCapturedNS_ and self.Remarks_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sRemarks>%s</%sRemarks>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Remarks), input_name='Remarks')), namespaceprefix_ , eol_))
+        if self.CommodityDescription is not None:
+            namespaceprefix_ = self.CommodityDescription_nsprefix_ + ':' if (UseCapturedNS_ and self.CommodityDescription_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sCommodityDescription>%s</%sCommodityDescription>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.CommodityDescription), input_name='CommodityDescription')), namespaceprefix_ , eol_))
+        if self.LatestEvent is not None:
+            namespaceprefix_ = self.LatestEvent_nsprefix_ + ':' if (UseCapturedNS_ and self.LatestEvent_nsprefix_) else ''
+            self.LatestEvent.export(outfile, level, namespaceprefix_, namespacedef_='', name_='LatestEvent', pretty_print=pretty_print)
+        if self.TagDetail is not None:
+            namespaceprefix_ = self.TagDetail_nsprefix_ + ':' if (UseCapturedNS_ and self.TagDetail_nsprefix_) else ''
+            self.TagDetail.export(outfile, level, namespaceprefix_, namespacedef_='', name_='TagDetail', pretty_print=pretty_print)
+        if self.FreightPickupDetail is not None:
+            namespaceprefix_ = self.FreightPickupDetail_nsprefix_ + ':' if (UseCapturedNS_ and self.FreightPickupDetail_nsprefix_) else ''
+            self.FreightPickupDetail.export(outfile, level, namespaceprefix_, namespacedef_='', name_='FreightPickupDetail', pretty_print=pretty_print)
+        if self.CountryRelationship is not None:
+            namespaceprefix_ = self.CountryRelationship_nsprefix_ + ':' if (UseCapturedNS_ and self.CountryRelationship_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sCountryRelationship>%s</%sCountryRelationship>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.CountryRelationship), input_name='CountryRelationship')), namespaceprefix_ , eol_))
+        if self.PickupType is not None:
+            namespaceprefix_ = self.PickupType_nsprefix_ + ':' if (UseCapturedNS_ and self.PickupType_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sPickupType>%s</%sPickupType>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.PickupType), input_name='PickupType')), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'HighestSeverity':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'HighestSeverity')
+            value_ = self.gds_validate_string(value_, node, 'HighestSeverity')
+            self.HighestSeverity = value_
+            self.HighestSeverity_nsprefix_ = child_.prefix
+            # validate type NotificationSeverityType
+            self.validate_NotificationSeverityType(self.HighestSeverity)
+        elif nodeName_ == 'Notifications':
+            obj_ = Notification.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Notifications.append(obj_)
+            obj_.original_tagname_ = 'Notifications'
+        elif nodeName_ == 'TransactionDetail':
+            obj_ = TransactionDetail.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.TransactionDetail = obj_
+            obj_.original_tagname_ = 'TransactionDetail'
+        elif nodeName_ == 'Version':
+            obj_ = VersionId.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Version = obj_
+            obj_.original_tagname_ = 'Version'
+        elif nodeName_ == 'AssociatedAccountNumbers':
+            obj_ = AssociatedAccount.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.AssociatedAccountNumbers.append(obj_)
+            obj_.original_tagname_ = 'AssociatedAccountNumbers'
+        elif nodeName_ == 'OriginDetail':
+            obj_ = PickupOriginDetail.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.OriginDetail = obj_
+            obj_.original_tagname_ = 'OriginDetail'
+        elif nodeName_ == 'ExpressFreightDetail':
+            obj_ = ExpressFreightPickupDetail.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.ExpressFreightDetail = obj_
+            obj_.original_tagname_ = 'ExpressFreightDetail'
+        elif nodeName_ == 'PackageCount' and child_.text:
+            sval_ = child_.text
+            ival_ = self.gds_parse_integer(sval_, node, 'PackageCount')
+            if ival_ < 0:
+                raise_parse_error(child_, 'requires nonNegativeInteger')
+            ival_ = self.gds_validate_integer(ival_, node, 'PackageCount')
+            self.PackageCount = ival_
+            self.PackageCount_nsprefix_ = child_.prefix
+        elif nodeName_ == 'TotalWeight':
+            obj_ = Weight.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.TotalWeight = obj_
+            obj_.original_tagname_ = 'TotalWeight'
+        elif nodeName_ == 'CarrierCode':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'CarrierCode')
+            value_ = self.gds_validate_string(value_, node, 'CarrierCode')
+            self.CarrierCode = value_
+            self.CarrierCode_nsprefix_ = child_.prefix
+            # validate type CarrierCodeType
+            self.validate_CarrierCodeType(self.CarrierCode)
+        elif nodeName_ == 'OversizePackageCount' and child_.text:
+            sval_ = child_.text
+            ival_ = self.gds_parse_integer(sval_, node, 'OversizePackageCount')
+            if ival_ < 0:
+                raise_parse_error(child_, 'requires nonNegativeInteger')
+            ival_ = self.gds_validate_integer(ival_, node, 'OversizePackageCount')
+            self.OversizePackageCount = ival_
+            self.OversizePackageCount_nsprefix_ = child_.prefix
+        elif nodeName_ == 'Remarks':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Remarks')
+            value_ = self.gds_validate_string(value_, node, 'Remarks')
+            self.Remarks = value_
+            self.Remarks_nsprefix_ = child_.prefix
+        elif nodeName_ == 'CommodityDescription':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'CommodityDescription')
+            value_ = self.gds_validate_string(value_, node, 'CommodityDescription')
+            self.CommodityDescription = value_
+            self.CommodityDescription_nsprefix_ = child_.prefix
+        elif nodeName_ == 'LatestEvent':
+            obj_ = PickupHistoryEvent.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.LatestEvent = obj_
+            obj_.original_tagname_ = 'LatestEvent'
+        elif nodeName_ == 'TagDetail':
+            obj_ = PickupTagDetail.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.TagDetail = obj_
+            obj_.original_tagname_ = 'TagDetail'
+        elif nodeName_ == 'FreightPickupDetail':
+            obj_ = FreightPickupDetail.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.FreightPickupDetail = obj_
+            obj_.original_tagname_ = 'FreightPickupDetail'
+        elif nodeName_ == 'CountryRelationship':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'CountryRelationship')
+            value_ = self.gds_validate_string(value_, node, 'CountryRelationship')
+            self.CountryRelationship = value_
+            self.CountryRelationship_nsprefix_ = child_.prefix
+            # validate type CountryRelationshipType
+            self.validate_CountryRelationshipType(self.CountryRelationship)
+        elif nodeName_ == 'PickupType':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'PickupType')
+            value_ = self.gds_validate_string(value_, node, 'PickupType')
+            self.PickupType = value_
+            self.PickupType_nsprefix_ = child_.prefix
+            # validate type PickupType
+            self.validate_PickupType(self.PickupType)
+# end class PickupHistoryDetailReply
+
+
+class PickupHistoryDetailRequest(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, WebAuthenticationDetail=None, ClientDetail=None, UserDetail=None, TransactionDetail=None, Version=None, ApplicationId=None, ServiceLevel=None, ScheduledDate=None, AssociatedAccountNumber=None, CarrierCode=None, IsExpressFreight=None, PickupConfirmationNumber=None, Location=None, StandingInstructionId=None, CountryCode=None, PostalCode=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.WebAuthenticationDetail = WebAuthenticationDetail
+        self.WebAuthenticationDetail_nsprefix_ = "ns"
+        self.ClientDetail = ClientDetail
+        self.ClientDetail_nsprefix_ = "ns"
+        self.UserDetail = UserDetail
+        self.UserDetail_nsprefix_ = "ns"
+        self.TransactionDetail = TransactionDetail
+        self.TransactionDetail_nsprefix_ = "ns"
+        self.Version = Version
+        self.Version_nsprefix_ = "ns"
+        self.ApplicationId = ApplicationId
+        self.ApplicationId_nsprefix_ = None
+        self.ServiceLevel = ServiceLevel
+        self.validate_PickupServiceLevelType(self.ServiceLevel)
+        self.ServiceLevel_nsprefix_ = "ns"
+        if isinstance(ScheduledDate, BaseStrType_):
+            initvalue_ = datetime_.datetime.strptime(ScheduledDate, '%Y-%m-%d').date()
+        else:
+            initvalue_ = ScheduledDate
+        self.ScheduledDate = initvalue_
+        self.ScheduledDate_nsprefix_ = None
+        self.AssociatedAccountNumber = AssociatedAccountNumber
+        self.AssociatedAccountNumber_nsprefix_ = "ns"
+        self.CarrierCode = CarrierCode
+        self.validate_CarrierCodeType(self.CarrierCode)
+        self.CarrierCode_nsprefix_ = "ns"
+        self.IsExpressFreight = IsExpressFreight
+        self.IsExpressFreight_nsprefix_ = None
+        self.PickupConfirmationNumber = PickupConfirmationNumber
+        self.PickupConfirmationNumber_nsprefix_ = None
+        self.Location = Location
+        self.Location_nsprefix_ = None
+        self.StandingInstructionId = StandingInstructionId
+        self.StandingInstructionId_nsprefix_ = None
+        self.CountryCode = CountryCode
+        self.CountryCode_nsprefix_ = None
+        self.PostalCode = PostalCode
+        self.PostalCode_nsprefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, PickupHistoryDetailRequest)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if PickupHistoryDetailRequest.subclass:
+            return PickupHistoryDetailRequest.subclass(*args_, **kwargs_)
+        else:
+            return PickupHistoryDetailRequest(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_WebAuthenticationDetail(self):
+        return self.WebAuthenticationDetail
+    def set_WebAuthenticationDetail(self, WebAuthenticationDetail):
+        self.WebAuthenticationDetail = WebAuthenticationDetail
+    def get_ClientDetail(self):
+        return self.ClientDetail
+    def set_ClientDetail(self, ClientDetail):
+        self.ClientDetail = ClientDetail
+    def get_UserDetail(self):
+        return self.UserDetail
+    def set_UserDetail(self, UserDetail):
+        self.UserDetail = UserDetail
+    def get_TransactionDetail(self):
+        return self.TransactionDetail
+    def set_TransactionDetail(self, TransactionDetail):
+        self.TransactionDetail = TransactionDetail
+    def get_Version(self):
+        return self.Version
+    def set_Version(self, Version):
+        self.Version = Version
+    def get_ApplicationId(self):
+        return self.ApplicationId
+    def set_ApplicationId(self, ApplicationId):
+        self.ApplicationId = ApplicationId
+    def get_ServiceLevel(self):
+        return self.ServiceLevel
+    def set_ServiceLevel(self, ServiceLevel):
+        self.ServiceLevel = ServiceLevel
+    def get_ScheduledDate(self):
+        return self.ScheduledDate
+    def set_ScheduledDate(self, ScheduledDate):
+        self.ScheduledDate = ScheduledDate
+    def get_AssociatedAccountNumber(self):
+        return self.AssociatedAccountNumber
+    def set_AssociatedAccountNumber(self, AssociatedAccountNumber):
+        self.AssociatedAccountNumber = AssociatedAccountNumber
+    def get_CarrierCode(self):
+        return self.CarrierCode
+    def set_CarrierCode(self, CarrierCode):
+        self.CarrierCode = CarrierCode
+    def get_IsExpressFreight(self):
+        return self.IsExpressFreight
+    def set_IsExpressFreight(self, IsExpressFreight):
+        self.IsExpressFreight = IsExpressFreight
+    def get_PickupConfirmationNumber(self):
+        return self.PickupConfirmationNumber
+    def set_PickupConfirmationNumber(self, PickupConfirmationNumber):
+        self.PickupConfirmationNumber = PickupConfirmationNumber
+    def get_Location(self):
+        return self.Location
+    def set_Location(self, Location):
+        self.Location = Location
+    def get_StandingInstructionId(self):
+        return self.StandingInstructionId
+    def set_StandingInstructionId(self, StandingInstructionId):
+        self.StandingInstructionId = StandingInstructionId
+    def get_CountryCode(self):
+        return self.CountryCode
+    def set_CountryCode(self, CountryCode):
+        self.CountryCode = CountryCode
+    def get_PostalCode(self):
+        return self.PostalCode
+    def set_PostalCode(self, PostalCode):
+        self.PostalCode = PostalCode
+    def validate_PickupServiceLevelType(self, value):
+        result = True
+        # Validate type PickupServiceLevelType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['EXTERNAL_EDITS', 'INTERNAL_EDITS', 'IVRS_EDITS', 'IVR_WITH_BIOMETRIC_AUTHENTICATION', 'TAG_EDITS', 'TRUSTED_PROXY']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on PickupServiceLevelType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_CarrierCodeType(self, value):
+        result = True
+        # Validate type CarrierCodeType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['FDXC', 'FDXE', 'FDXG', 'FDXO', 'FXCC', 'FXFR', 'FXSP']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on CarrierCodeType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def hasContent_(self):
+        if (
+            self.WebAuthenticationDetail is not None or
+            self.ClientDetail is not None or
+            self.UserDetail is not None or
+            self.TransactionDetail is not None or
+            self.Version is not None or
+            self.ApplicationId is not None or
+            self.ServiceLevel is not None or
+            self.ScheduledDate is not None or
+            self.AssociatedAccountNumber is not None or
+            self.CarrierCode is not None or
+            self.IsExpressFreight is not None or
+            self.PickupConfirmationNumber is not None or
+            self.Location is not None or
+            self.StandingInstructionId is not None or
+            self.CountryCode is not None or
+            self.PostalCode is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='PickupHistoryDetailRequest', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('PickupHistoryDetailRequest')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'PickupHistoryDetailRequest':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='PickupHistoryDetailRequest')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='PickupHistoryDetailRequest', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='PickupHistoryDetailRequest'):
+        pass
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='PickupHistoryDetailRequest', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.WebAuthenticationDetail is not None:
+            namespaceprefix_ = self.WebAuthenticationDetail_nsprefix_ + ':' if (UseCapturedNS_ and self.WebAuthenticationDetail_nsprefix_) else ''
+            self.WebAuthenticationDetail.export(outfile, level, namespaceprefix_, namespacedef_='', name_='WebAuthenticationDetail', pretty_print=pretty_print)
+        if self.ClientDetail is not None:
+            namespaceprefix_ = self.ClientDetail_nsprefix_ + ':' if (UseCapturedNS_ and self.ClientDetail_nsprefix_) else ''
+            self.ClientDetail.export(outfile, level, namespaceprefix_, namespacedef_='', name_='ClientDetail', pretty_print=pretty_print)
+        if self.UserDetail is not None:
+            namespaceprefix_ = self.UserDetail_nsprefix_ + ':' if (UseCapturedNS_ and self.UserDetail_nsprefix_) else ''
+            self.UserDetail.export(outfile, level, namespaceprefix_, namespacedef_='', name_='UserDetail', pretty_print=pretty_print)
+        if self.TransactionDetail is not None:
+            namespaceprefix_ = self.TransactionDetail_nsprefix_ + ':' if (UseCapturedNS_ and self.TransactionDetail_nsprefix_) else ''
+            self.TransactionDetail.export(outfile, level, namespaceprefix_, namespacedef_='', name_='TransactionDetail', pretty_print=pretty_print)
+        if self.Version is not None:
+            namespaceprefix_ = self.Version_nsprefix_ + ':' if (UseCapturedNS_ and self.Version_nsprefix_) else ''
+            self.Version.export(outfile, level, namespaceprefix_, namespacedef_='', name_='Version', pretty_print=pretty_print)
+        if self.ApplicationId is not None:
+            namespaceprefix_ = self.ApplicationId_nsprefix_ + ':' if (UseCapturedNS_ and self.ApplicationId_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sApplicationId>%s</%sApplicationId>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.ApplicationId), input_name='ApplicationId')), namespaceprefix_ , eol_))
+        if self.ServiceLevel is not None:
+            namespaceprefix_ = self.ServiceLevel_nsprefix_ + ':' if (UseCapturedNS_ and self.ServiceLevel_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sServiceLevel>%s</%sServiceLevel>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.ServiceLevel), input_name='ServiceLevel')), namespaceprefix_ , eol_))
+        if self.ScheduledDate is not None:
+            namespaceprefix_ = self.ScheduledDate_nsprefix_ + ':' if (UseCapturedNS_ and self.ScheduledDate_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sScheduledDate>%s</%sScheduledDate>%s' % (namespaceprefix_ , self.gds_format_date(self.ScheduledDate, input_name='ScheduledDate'), namespaceprefix_ , eol_))
+        if self.AssociatedAccountNumber is not None:
+            namespaceprefix_ = self.AssociatedAccountNumber_nsprefix_ + ':' if (UseCapturedNS_ and self.AssociatedAccountNumber_nsprefix_) else ''
+            self.AssociatedAccountNumber.export(outfile, level, namespaceprefix_, namespacedef_='', name_='AssociatedAccountNumber', pretty_print=pretty_print)
+        if self.CarrierCode is not None:
+            namespaceprefix_ = self.CarrierCode_nsprefix_ + ':' if (UseCapturedNS_ and self.CarrierCode_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sCarrierCode>%s</%sCarrierCode>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.CarrierCode), input_name='CarrierCode')), namespaceprefix_ , eol_))
+        if self.IsExpressFreight is not None:
+            namespaceprefix_ = self.IsExpressFreight_nsprefix_ + ':' if (UseCapturedNS_ and self.IsExpressFreight_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sIsExpressFreight>%s</%sIsExpressFreight>%s' % (namespaceprefix_ , self.gds_format_boolean(self.IsExpressFreight, input_name='IsExpressFreight'), namespaceprefix_ , eol_))
+        if self.PickupConfirmationNumber is not None:
+            namespaceprefix_ = self.PickupConfirmationNumber_nsprefix_ + ':' if (UseCapturedNS_ and self.PickupConfirmationNumber_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sPickupConfirmationNumber>%s</%sPickupConfirmationNumber>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.PickupConfirmationNumber), input_name='PickupConfirmationNumber')), namespaceprefix_ , eol_))
+        if self.Location is not None:
+            namespaceprefix_ = self.Location_nsprefix_ + ':' if (UseCapturedNS_ and self.Location_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sLocation>%s</%sLocation>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Location), input_name='Location')), namespaceprefix_ , eol_))
+        if self.StandingInstructionId is not None:
+            namespaceprefix_ = self.StandingInstructionId_nsprefix_ + ':' if (UseCapturedNS_ and self.StandingInstructionId_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sStandingInstructionId>%s</%sStandingInstructionId>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.StandingInstructionId), input_name='StandingInstructionId')), namespaceprefix_ , eol_))
+        if self.CountryCode is not None:
+            namespaceprefix_ = self.CountryCode_nsprefix_ + ':' if (UseCapturedNS_ and self.CountryCode_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sCountryCode>%s</%sCountryCode>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.CountryCode), input_name='CountryCode')), namespaceprefix_ , eol_))
+        if self.PostalCode is not None:
+            namespaceprefix_ = self.PostalCode_nsprefix_ + ':' if (UseCapturedNS_ and self.PostalCode_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sPostalCode>%s</%sPostalCode>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.PostalCode), input_name='PostalCode')), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'WebAuthenticationDetail':
+            obj_ = WebAuthenticationDetail.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.WebAuthenticationDetail = obj_
+            obj_.original_tagname_ = 'WebAuthenticationDetail'
+        elif nodeName_ == 'ClientDetail':
+            obj_ = ClientDetail.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.ClientDetail = obj_
+            obj_.original_tagname_ = 'ClientDetail'
+        elif nodeName_ == 'UserDetail':
+            obj_ = UserDetail.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.UserDetail = obj_
+            obj_.original_tagname_ = 'UserDetail'
+        elif nodeName_ == 'TransactionDetail':
+            obj_ = TransactionDetail.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.TransactionDetail = obj_
+            obj_.original_tagname_ = 'TransactionDetail'
+        elif nodeName_ == 'Version':
+            obj_ = VersionId.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Version = obj_
+            obj_.original_tagname_ = 'Version'
+        elif nodeName_ == 'ApplicationId':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'ApplicationId')
+            value_ = self.gds_validate_string(value_, node, 'ApplicationId')
+            self.ApplicationId = value_
+            self.ApplicationId_nsprefix_ = child_.prefix
+        elif nodeName_ == 'ServiceLevel':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'ServiceLevel')
+            value_ = self.gds_validate_string(value_, node, 'ServiceLevel')
+            self.ServiceLevel = value_
+            self.ServiceLevel_nsprefix_ = child_.prefix
+            # validate type PickupServiceLevelType
+            self.validate_PickupServiceLevelType(self.ServiceLevel)
+        elif nodeName_ == 'ScheduledDate':
+            sval_ = child_.text
+            dval_ = self.gds_parse_date(sval_)
+            self.ScheduledDate = dval_
+            self.ScheduledDate_nsprefix_ = child_.prefix
+        elif nodeName_ == 'AssociatedAccountNumber':
+            obj_ = AssociatedAccount.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.AssociatedAccountNumber = obj_
+            obj_.original_tagname_ = 'AssociatedAccountNumber'
+        elif nodeName_ == 'CarrierCode':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'CarrierCode')
+            value_ = self.gds_validate_string(value_, node, 'CarrierCode')
+            self.CarrierCode = value_
+            self.CarrierCode_nsprefix_ = child_.prefix
+            # validate type CarrierCodeType
+            self.validate_CarrierCodeType(self.CarrierCode)
+        elif nodeName_ == 'IsExpressFreight':
+            sval_ = child_.text
+            ival_ = self.gds_parse_boolean(sval_, node, 'IsExpressFreight')
+            ival_ = self.gds_validate_boolean(ival_, node, 'IsExpressFreight')
+            self.IsExpressFreight = ival_
+            self.IsExpressFreight_nsprefix_ = child_.prefix
+        elif nodeName_ == 'PickupConfirmationNumber':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'PickupConfirmationNumber')
+            value_ = self.gds_validate_string(value_, node, 'PickupConfirmationNumber')
+            self.PickupConfirmationNumber = value_
+            self.PickupConfirmationNumber_nsprefix_ = child_.prefix
+        elif nodeName_ == 'Location':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Location')
+            value_ = self.gds_validate_string(value_, node, 'Location')
+            self.Location = value_
+            self.Location_nsprefix_ = child_.prefix
+        elif nodeName_ == 'StandingInstructionId':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'StandingInstructionId')
+            value_ = self.gds_validate_string(value_, node, 'StandingInstructionId')
+            self.StandingInstructionId = value_
+            self.StandingInstructionId_nsprefix_ = child_.prefix
+        elif nodeName_ == 'CountryCode':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'CountryCode')
+            value_ = self.gds_validate_string(value_, node, 'CountryCode')
+            self.CountryCode = value_
+            self.CountryCode_nsprefix_ = child_.prefix
+        elif nodeName_ == 'PostalCode':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'PostalCode')
+            value_ = self.gds_validate_string(value_, node, 'PostalCode')
+            self.PostalCode = value_
+            self.PostalCode_nsprefix_ = child_.prefix
+# end class PickupHistoryDetailRequest
+
+
+class PickupHistoryEvent(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, Event=None, Exception=None, EventTimestamp=None, DriverEmployeeId=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.Event = Event
+        self.validate_PickupEventType(self.Event)
+        self.Event_nsprefix_ = "ns"
+        self.Exception = Exception
+        self.validate_PickupExceptionType(self.Exception)
+        self.Exception_nsprefix_ = "ns"
+        if isinstance(EventTimestamp, BaseStrType_):
+            initvalue_ = datetime_.datetime.strptime(EventTimestamp, '%Y-%m-%dT%H:%M:%S')
+        else:
+            initvalue_ = EventTimestamp
+        self.EventTimestamp = initvalue_
+        self.EventTimestamp_nsprefix_ = None
+        self.DriverEmployeeId = DriverEmployeeId
+        self.DriverEmployeeId_nsprefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, PickupHistoryEvent)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if PickupHistoryEvent.subclass:
+            return PickupHistoryEvent.subclass(*args_, **kwargs_)
+        else:
+            return PickupHistoryEvent(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_Event(self):
+        return self.Event
+    def set_Event(self, Event):
+        self.Event = Event
+    def get_Exception(self):
+        return self.Exception
+    def set_Exception(self, Exception):
+        self.Exception = Exception
+    def get_EventTimestamp(self):
+        return self.EventTimestamp
+    def set_EventTimestamp(self, EventTimestamp):
+        self.EventTimestamp = EventTimestamp
+    def get_DriverEmployeeId(self):
+        return self.DriverEmployeeId
+    def set_DriverEmployeeId(self, DriverEmployeeId):
+        self.DriverEmployeeId = DriverEmployeeId
+    def validate_PickupEventType(self, value):
+        result = True
+        # Validate type PickupEventType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['ASSIGNED_TO_DRIVER', 'CANCELED', 'DRIVER_ARRIVED', 'DRIVER_DEPARTED', 'DRIVER_EN_ROUTE', 'EXCEPTION', 'PICKED_UP', 'SCHEDULED']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on PickupEventType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_PickupExceptionType(self, value):
+        result = True
+        # Validate type PickupExceptionType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['ATTEMPTED_AFTER_CLOSE_TIME', 'ATTEMPTED_OUT_OF_WINDOW', 'BUSINESS_CLOSED', 'BUSINESS_ON_STRIKE', 'CITY_NOT_IN_SERVICE_AREA', 'COMAIL_STOP', 'COMMODITY_UNACCEPTABLE', 'CORRECTIVE_PICKUP', 'COURIER_ATTEMPTED_PACKAGE_LEFT_BEHIND', 'CUSTOMER_DELAY', 'CUSTOMER_DID_NOT_WAIT', 'CUSTOMER_NOT_AT_PICKUP_LOCATION', 'CUSTOMER_SECURITY_DELAY', 'EXCEED_SERVICE_LIMITS', 'FUTURE_DELIVERY_REQUESTED', 'HAZARD_TO_COURIER', 'HAZMAT_PICKUP_NOT_COMPLETED', 'INCORRECT_ADDRESS', 'INCORRECT_PICKUP_INFORMATION', 'INCORRECT_ROUTE', 'INTERLINE_PICKUP', 'LOCAL_EVENT', 'MASS_PICKUP_SCAN', 'MASS_ROUTING_SCAN', 'MISSING_REGULATORY_PAPERWORK', 'MULTIPLE_PICKUPS_SCHEDULED', 'NO_CREDIT_APPROVAL_BULK_SHIPMENT', 'NO_PACKAGE', 'NO_PICKUP_ATTEMPT_MADE', 'OTHER', 'PACKAGE_ALREADY_TENDERED', 'PACKAGE_MOVEMENT_NOT_SUPPORTED', 'PACKAGE_RECEIVED_AFTER_SHUTTLE_DEPARTED', 'PACKAGE_RETRIEVAL', 'PACKAGE_TENDERED_TO_OTHER_CARRIER', 'PACKAGE_TENDERED_TO_OTHER_FEDEX_CARRIER', 'PACKAGE_TRANSFERRED_TO_OTHER_CARRIER', 'PAYMENT_RECEIVED', 'PICKUP_CANCELLED', 'PICKUP_NOT_READY', 'PICKUP_ORIGIN_HOLIDAY', 'PICKUP_SUSPENDED', 'PICKUP_TYPE_RESTRICTED', 'PICKUP_UPON_DELIVERY', 'PREROUTED_METER_PACKAGE', 'REROUTED', 'SCHEDULED_PAST_CUTOFF', 'SYSTEM_OUTAGE_NO_PICKUP', 'TENDERED_BY_CARTAGE_AGENT', 'THIRD_PARTY_CALL_IN', 'UNABLE_TO_COLLECT_PAYMENT', 'UNABLE_TO_SCAN_PACKAGE', 'UNEXPECTED_DELAY', 'WEATHER_DELAY']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on PickupExceptionType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def hasContent_(self):
+        if (
+            self.Event is not None or
+            self.Exception is not None or
+            self.EventTimestamp is not None or
+            self.DriverEmployeeId is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='PickupHistoryEvent', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('PickupHistoryEvent')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'PickupHistoryEvent':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='PickupHistoryEvent')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='PickupHistoryEvent', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='PickupHistoryEvent'):
+        pass
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='PickupHistoryEvent', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.Event is not None:
+            namespaceprefix_ = self.Event_nsprefix_ + ':' if (UseCapturedNS_ and self.Event_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sEvent>%s</%sEvent>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Event), input_name='Event')), namespaceprefix_ , eol_))
+        if self.Exception is not None:
+            namespaceprefix_ = self.Exception_nsprefix_ + ':' if (UseCapturedNS_ and self.Exception_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sException>%s</%sException>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Exception), input_name='Exception')), namespaceprefix_ , eol_))
+        if self.EventTimestamp is not None:
+            namespaceprefix_ = self.EventTimestamp_nsprefix_ + ':' if (UseCapturedNS_ and self.EventTimestamp_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sEventTimestamp>%s</%sEventTimestamp>%s' % (namespaceprefix_ , self.gds_format_datetime(self.EventTimestamp, input_name='EventTimestamp'), namespaceprefix_ , eol_))
+        if self.DriverEmployeeId is not None:
+            namespaceprefix_ = self.DriverEmployeeId_nsprefix_ + ':' if (UseCapturedNS_ and self.DriverEmployeeId_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sDriverEmployeeId>%s</%sDriverEmployeeId>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.DriverEmployeeId), input_name='DriverEmployeeId')), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'Event':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Event')
+            value_ = self.gds_validate_string(value_, node, 'Event')
+            self.Event = value_
+            self.Event_nsprefix_ = child_.prefix
+            # validate type PickupEventType
+            self.validate_PickupEventType(self.Event)
+        elif nodeName_ == 'Exception':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Exception')
+            value_ = self.gds_validate_string(value_, node, 'Exception')
+            self.Exception = value_
+            self.Exception_nsprefix_ = child_.prefix
+            # validate type PickupExceptionType
+            self.validate_PickupExceptionType(self.Exception)
+        elif nodeName_ == 'EventTimestamp':
+            sval_ = child_.text
+            dval_ = self.gds_parse_datetime(sval_)
+            self.EventTimestamp = dval_
+            self.EventTimestamp_nsprefix_ = child_.prefix
+        elif nodeName_ == 'DriverEmployeeId':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'DriverEmployeeId')
+            value_ = self.gds_validate_string(value_, node, 'DriverEmployeeId')
+            self.DriverEmployeeId = value_
+            self.DriverEmployeeId_nsprefix_ = child_.prefix
+# end class PickupHistoryEvent
+
+
+class PickupHistoryServiceSummary(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, Service=None, TotalWeight=None, TotalLineItems=None, TotalHandlingUnits=None, TotalPieces=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.Service = Service
+        self.Service_nsprefix_ = None
+        self.TotalWeight = TotalWeight
+        self.TotalWeight_nsprefix_ = "ns"
+        self.TotalLineItems = TotalLineItems
+        self.TotalLineItems_nsprefix_ = None
+        self.TotalHandlingUnits = TotalHandlingUnits
+        self.TotalHandlingUnits_nsprefix_ = None
+        self.TotalPieces = TotalPieces
+        self.TotalPieces_nsprefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, PickupHistoryServiceSummary)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if PickupHistoryServiceSummary.subclass:
+            return PickupHistoryServiceSummary.subclass(*args_, **kwargs_)
+        else:
+            return PickupHistoryServiceSummary(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_Service(self):
+        return self.Service
+    def set_Service(self, Service):
+        self.Service = Service
+    def get_TotalWeight(self):
+        return self.TotalWeight
+    def set_TotalWeight(self, TotalWeight):
+        self.TotalWeight = TotalWeight
+    def get_TotalLineItems(self):
+        return self.TotalLineItems
+    def set_TotalLineItems(self, TotalLineItems):
+        self.TotalLineItems = TotalLineItems
+    def get_TotalHandlingUnits(self):
+        return self.TotalHandlingUnits
+    def set_TotalHandlingUnits(self, TotalHandlingUnits):
+        self.TotalHandlingUnits = TotalHandlingUnits
+    def get_TotalPieces(self):
+        return self.TotalPieces
+    def set_TotalPieces(self, TotalPieces):
+        self.TotalPieces = TotalPieces
+    def hasContent_(self):
+        if (
+            self.Service is not None or
+            self.TotalWeight is not None or
+            self.TotalLineItems is not None or
+            self.TotalHandlingUnits is not None or
+            self.TotalPieces is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='PickupHistoryServiceSummary', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('PickupHistoryServiceSummary')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'PickupHistoryServiceSummary':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='PickupHistoryServiceSummary')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='PickupHistoryServiceSummary', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='PickupHistoryServiceSummary'):
+        pass
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='PickupHistoryServiceSummary', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.Service is not None:
+            namespaceprefix_ = self.Service_nsprefix_ + ':' if (UseCapturedNS_ and self.Service_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sService>%s</%sService>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Service), input_name='Service')), namespaceprefix_ , eol_))
+        if self.TotalWeight is not None:
+            namespaceprefix_ = self.TotalWeight_nsprefix_ + ':' if (UseCapturedNS_ and self.TotalWeight_nsprefix_) else ''
+            self.TotalWeight.export(outfile, level, namespaceprefix_, namespacedef_='', name_='TotalWeight', pretty_print=pretty_print)
+        if self.TotalLineItems is not None:
+            namespaceprefix_ = self.TotalLineItems_nsprefix_ + ':' if (UseCapturedNS_ and self.TotalLineItems_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sTotalLineItems>%s</%sTotalLineItems>%s' % (namespaceprefix_ , self.gds_format_integer(self.TotalLineItems, input_name='TotalLineItems'), namespaceprefix_ , eol_))
+        if self.TotalHandlingUnits is not None:
+            namespaceprefix_ = self.TotalHandlingUnits_nsprefix_ + ':' if (UseCapturedNS_ and self.TotalHandlingUnits_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sTotalHandlingUnits>%s</%sTotalHandlingUnits>%s' % (namespaceprefix_ , self.gds_format_integer(self.TotalHandlingUnits, input_name='TotalHandlingUnits'), namespaceprefix_ , eol_))
+        if self.TotalPieces is not None:
+            namespaceprefix_ = self.TotalPieces_nsprefix_ + ':' if (UseCapturedNS_ and self.TotalPieces_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sTotalPieces>%s</%sTotalPieces>%s' % (namespaceprefix_ , self.gds_format_integer(self.TotalPieces, input_name='TotalPieces'), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'Service':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Service')
+            value_ = self.gds_validate_string(value_, node, 'Service')
+            self.Service = value_
+            self.Service_nsprefix_ = child_.prefix
+        elif nodeName_ == 'TotalWeight':
+            obj_ = Weight.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.TotalWeight = obj_
+            obj_.original_tagname_ = 'TotalWeight'
+        elif nodeName_ == 'TotalLineItems' and child_.text:
+            sval_ = child_.text
+            ival_ = self.gds_parse_integer(sval_, node, 'TotalLineItems')
+            if ival_ < 0:
+                raise_parse_error(child_, 'requires nonNegativeInteger')
+            ival_ = self.gds_validate_integer(ival_, node, 'TotalLineItems')
+            self.TotalLineItems = ival_
+            self.TotalLineItems_nsprefix_ = child_.prefix
+        elif nodeName_ == 'TotalHandlingUnits' and child_.text:
+            sval_ = child_.text
+            ival_ = self.gds_parse_integer(sval_, node, 'TotalHandlingUnits')
+            if ival_ < 0:
+                raise_parse_error(child_, 'requires nonNegativeInteger')
+            ival_ = self.gds_validate_integer(ival_, node, 'TotalHandlingUnits')
+            self.TotalHandlingUnits = ival_
+            self.TotalHandlingUnits_nsprefix_ = child_.prefix
+        elif nodeName_ == 'TotalPieces' and child_.text:
+            sval_ = child_.text
+            ival_ = self.gds_parse_integer(sval_, node, 'TotalPieces')
+            if ival_ < 0:
+                raise_parse_error(child_, 'requires nonNegativeInteger')
+            ival_ = self.gds_validate_integer(ival_, node, 'TotalPieces')
+            self.TotalPieces = ival_
+            self.TotalPieces_nsprefix_ = child_.prefix
+# end class PickupHistoryServiceSummary
+
+
+class PickupHistorySummary(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, Address=None, CompanyName=None, ReadyTimestamp=None, CompletionTimestamp=None, CloseTime=None, CallProcessedTimestamp=None, AssociatedAccountNumbers=None, PickupConfirmationNumber=None, StandingInstructionId=None, Location=None, LatestEventType=None, CarrierCode=None, ServiceType=None, IsExpressFreight=None, PickupType=None, CountryRelationship=None, Contact=None, UserId=None, InternalSystemId=None, ServiceSummaries=None, Status=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.Address = Address
+        self.Address_nsprefix_ = "ns"
+        self.CompanyName = CompanyName
+        self.CompanyName_nsprefix_ = None
+        if isinstance(ReadyTimestamp, BaseStrType_):
+            initvalue_ = datetime_.datetime.strptime(ReadyTimestamp, '%Y-%m-%dT%H:%M:%S')
+        else:
+            initvalue_ = ReadyTimestamp
+        self.ReadyTimestamp = initvalue_
+        self.ReadyTimestamp_nsprefix_ = None
+        if isinstance(CompletionTimestamp, BaseStrType_):
+            initvalue_ = datetime_.datetime.strptime(CompletionTimestamp, '%Y-%m-%dT%H:%M:%S')
+        else:
+            initvalue_ = CompletionTimestamp
+        self.CompletionTimestamp = initvalue_
+        self.CompletionTimestamp_nsprefix_ = None
+        if isinstance(CloseTime, BaseStrType_):
+            initvalue_ = datetime_.datetime.strptime(CloseTime, '%H:%M:%S').time()
+        else:
+            initvalue_ = CloseTime
+        self.CloseTime = initvalue_
+        self.CloseTime_nsprefix_ = None
+        if isinstance(CallProcessedTimestamp, BaseStrType_):
+            initvalue_ = datetime_.datetime.strptime(CallProcessedTimestamp, '%Y-%m-%dT%H:%M:%S')
+        else:
+            initvalue_ = CallProcessedTimestamp
+        self.CallProcessedTimestamp = initvalue_
+        self.CallProcessedTimestamp_nsprefix_ = None
+        if AssociatedAccountNumbers is None:
+            self.AssociatedAccountNumbers = []
+        else:
+            self.AssociatedAccountNumbers = AssociatedAccountNumbers
+        self.AssociatedAccountNumbers_nsprefix_ = "ns"
+        self.PickupConfirmationNumber = PickupConfirmationNumber
+        self.PickupConfirmationNumber_nsprefix_ = None
+        self.StandingInstructionId = StandingInstructionId
+        self.StandingInstructionId_nsprefix_ = None
+        self.Location = Location
+        self.Location_nsprefix_ = None
+        self.LatestEventType = LatestEventType
+        self.validate_PickupEventType(self.LatestEventType)
+        self.LatestEventType_nsprefix_ = "ns"
+        self.CarrierCode = CarrierCode
+        self.validate_CarrierCodeType(self.CarrierCode)
+        self.CarrierCode_nsprefix_ = "ns"
+        self.ServiceType = ServiceType
+        self.ServiceType_nsprefix_ = None
+        self.IsExpressFreight = IsExpressFreight
+        self.IsExpressFreight_nsprefix_ = None
+        self.PickupType = PickupType
+        self.validate_PickupType(self.PickupType)
+        self.PickupType_nsprefix_ = "ns"
+        self.CountryRelationship = CountryRelationship
+        self.validate_CountryRelationshipType(self.CountryRelationship)
+        self.CountryRelationship_nsprefix_ = "ns"
+        self.Contact = Contact
+        self.Contact_nsprefix_ = "ns"
+        self.UserId = UserId
+        self.UserId_nsprefix_ = None
+        self.InternalSystemId = InternalSystemId
+        self.InternalSystemId_nsprefix_ = None
+        if ServiceSummaries is None:
+            self.ServiceSummaries = []
+        else:
+            self.ServiceSummaries = ServiceSummaries
+        self.ServiceSummaries_nsprefix_ = "ns"
+        self.Status = Status
+        self.validate_PickupStatusType(self.Status)
+        self.Status_nsprefix_ = "ns"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, PickupHistorySummary)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if PickupHistorySummary.subclass:
+            return PickupHistorySummary.subclass(*args_, **kwargs_)
+        else:
+            return PickupHistorySummary(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_Address(self):
+        return self.Address
+    def set_Address(self, Address):
+        self.Address = Address
+    def get_CompanyName(self):
+        return self.CompanyName
+    def set_CompanyName(self, CompanyName):
+        self.CompanyName = CompanyName
+    def get_ReadyTimestamp(self):
+        return self.ReadyTimestamp
+    def set_ReadyTimestamp(self, ReadyTimestamp):
+        self.ReadyTimestamp = ReadyTimestamp
+    def get_CompletionTimestamp(self):
+        return self.CompletionTimestamp
+    def set_CompletionTimestamp(self, CompletionTimestamp):
+        self.CompletionTimestamp = CompletionTimestamp
+    def get_CloseTime(self):
+        return self.CloseTime
+    def set_CloseTime(self, CloseTime):
+        self.CloseTime = CloseTime
+    def get_CallProcessedTimestamp(self):
+        return self.CallProcessedTimestamp
+    def set_CallProcessedTimestamp(self, CallProcessedTimestamp):
+        self.CallProcessedTimestamp = CallProcessedTimestamp
+    def get_AssociatedAccountNumbers(self):
+        return self.AssociatedAccountNumbers
+    def set_AssociatedAccountNumbers(self, AssociatedAccountNumbers):
+        self.AssociatedAccountNumbers = AssociatedAccountNumbers
+    def add_AssociatedAccountNumbers(self, value):
+        self.AssociatedAccountNumbers.append(value)
+    def insert_AssociatedAccountNumbers_at(self, index, value):
+        self.AssociatedAccountNumbers.insert(index, value)
+    def replace_AssociatedAccountNumbers_at(self, index, value):
+        self.AssociatedAccountNumbers[index] = value
+    def get_PickupConfirmationNumber(self):
+        return self.PickupConfirmationNumber
+    def set_PickupConfirmationNumber(self, PickupConfirmationNumber):
+        self.PickupConfirmationNumber = PickupConfirmationNumber
+    def get_StandingInstructionId(self):
+        return self.StandingInstructionId
+    def set_StandingInstructionId(self, StandingInstructionId):
+        self.StandingInstructionId = StandingInstructionId
+    def get_Location(self):
+        return self.Location
+    def set_Location(self, Location):
+        self.Location = Location
+    def get_LatestEventType(self):
+        return self.LatestEventType
+    def set_LatestEventType(self, LatestEventType):
+        self.LatestEventType = LatestEventType
+    def get_CarrierCode(self):
+        return self.CarrierCode
+    def set_CarrierCode(self, CarrierCode):
+        self.CarrierCode = CarrierCode
+    def get_ServiceType(self):
+        return self.ServiceType
+    def set_ServiceType(self, ServiceType):
+        self.ServiceType = ServiceType
+    def get_IsExpressFreight(self):
+        return self.IsExpressFreight
+    def set_IsExpressFreight(self, IsExpressFreight):
+        self.IsExpressFreight = IsExpressFreight
+    def get_PickupType(self):
+        return self.PickupType
+    def set_PickupType(self, PickupType):
+        self.PickupType = PickupType
+    def get_CountryRelationship(self):
+        return self.CountryRelationship
+    def set_CountryRelationship(self, CountryRelationship):
+        self.CountryRelationship = CountryRelationship
+    def get_Contact(self):
+        return self.Contact
+    def set_Contact(self, Contact):
+        self.Contact = Contact
+    def get_UserId(self):
+        return self.UserId
+    def set_UserId(self, UserId):
+        self.UserId = UserId
+    def get_InternalSystemId(self):
+        return self.InternalSystemId
+    def set_InternalSystemId(self, InternalSystemId):
+        self.InternalSystemId = InternalSystemId
+    def get_ServiceSummaries(self):
+        return self.ServiceSummaries
+    def set_ServiceSummaries(self, ServiceSummaries):
+        self.ServiceSummaries = ServiceSummaries
+    def add_ServiceSummaries(self, value):
+        self.ServiceSummaries.append(value)
+    def insert_ServiceSummaries_at(self, index, value):
+        self.ServiceSummaries.insert(index, value)
+    def replace_ServiceSummaries_at(self, index, value):
+        self.ServiceSummaries[index] = value
+    def get_Status(self):
+        return self.Status
+    def set_Status(self, Status):
+        self.Status = Status
+    def validate_PickupEventType(self, value):
+        result = True
+        # Validate type PickupEventType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['ASSIGNED_TO_DRIVER', 'CANCELED', 'DRIVER_ARRIVED', 'DRIVER_DEPARTED', 'DRIVER_EN_ROUTE', 'EXCEPTION', 'PICKED_UP', 'SCHEDULED']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on PickupEventType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_CarrierCodeType(self, value):
+        result = True
+        # Validate type CarrierCodeType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['FDXC', 'FDXE', 'FDXG', 'FDXO', 'FXCC', 'FXFR', 'FXSP']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on CarrierCodeType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_PickupType(self, value):
+        result = True
+        # Validate type PickupType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['ON_CALL', 'PACKAGE_RETURN_PROGRAM', 'REGULAR_STOP', 'REGULAR_STOP_WITH_AUTO_CANCEL', 'TAG']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on PickupType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_CountryRelationshipType(self, value):
+        result = True
+        # Validate type CountryRelationshipType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['DOMESTIC', 'INTERNATIONAL']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on CountryRelationshipType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_PickupStatusType(self, value):
+        result = True
+        # Validate type PickupStatusType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['CANCELLED', 'COMPLETED', 'OPEN']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on PickupStatusType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def hasContent_(self):
+        if (
+            self.Address is not None or
+            self.CompanyName is not None or
+            self.ReadyTimestamp is not None or
+            self.CompletionTimestamp is not None or
+            self.CloseTime is not None or
+            self.CallProcessedTimestamp is not None or
+            self.AssociatedAccountNumbers or
+            self.PickupConfirmationNumber is not None or
+            self.StandingInstructionId is not None or
+            self.Location is not None or
+            self.LatestEventType is not None or
+            self.CarrierCode is not None or
+            self.ServiceType is not None or
+            self.IsExpressFreight is not None or
+            self.PickupType is not None or
+            self.CountryRelationship is not None or
+            self.Contact is not None or
+            self.UserId is not None or
+            self.InternalSystemId is not None or
+            self.ServiceSummaries or
+            self.Status is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='PickupHistorySummary', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('PickupHistorySummary')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'PickupHistorySummary':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='PickupHistorySummary')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='PickupHistorySummary', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='PickupHistorySummary'):
+        pass
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='PickupHistorySummary', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.Address is not None:
+            namespaceprefix_ = self.Address_nsprefix_ + ':' if (UseCapturedNS_ and self.Address_nsprefix_) else ''
+            self.Address.export(outfile, level, namespaceprefix_, namespacedef_='', name_='Address', pretty_print=pretty_print)
+        if self.CompanyName is not None:
+            namespaceprefix_ = self.CompanyName_nsprefix_ + ':' if (UseCapturedNS_ and self.CompanyName_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sCompanyName>%s</%sCompanyName>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.CompanyName), input_name='CompanyName')), namespaceprefix_ , eol_))
+        if self.ReadyTimestamp is not None:
+            namespaceprefix_ = self.ReadyTimestamp_nsprefix_ + ':' if (UseCapturedNS_ and self.ReadyTimestamp_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sReadyTimestamp>%s</%sReadyTimestamp>%s' % (namespaceprefix_ , self.gds_format_datetime(self.ReadyTimestamp, input_name='ReadyTimestamp'), namespaceprefix_ , eol_))
+        if self.CompletionTimestamp is not None:
+            namespaceprefix_ = self.CompletionTimestamp_nsprefix_ + ':' if (UseCapturedNS_ and self.CompletionTimestamp_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sCompletionTimestamp>%s</%sCompletionTimestamp>%s' % (namespaceprefix_ , self.gds_format_datetime(self.CompletionTimestamp, input_name='CompletionTimestamp'), namespaceprefix_ , eol_))
+        if self.CloseTime is not None:
+            namespaceprefix_ = self.CloseTime_nsprefix_ + ':' if (UseCapturedNS_ and self.CloseTime_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sCloseTime>%s</%sCloseTime>%s' % (namespaceprefix_ , self.gds_format_time(self.CloseTime, input_name='CloseTime'), namespaceprefix_ , eol_))
+        if self.CallProcessedTimestamp is not None:
+            namespaceprefix_ = self.CallProcessedTimestamp_nsprefix_ + ':' if (UseCapturedNS_ and self.CallProcessedTimestamp_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sCallProcessedTimestamp>%s</%sCallProcessedTimestamp>%s' % (namespaceprefix_ , self.gds_format_datetime(self.CallProcessedTimestamp, input_name='CallProcessedTimestamp'), namespaceprefix_ , eol_))
+        for AssociatedAccountNumbers_ in self.AssociatedAccountNumbers:
+            namespaceprefix_ = self.AssociatedAccountNumbers_nsprefix_ + ':' if (UseCapturedNS_ and self.AssociatedAccountNumbers_nsprefix_) else ''
+            AssociatedAccountNumbers_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='AssociatedAccountNumbers', pretty_print=pretty_print)
+        if self.PickupConfirmationNumber is not None:
+            namespaceprefix_ = self.PickupConfirmationNumber_nsprefix_ + ':' if (UseCapturedNS_ and self.PickupConfirmationNumber_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sPickupConfirmationNumber>%s</%sPickupConfirmationNumber>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.PickupConfirmationNumber), input_name='PickupConfirmationNumber')), namespaceprefix_ , eol_))
+        if self.StandingInstructionId is not None:
+            namespaceprefix_ = self.StandingInstructionId_nsprefix_ + ':' if (UseCapturedNS_ and self.StandingInstructionId_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sStandingInstructionId>%s</%sStandingInstructionId>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.StandingInstructionId), input_name='StandingInstructionId')), namespaceprefix_ , eol_))
+        if self.Location is not None:
+            namespaceprefix_ = self.Location_nsprefix_ + ':' if (UseCapturedNS_ and self.Location_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sLocation>%s</%sLocation>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Location), input_name='Location')), namespaceprefix_ , eol_))
+        if self.LatestEventType is not None:
+            namespaceprefix_ = self.LatestEventType_nsprefix_ + ':' if (UseCapturedNS_ and self.LatestEventType_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sLatestEventType>%s</%sLatestEventType>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.LatestEventType), input_name='LatestEventType')), namespaceprefix_ , eol_))
+        if self.CarrierCode is not None:
+            namespaceprefix_ = self.CarrierCode_nsprefix_ + ':' if (UseCapturedNS_ and self.CarrierCode_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sCarrierCode>%s</%sCarrierCode>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.CarrierCode), input_name='CarrierCode')), namespaceprefix_ , eol_))
+        if self.ServiceType is not None:
+            namespaceprefix_ = self.ServiceType_nsprefix_ + ':' if (UseCapturedNS_ and self.ServiceType_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sServiceType>%s</%sServiceType>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.ServiceType), input_name='ServiceType')), namespaceprefix_ , eol_))
+        if self.IsExpressFreight is not None:
+            namespaceprefix_ = self.IsExpressFreight_nsprefix_ + ':' if (UseCapturedNS_ and self.IsExpressFreight_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sIsExpressFreight>%s</%sIsExpressFreight>%s' % (namespaceprefix_ , self.gds_format_boolean(self.IsExpressFreight, input_name='IsExpressFreight'), namespaceprefix_ , eol_))
+        if self.PickupType is not None:
+            namespaceprefix_ = self.PickupType_nsprefix_ + ':' if (UseCapturedNS_ and self.PickupType_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sPickupType>%s</%sPickupType>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.PickupType), input_name='PickupType')), namespaceprefix_ , eol_))
+        if self.CountryRelationship is not None:
+            namespaceprefix_ = self.CountryRelationship_nsprefix_ + ':' if (UseCapturedNS_ and self.CountryRelationship_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sCountryRelationship>%s</%sCountryRelationship>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.CountryRelationship), input_name='CountryRelationship')), namespaceprefix_ , eol_))
+        if self.Contact is not None:
+            namespaceprefix_ = self.Contact_nsprefix_ + ':' if (UseCapturedNS_ and self.Contact_nsprefix_) else ''
+            self.Contact.export(outfile, level, namespaceprefix_, namespacedef_='', name_='Contact', pretty_print=pretty_print)
+        if self.UserId is not None:
+            namespaceprefix_ = self.UserId_nsprefix_ + ':' if (UseCapturedNS_ and self.UserId_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sUserId>%s</%sUserId>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.UserId), input_name='UserId')), namespaceprefix_ , eol_))
+        if self.InternalSystemId is not None:
+            namespaceprefix_ = self.InternalSystemId_nsprefix_ + ':' if (UseCapturedNS_ and self.InternalSystemId_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sInternalSystemId>%s</%sInternalSystemId>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.InternalSystemId), input_name='InternalSystemId')), namespaceprefix_ , eol_))
+        for ServiceSummaries_ in self.ServiceSummaries:
+            namespaceprefix_ = self.ServiceSummaries_nsprefix_ + ':' if (UseCapturedNS_ and self.ServiceSummaries_nsprefix_) else ''
+            ServiceSummaries_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='ServiceSummaries', pretty_print=pretty_print)
+        if self.Status is not None:
+            namespaceprefix_ = self.Status_nsprefix_ + ':' if (UseCapturedNS_ and self.Status_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sStatus>%s</%sStatus>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Status), input_name='Status')), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'Address':
+            obj_ = Address.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Address = obj_
+            obj_.original_tagname_ = 'Address'
+        elif nodeName_ == 'CompanyName':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'CompanyName')
+            value_ = self.gds_validate_string(value_, node, 'CompanyName')
+            self.CompanyName = value_
+            self.CompanyName_nsprefix_ = child_.prefix
+        elif nodeName_ == 'ReadyTimestamp':
+            sval_ = child_.text
+            dval_ = self.gds_parse_datetime(sval_)
+            self.ReadyTimestamp = dval_
+            self.ReadyTimestamp_nsprefix_ = child_.prefix
+        elif nodeName_ == 'CompletionTimestamp':
+            sval_ = child_.text
+            dval_ = self.gds_parse_datetime(sval_)
+            self.CompletionTimestamp = dval_
+            self.CompletionTimestamp_nsprefix_ = child_.prefix
+        elif nodeName_ == 'CloseTime':
+            sval_ = child_.text
+            dval_ = self.gds_parse_time(sval_)
+            self.CloseTime = dval_
+            self.CloseTime_nsprefix_ = child_.prefix
+        elif nodeName_ == 'CallProcessedTimestamp':
+            sval_ = child_.text
+            dval_ = self.gds_parse_datetime(sval_)
+            self.CallProcessedTimestamp = dval_
+            self.CallProcessedTimestamp_nsprefix_ = child_.prefix
+        elif nodeName_ == 'AssociatedAccountNumbers':
+            obj_ = AssociatedAccount.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.AssociatedAccountNumbers.append(obj_)
+            obj_.original_tagname_ = 'AssociatedAccountNumbers'
+        elif nodeName_ == 'PickupConfirmationNumber':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'PickupConfirmationNumber')
+            value_ = self.gds_validate_string(value_, node, 'PickupConfirmationNumber')
+            self.PickupConfirmationNumber = value_
+            self.PickupConfirmationNumber_nsprefix_ = child_.prefix
+        elif nodeName_ == 'StandingInstructionId':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'StandingInstructionId')
+            value_ = self.gds_validate_string(value_, node, 'StandingInstructionId')
+            self.StandingInstructionId = value_
+            self.StandingInstructionId_nsprefix_ = child_.prefix
+        elif nodeName_ == 'Location':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Location')
+            value_ = self.gds_validate_string(value_, node, 'Location')
+            self.Location = value_
+            self.Location_nsprefix_ = child_.prefix
+        elif nodeName_ == 'LatestEventType':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'LatestEventType')
+            value_ = self.gds_validate_string(value_, node, 'LatestEventType')
+            self.LatestEventType = value_
+            self.LatestEventType_nsprefix_ = child_.prefix
+            # validate type PickupEventType
+            self.validate_PickupEventType(self.LatestEventType)
+        elif nodeName_ == 'CarrierCode':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'CarrierCode')
+            value_ = self.gds_validate_string(value_, node, 'CarrierCode')
+            self.CarrierCode = value_
+            self.CarrierCode_nsprefix_ = child_.prefix
+            # validate type CarrierCodeType
+            self.validate_CarrierCodeType(self.CarrierCode)
+        elif nodeName_ == 'ServiceType':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'ServiceType')
+            value_ = self.gds_validate_string(value_, node, 'ServiceType')
+            self.ServiceType = value_
+            self.ServiceType_nsprefix_ = child_.prefix
+        elif nodeName_ == 'IsExpressFreight':
+            sval_ = child_.text
+            ival_ = self.gds_parse_boolean(sval_, node, 'IsExpressFreight')
+            ival_ = self.gds_validate_boolean(ival_, node, 'IsExpressFreight')
+            self.IsExpressFreight = ival_
+            self.IsExpressFreight_nsprefix_ = child_.prefix
+        elif nodeName_ == 'PickupType':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'PickupType')
+            value_ = self.gds_validate_string(value_, node, 'PickupType')
+            self.PickupType = value_
+            self.PickupType_nsprefix_ = child_.prefix
+            # validate type PickupType
+            self.validate_PickupType(self.PickupType)
+        elif nodeName_ == 'CountryRelationship':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'CountryRelationship')
+            value_ = self.gds_validate_string(value_, node, 'CountryRelationship')
+            self.CountryRelationship = value_
+            self.CountryRelationship_nsprefix_ = child_.prefix
+            # validate type CountryRelationshipType
+            self.validate_CountryRelationshipType(self.CountryRelationship)
+        elif nodeName_ == 'Contact':
+            obj_ = Contact.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Contact = obj_
+            obj_.original_tagname_ = 'Contact'
+        elif nodeName_ == 'UserId':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'UserId')
+            value_ = self.gds_validate_string(value_, node, 'UserId')
+            self.UserId = value_
+            self.UserId_nsprefix_ = child_.prefix
+        elif nodeName_ == 'InternalSystemId':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'InternalSystemId')
+            value_ = self.gds_validate_string(value_, node, 'InternalSystemId')
+            self.InternalSystemId = value_
+            self.InternalSystemId_nsprefix_ = child_.prefix
+        elif nodeName_ == 'ServiceSummaries':
+            obj_ = PickupHistoryServiceSummary.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.ServiceSummaries.append(obj_)
+            obj_.original_tagname_ = 'ServiceSummaries'
+        elif nodeName_ == 'Status':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Status')
+            value_ = self.gds_validate_string(value_, node, 'Status')
+            self.Status = value_
+            self.Status_nsprefix_ = child_.prefix
+            # validate type PickupStatusType
+            self.validate_PickupStatusType(self.Status)
+# end class PickupHistorySummary
+
+
+class PickupHistorySummaryReply(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, HighestSeverity=None, Notifications=None, TransactionDetail=None, Version=None, InternalMessages=None, TotalResultAvailable=None, ResultsReturned=None, PagingDetail=None, PickupHistorySummaries=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.HighestSeverity = HighestSeverity
+        self.validate_NotificationSeverityType(self.HighestSeverity)
+        self.HighestSeverity_nsprefix_ = "ns"
+        if Notifications is None:
+            self.Notifications = []
+        else:
+            self.Notifications = Notifications
+        self.Notifications_nsprefix_ = "ns"
+        self.TransactionDetail = TransactionDetail
+        self.TransactionDetail_nsprefix_ = "ns"
+        self.Version = Version
+        self.Version_nsprefix_ = "ns"
+        if InternalMessages is None:
+            self.InternalMessages = []
+        else:
+            self.InternalMessages = InternalMessages
+        self.InternalMessages_nsprefix_ = None
+        self.TotalResultAvailable = TotalResultAvailable
+        self.TotalResultAvailable_nsprefix_ = None
+        self.ResultsReturned = ResultsReturned
+        self.ResultsReturned_nsprefix_ = None
+        self.PagingDetail = PagingDetail
+        self.PagingDetail_nsprefix_ = "ns"
+        if PickupHistorySummaries is None:
+            self.PickupHistorySummaries = []
+        else:
+            self.PickupHistorySummaries = PickupHistorySummaries
+        self.PickupHistorySummaries_nsprefix_ = "ns"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, PickupHistorySummaryReply)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if PickupHistorySummaryReply.subclass:
+            return PickupHistorySummaryReply.subclass(*args_, **kwargs_)
+        else:
+            return PickupHistorySummaryReply(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_HighestSeverity(self):
+        return self.HighestSeverity
+    def set_HighestSeverity(self, HighestSeverity):
+        self.HighestSeverity = HighestSeverity
+    def get_Notifications(self):
+        return self.Notifications
+    def set_Notifications(self, Notifications):
+        self.Notifications = Notifications
+    def add_Notifications(self, value):
+        self.Notifications.append(value)
+    def insert_Notifications_at(self, index, value):
+        self.Notifications.insert(index, value)
+    def replace_Notifications_at(self, index, value):
+        self.Notifications[index] = value
+    def get_TransactionDetail(self):
+        return self.TransactionDetail
+    def set_TransactionDetail(self, TransactionDetail):
+        self.TransactionDetail = TransactionDetail
+    def get_Version(self):
+        return self.Version
+    def set_Version(self, Version):
+        self.Version = Version
+    def get_InternalMessages(self):
+        return self.InternalMessages
+    def set_InternalMessages(self, InternalMessages):
+        self.InternalMessages = InternalMessages
+    def add_InternalMessages(self, value):
+        self.InternalMessages.append(value)
+    def insert_InternalMessages_at(self, index, value):
+        self.InternalMessages.insert(index, value)
+    def replace_InternalMessages_at(self, index, value):
+        self.InternalMessages[index] = value
+    def get_TotalResultAvailable(self):
+        return self.TotalResultAvailable
+    def set_TotalResultAvailable(self, TotalResultAvailable):
+        self.TotalResultAvailable = TotalResultAvailable
+    def get_ResultsReturned(self):
+        return self.ResultsReturned
+    def set_ResultsReturned(self, ResultsReturned):
+        self.ResultsReturned = ResultsReturned
+    def get_PagingDetail(self):
+        return self.PagingDetail
+    def set_PagingDetail(self, PagingDetail):
+        self.PagingDetail = PagingDetail
+    def get_PickupHistorySummaries(self):
+        return self.PickupHistorySummaries
+    def set_PickupHistorySummaries(self, PickupHistorySummaries):
+        self.PickupHistorySummaries = PickupHistorySummaries
+    def add_PickupHistorySummaries(self, value):
+        self.PickupHistorySummaries.append(value)
+    def insert_PickupHistorySummaries_at(self, index, value):
+        self.PickupHistorySummaries.insert(index, value)
+    def replace_PickupHistorySummaries_at(self, index, value):
+        self.PickupHistorySummaries[index] = value
+    def validate_NotificationSeverityType(self, value):
+        result = True
+        # Validate type NotificationSeverityType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['ERROR', 'FAILURE', 'NOTE', 'SUCCESS', 'WARNING']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on NotificationSeverityType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def hasContent_(self):
+        if (
+            self.HighestSeverity is not None or
+            self.Notifications or
+            self.TransactionDetail is not None or
+            self.Version is not None or
+            self.InternalMessages or
+            self.TotalResultAvailable is not None or
+            self.ResultsReturned is not None or
+            self.PagingDetail is not None or
+            self.PickupHistorySummaries
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='PickupHistorySummaryReply', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('PickupHistorySummaryReply')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'PickupHistorySummaryReply':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='PickupHistorySummaryReply')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='PickupHistorySummaryReply', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='PickupHistorySummaryReply'):
+        pass
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='PickupHistorySummaryReply', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.HighestSeverity is not None:
+            namespaceprefix_ = self.HighestSeverity_nsprefix_ + ':' if (UseCapturedNS_ and self.HighestSeverity_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sHighestSeverity>%s</%sHighestSeverity>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.HighestSeverity), input_name='HighestSeverity')), namespaceprefix_ , eol_))
+        for Notifications_ in self.Notifications:
+            namespaceprefix_ = self.Notifications_nsprefix_ + ':' if (UseCapturedNS_ and self.Notifications_nsprefix_) else ''
+            Notifications_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='Notifications', pretty_print=pretty_print)
+        if self.TransactionDetail is not None:
+            namespaceprefix_ = self.TransactionDetail_nsprefix_ + ':' if (UseCapturedNS_ and self.TransactionDetail_nsprefix_) else ''
+            self.TransactionDetail.export(outfile, level, namespaceprefix_, namespacedef_='', name_='TransactionDetail', pretty_print=pretty_print)
+        if self.Version is not None:
+            namespaceprefix_ = self.Version_nsprefix_ + ':' if (UseCapturedNS_ and self.Version_nsprefix_) else ''
+            self.Version.export(outfile, level, namespaceprefix_, namespacedef_='', name_='Version', pretty_print=pretty_print)
+        for InternalMessages_ in self.InternalMessages:
+            namespaceprefix_ = self.InternalMessages_nsprefix_ + ':' if (UseCapturedNS_ and self.InternalMessages_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sInternalMessages>%s</%sInternalMessages>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(InternalMessages_), input_name='InternalMessages')), namespaceprefix_ , eol_))
+        if self.TotalResultAvailable is not None:
+            namespaceprefix_ = self.TotalResultAvailable_nsprefix_ + ':' if (UseCapturedNS_ and self.TotalResultAvailable_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sTotalResultAvailable>%s</%sTotalResultAvailable>%s' % (namespaceprefix_ , self.gds_format_integer(self.TotalResultAvailable, input_name='TotalResultAvailable'), namespaceprefix_ , eol_))
+        if self.ResultsReturned is not None:
+            namespaceprefix_ = self.ResultsReturned_nsprefix_ + ':' if (UseCapturedNS_ and self.ResultsReturned_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sResultsReturned>%s</%sResultsReturned>%s' % (namespaceprefix_ , self.gds_format_integer(self.ResultsReturned, input_name='ResultsReturned'), namespaceprefix_ , eol_))
+        if self.PagingDetail is not None:
+            namespaceprefix_ = self.PagingDetail_nsprefix_ + ':' if (UseCapturedNS_ and self.PagingDetail_nsprefix_) else ''
+            self.PagingDetail.export(outfile, level, namespaceprefix_, namespacedef_='', name_='PagingDetail', pretty_print=pretty_print)
+        for PickupHistorySummaries_ in self.PickupHistorySummaries:
+            namespaceprefix_ = self.PickupHistorySummaries_nsprefix_ + ':' if (UseCapturedNS_ and self.PickupHistorySummaries_nsprefix_) else ''
+            PickupHistorySummaries_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='PickupHistorySummaries', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'HighestSeverity':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'HighestSeverity')
+            value_ = self.gds_validate_string(value_, node, 'HighestSeverity')
+            self.HighestSeverity = value_
+            self.HighestSeverity_nsprefix_ = child_.prefix
+            # validate type NotificationSeverityType
+            self.validate_NotificationSeverityType(self.HighestSeverity)
+        elif nodeName_ == 'Notifications':
+            obj_ = Notification.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Notifications.append(obj_)
+            obj_.original_tagname_ = 'Notifications'
+        elif nodeName_ == 'TransactionDetail':
+            obj_ = TransactionDetail.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.TransactionDetail = obj_
+            obj_.original_tagname_ = 'TransactionDetail'
+        elif nodeName_ == 'Version':
+            obj_ = VersionId.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Version = obj_
+            obj_.original_tagname_ = 'Version'
+        elif nodeName_ == 'InternalMessages':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'InternalMessages')
+            value_ = self.gds_validate_string(value_, node, 'InternalMessages')
+            self.InternalMessages.append(value_)
+            self.InternalMessages_nsprefix_ = child_.prefix
+        elif nodeName_ == 'TotalResultAvailable' and child_.text:
+            sval_ = child_.text
+            ival_ = self.gds_parse_integer(sval_, node, 'TotalResultAvailable')
+            if ival_ < 0:
+                raise_parse_error(child_, 'requires nonNegativeInteger')
+            ival_ = self.gds_validate_integer(ival_, node, 'TotalResultAvailable')
+            self.TotalResultAvailable = ival_
+            self.TotalResultAvailable_nsprefix_ = child_.prefix
+        elif nodeName_ == 'ResultsReturned' and child_.text:
+            sval_ = child_.text
+            ival_ = self.gds_parse_integer(sval_, node, 'ResultsReturned')
+            if ival_ < 0:
+                raise_parse_error(child_, 'requires nonNegativeInteger')
+            ival_ = self.gds_validate_integer(ival_, node, 'ResultsReturned')
+            self.ResultsReturned = ival_
+            self.ResultsReturned_nsprefix_ = child_.prefix
+        elif nodeName_ == 'PagingDetail':
+            obj_ = PagingResultsDetail.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.PagingDetail = obj_
+            obj_.original_tagname_ = 'PagingDetail'
+        elif nodeName_ == 'PickupHistorySummaries':
+            obj_ = PickupHistorySummary.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.PickupHistorySummaries.append(obj_)
+            obj_.original_tagname_ = 'PickupHistorySummaries'
+# end class PickupHistorySummaryReply
+
+
+class PickupHistorySummaryRequest(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, WebAuthenticationDetail=None, ClientDetail=None, UserDetail=None, TransactionDetail=None, Version=None, ApplicationId=None, ServiceLevel=None, EarliestPickupDate=None, ResultsToSkip=None, ResultsRequested=None, PagingDetail=None, CarrierCode=None, PickupType=None, StandingInstructionId=None, Conditions=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.WebAuthenticationDetail = WebAuthenticationDetail
+        self.WebAuthenticationDetail_nsprefix_ = "ns"
+        self.ClientDetail = ClientDetail
+        self.ClientDetail_nsprefix_ = "ns"
+        self.UserDetail = UserDetail
+        self.UserDetail_nsprefix_ = "ns"
+        self.TransactionDetail = TransactionDetail
+        self.TransactionDetail_nsprefix_ = "ns"
+        self.Version = Version
+        self.Version_nsprefix_ = "ns"
+        self.ApplicationId = ApplicationId
+        self.ApplicationId_nsprefix_ = None
+        self.ServiceLevel = ServiceLevel
+        self.validate_PickupServiceLevelType(self.ServiceLevel)
+        self.ServiceLevel_nsprefix_ = "ns"
+        if isinstance(EarliestPickupDate, BaseStrType_):
+            initvalue_ = datetime_.datetime.strptime(EarliestPickupDate, '%Y-%m-%d').date()
+        else:
+            initvalue_ = EarliestPickupDate
+        self.EarliestPickupDate = initvalue_
+        self.EarliestPickupDate_nsprefix_ = None
+        self.ResultsToSkip = ResultsToSkip
+        self.ResultsToSkip_nsprefix_ = None
+        self.ResultsRequested = ResultsRequested
+        self.ResultsRequested_nsprefix_ = None
+        self.PagingDetail = PagingDetail
+        self.PagingDetail_nsprefix_ = "ns"
+        if CarrierCode is None:
+            self.CarrierCode = []
+        else:
+            self.CarrierCode = CarrierCode
+        self.CarrierCode_nsprefix_ = "ns"
+        self.PickupType = PickupType
+        self.validate_PickupType(self.PickupType)
+        self.PickupType_nsprefix_ = "ns"
+        self.StandingInstructionId = StandingInstructionId
+        self.StandingInstructionId_nsprefix_ = None
+        if Conditions is None:
+            self.Conditions = []
+        else:
+            self.Conditions = Conditions
+        self.Conditions_nsprefix_ = "ns"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, PickupHistorySummaryRequest)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if PickupHistorySummaryRequest.subclass:
+            return PickupHistorySummaryRequest.subclass(*args_, **kwargs_)
+        else:
+            return PickupHistorySummaryRequest(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_WebAuthenticationDetail(self):
+        return self.WebAuthenticationDetail
+    def set_WebAuthenticationDetail(self, WebAuthenticationDetail):
+        self.WebAuthenticationDetail = WebAuthenticationDetail
+    def get_ClientDetail(self):
+        return self.ClientDetail
+    def set_ClientDetail(self, ClientDetail):
+        self.ClientDetail = ClientDetail
+    def get_UserDetail(self):
+        return self.UserDetail
+    def set_UserDetail(self, UserDetail):
+        self.UserDetail = UserDetail
+    def get_TransactionDetail(self):
+        return self.TransactionDetail
+    def set_TransactionDetail(self, TransactionDetail):
+        self.TransactionDetail = TransactionDetail
+    def get_Version(self):
+        return self.Version
+    def set_Version(self, Version):
+        self.Version = Version
+    def get_ApplicationId(self):
+        return self.ApplicationId
+    def set_ApplicationId(self, ApplicationId):
+        self.ApplicationId = ApplicationId
+    def get_ServiceLevel(self):
+        return self.ServiceLevel
+    def set_ServiceLevel(self, ServiceLevel):
+        self.ServiceLevel = ServiceLevel
+    def get_EarliestPickupDate(self):
+        return self.EarliestPickupDate
+    def set_EarliestPickupDate(self, EarliestPickupDate):
+        self.EarliestPickupDate = EarliestPickupDate
+    def get_ResultsToSkip(self):
+        return self.ResultsToSkip
+    def set_ResultsToSkip(self, ResultsToSkip):
+        self.ResultsToSkip = ResultsToSkip
+    def get_ResultsRequested(self):
+        return self.ResultsRequested
+    def set_ResultsRequested(self, ResultsRequested):
+        self.ResultsRequested = ResultsRequested
+    def get_PagingDetail(self):
+        return self.PagingDetail
+    def set_PagingDetail(self, PagingDetail):
+        self.PagingDetail = PagingDetail
+    def get_CarrierCode(self):
+        return self.CarrierCode
+    def set_CarrierCode(self, CarrierCode):
+        self.CarrierCode = CarrierCode
+    def add_CarrierCode(self, value):
+        self.CarrierCode.append(value)
+    def insert_CarrierCode_at(self, index, value):
+        self.CarrierCode.insert(index, value)
+    def replace_CarrierCode_at(self, index, value):
+        self.CarrierCode[index] = value
+    def get_PickupType(self):
+        return self.PickupType
+    def set_PickupType(self, PickupType):
+        self.PickupType = PickupType
+    def get_StandingInstructionId(self):
+        return self.StandingInstructionId
+    def set_StandingInstructionId(self, StandingInstructionId):
+        self.StandingInstructionId = StandingInstructionId
+    def get_Conditions(self):
+        return self.Conditions
+    def set_Conditions(self, Conditions):
+        self.Conditions = Conditions
+    def add_Conditions(self, value):
+        self.Conditions.append(value)
+    def insert_Conditions_at(self, index, value):
+        self.Conditions.insert(index, value)
+    def replace_Conditions_at(self, index, value):
+        self.Conditions[index] = value
+    def validate_PickupServiceLevelType(self, value):
+        result = True
+        # Validate type PickupServiceLevelType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['EXTERNAL_EDITS', 'INTERNAL_EDITS', 'IVRS_EDITS', 'IVR_WITH_BIOMETRIC_AUTHENTICATION', 'TAG_EDITS', 'TRUSTED_PROXY']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on PickupServiceLevelType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_CarrierCodeType(self, value):
+        result = True
+        # Validate type CarrierCodeType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['FDXC', 'FDXE', 'FDXG', 'FDXO', 'FXCC', 'FXFR', 'FXSP']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on CarrierCodeType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_PickupType(self, value):
+        result = True
+        # Validate type PickupType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['ON_CALL', 'PACKAGE_RETURN_PROGRAM', 'REGULAR_STOP', 'REGULAR_STOP_WITH_AUTO_CANCEL', 'TAG']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on PickupType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def hasContent_(self):
+        if (
+            self.WebAuthenticationDetail is not None or
+            self.ClientDetail is not None or
+            self.UserDetail is not None or
+            self.TransactionDetail is not None or
+            self.Version is not None or
+            self.ApplicationId is not None or
+            self.ServiceLevel is not None or
+            self.EarliestPickupDate is not None or
+            self.ResultsToSkip is not None or
+            self.ResultsRequested is not None or
+            self.PagingDetail is not None or
+            self.CarrierCode or
+            self.PickupType is not None or
+            self.StandingInstructionId is not None or
+            self.Conditions
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='PickupHistorySummaryRequest', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('PickupHistorySummaryRequest')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'PickupHistorySummaryRequest':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='PickupHistorySummaryRequest')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='PickupHistorySummaryRequest', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='PickupHistorySummaryRequest'):
+        pass
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='PickupHistorySummaryRequest', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.WebAuthenticationDetail is not None:
+            namespaceprefix_ = self.WebAuthenticationDetail_nsprefix_ + ':' if (UseCapturedNS_ and self.WebAuthenticationDetail_nsprefix_) else ''
+            self.WebAuthenticationDetail.export(outfile, level, namespaceprefix_, namespacedef_='', name_='WebAuthenticationDetail', pretty_print=pretty_print)
+        if self.ClientDetail is not None:
+            namespaceprefix_ = self.ClientDetail_nsprefix_ + ':' if (UseCapturedNS_ and self.ClientDetail_nsprefix_) else ''
+            self.ClientDetail.export(outfile, level, namespaceprefix_, namespacedef_='', name_='ClientDetail', pretty_print=pretty_print)
+        if self.UserDetail is not None:
+            namespaceprefix_ = self.UserDetail_nsprefix_ + ':' if (UseCapturedNS_ and self.UserDetail_nsprefix_) else ''
+            self.UserDetail.export(outfile, level, namespaceprefix_, namespacedef_='', name_='UserDetail', pretty_print=pretty_print)
+        if self.TransactionDetail is not None:
+            namespaceprefix_ = self.TransactionDetail_nsprefix_ + ':' if (UseCapturedNS_ and self.TransactionDetail_nsprefix_) else ''
+            self.TransactionDetail.export(outfile, level, namespaceprefix_, namespacedef_='', name_='TransactionDetail', pretty_print=pretty_print)
+        if self.Version is not None:
+            namespaceprefix_ = self.Version_nsprefix_ + ':' if (UseCapturedNS_ and self.Version_nsprefix_) else ''
+            self.Version.export(outfile, level, namespaceprefix_, namespacedef_='', name_='Version', pretty_print=pretty_print)
+        if self.ApplicationId is not None:
+            namespaceprefix_ = self.ApplicationId_nsprefix_ + ':' if (UseCapturedNS_ and self.ApplicationId_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sApplicationId>%s</%sApplicationId>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.ApplicationId), input_name='ApplicationId')), namespaceprefix_ , eol_))
+        if self.ServiceLevel is not None:
+            namespaceprefix_ = self.ServiceLevel_nsprefix_ + ':' if (UseCapturedNS_ and self.ServiceLevel_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sServiceLevel>%s</%sServiceLevel>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.ServiceLevel), input_name='ServiceLevel')), namespaceprefix_ , eol_))
+        if self.EarliestPickupDate is not None:
+            namespaceprefix_ = self.EarliestPickupDate_nsprefix_ + ':' if (UseCapturedNS_ and self.EarliestPickupDate_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sEarliestPickupDate>%s</%sEarliestPickupDate>%s' % (namespaceprefix_ , self.gds_format_date(self.EarliestPickupDate, input_name='EarliestPickupDate'), namespaceprefix_ , eol_))
+        if self.ResultsToSkip is not None:
+            namespaceprefix_ = self.ResultsToSkip_nsprefix_ + ':' if (UseCapturedNS_ and self.ResultsToSkip_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sResultsToSkip>%s</%sResultsToSkip>%s' % (namespaceprefix_ , self.gds_format_integer(self.ResultsToSkip, input_name='ResultsToSkip'), namespaceprefix_ , eol_))
+        if self.ResultsRequested is not None:
+            namespaceprefix_ = self.ResultsRequested_nsprefix_ + ':' if (UseCapturedNS_ and self.ResultsRequested_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sResultsRequested>%s</%sResultsRequested>%s' % (namespaceprefix_ , self.gds_format_integer(self.ResultsRequested, input_name='ResultsRequested'), namespaceprefix_ , eol_))
+        if self.PagingDetail is not None:
+            namespaceprefix_ = self.PagingDetail_nsprefix_ + ':' if (UseCapturedNS_ and self.PagingDetail_nsprefix_) else ''
+            self.PagingDetail.export(outfile, level, namespaceprefix_, namespacedef_='', name_='PagingDetail', pretty_print=pretty_print)
+        for CarrierCode_ in self.CarrierCode:
+            namespaceprefix_ = self.CarrierCode_nsprefix_ + ':' if (UseCapturedNS_ and self.CarrierCode_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sCarrierCode>%s</%sCarrierCode>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(CarrierCode_), input_name='CarrierCode')), namespaceprefix_ , eol_))
+        if self.PickupType is not None:
+            namespaceprefix_ = self.PickupType_nsprefix_ + ':' if (UseCapturedNS_ and self.PickupType_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sPickupType>%s</%sPickupType>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.PickupType), input_name='PickupType')), namespaceprefix_ , eol_))
+        if self.StandingInstructionId is not None:
+            namespaceprefix_ = self.StandingInstructionId_nsprefix_ + ':' if (UseCapturedNS_ and self.StandingInstructionId_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sStandingInstructionId>%s</%sStandingInstructionId>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.StandingInstructionId), input_name='StandingInstructionId')), namespaceprefix_ , eol_))
+        for Conditions_ in self.Conditions:
+            namespaceprefix_ = self.Conditions_nsprefix_ + ':' if (UseCapturedNS_ and self.Conditions_nsprefix_) else ''
+            Conditions_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='Conditions', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'WebAuthenticationDetail':
+            obj_ = WebAuthenticationDetail.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.WebAuthenticationDetail = obj_
+            obj_.original_tagname_ = 'WebAuthenticationDetail'
+        elif nodeName_ == 'ClientDetail':
+            obj_ = ClientDetail.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.ClientDetail = obj_
+            obj_.original_tagname_ = 'ClientDetail'
+        elif nodeName_ == 'UserDetail':
+            obj_ = UserDetail.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.UserDetail = obj_
+            obj_.original_tagname_ = 'UserDetail'
+        elif nodeName_ == 'TransactionDetail':
+            obj_ = TransactionDetail.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.TransactionDetail = obj_
+            obj_.original_tagname_ = 'TransactionDetail'
+        elif nodeName_ == 'Version':
+            obj_ = VersionId.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Version = obj_
+            obj_.original_tagname_ = 'Version'
+        elif nodeName_ == 'ApplicationId':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'ApplicationId')
+            value_ = self.gds_validate_string(value_, node, 'ApplicationId')
+            self.ApplicationId = value_
+            self.ApplicationId_nsprefix_ = child_.prefix
+        elif nodeName_ == 'ServiceLevel':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'ServiceLevel')
+            value_ = self.gds_validate_string(value_, node, 'ServiceLevel')
+            self.ServiceLevel = value_
+            self.ServiceLevel_nsprefix_ = child_.prefix
+            # validate type PickupServiceLevelType
+            self.validate_PickupServiceLevelType(self.ServiceLevel)
+        elif nodeName_ == 'EarliestPickupDate':
+            sval_ = child_.text
+            dval_ = self.gds_parse_date(sval_)
+            self.EarliestPickupDate = dval_
+            self.EarliestPickupDate_nsprefix_ = child_.prefix
+        elif nodeName_ == 'ResultsToSkip' and child_.text:
+            sval_ = child_.text
+            ival_ = self.gds_parse_integer(sval_, node, 'ResultsToSkip')
+            if ival_ < 0:
+                raise_parse_error(child_, 'requires nonNegativeInteger')
+            ival_ = self.gds_validate_integer(ival_, node, 'ResultsToSkip')
+            self.ResultsToSkip = ival_
+            self.ResultsToSkip_nsprefix_ = child_.prefix
+        elif nodeName_ == 'ResultsRequested' and child_.text:
+            sval_ = child_.text
+            ival_ = self.gds_parse_integer(sval_, node, 'ResultsRequested')
+            if ival_ < 0:
+                raise_parse_error(child_, 'requires nonNegativeInteger')
+            ival_ = self.gds_validate_integer(ival_, node, 'ResultsRequested')
+            self.ResultsRequested = ival_
+            self.ResultsRequested_nsprefix_ = child_.prefix
+        elif nodeName_ == 'PagingDetail':
+            obj_ = PagingRequestDetail.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.PagingDetail = obj_
+            obj_.original_tagname_ = 'PagingDetail'
+        elif nodeName_ == 'CarrierCode':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'CarrierCode')
+            value_ = self.gds_validate_string(value_, node, 'CarrierCode')
+            self.CarrierCode.append(value_)
+            self.CarrierCode_nsprefix_ = child_.prefix
+            # validate type CarrierCodeType
+            self.validate_CarrierCodeType(self.CarrierCode[-1])
+        elif nodeName_ == 'PickupType':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'PickupType')
+            value_ = self.gds_validate_string(value_, node, 'PickupType')
+            self.PickupType = value_
+            self.PickupType_nsprefix_ = child_.prefix
+            # validate type PickupType
+            self.validate_PickupType(self.PickupType)
+        elif nodeName_ == 'StandingInstructionId':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'StandingInstructionId')
+            value_ = self.gds_validate_string(value_, node, 'StandingInstructionId')
+            self.StandingInstructionId = value_
+            self.StandingInstructionId_nsprefix_ = child_.prefix
+        elif nodeName_ == 'Conditions':
+            obj_ = PickupLookupCondition.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Conditions.append(obj_)
+            obj_.original_tagname_ = 'Conditions'
+# end class PickupHistorySummaryRequest
+
+
+class PickupLookupCondition(GeneratedsSuper):
+    """Specifies a condition to be used as part of a Pickup History Summary
+    lookup."""
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, ConditionType=None, Value=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.ConditionType = ConditionType
+        self.validate_PickupLookupConditionType(self.ConditionType)
+        self.ConditionType_nsprefix_ = "ns"
+        self.Value = Value
+        self.Value_nsprefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, PickupLookupCondition)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if PickupLookupCondition.subclass:
+            return PickupLookupCondition.subclass(*args_, **kwargs_)
+        else:
+            return PickupLookupCondition(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_ConditionType(self):
+        return self.ConditionType
+    def set_ConditionType(self, ConditionType):
+        self.ConditionType = ConditionType
+    def get_Value(self):
+        return self.Value
+    def set_Value(self, Value):
+        self.Value = Value
+    def validate_PickupLookupConditionType(self, value):
+        result = True
+        # Validate type PickupLookupConditionType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['ACCOUNT_NUMBER', 'BEGIN_DATE', 'COMPANY_NAME', 'COUNTRY_CODE', 'COUNTRY_RELATIONSHIP', 'END_DATE', 'INTERNAL_SYSTEM_TYPE', 'PICKUP_LOCATION_ID', 'POSTAL_CODE', 'SERVICE_TYPE']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on PickupLookupConditionType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def hasContent_(self):
+        if (
+            self.ConditionType is not None or
+            self.Value is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='PickupLookupCondition', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('PickupLookupCondition')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'PickupLookupCondition':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='PickupLookupCondition')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='PickupLookupCondition', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='PickupLookupCondition'):
+        pass
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='PickupLookupCondition', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.ConditionType is not None:
+            namespaceprefix_ = self.ConditionType_nsprefix_ + ':' if (UseCapturedNS_ and self.ConditionType_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sConditionType>%s</%sConditionType>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.ConditionType), input_name='ConditionType')), namespaceprefix_ , eol_))
+        if self.Value is not None:
+            namespaceprefix_ = self.Value_nsprefix_ + ':' if (UseCapturedNS_ and self.Value_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sValue>%s</%sValue>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Value), input_name='Value')), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'ConditionType':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'ConditionType')
+            value_ = self.gds_validate_string(value_, node, 'ConditionType')
+            self.ConditionType = value_
+            self.ConditionType_nsprefix_ = child_.prefix
+            # validate type PickupLookupConditionType
+            self.validate_PickupLookupConditionType(self.ConditionType)
+        elif nodeName_ == 'Value':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Value')
+            value_ = self.gds_validate_string(value_, node, 'Value')
+            self.Value = value_
+            self.Value_nsprefix_ = child_.prefix
+# end class PickupLookupCondition
+
+
 class PickupOriginDetail(GeneratedsSuper):
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
@@ -10864,13 +14636,13 @@ class PickupOriginDetail(GeneratedsSuper):
         self.AddressId = AddressId
         self.AddressId_nsprefix_ = None
         self.PickupLocation = PickupLocation
-        self.PickupLocation_nsprefix_ = None
+        self.PickupLocation_nsprefix_ = "ns"
         self.PackageLocation = PackageLocation
         self.validate_PickupBuildingLocationType(self.PackageLocation)
-        self.PackageLocation_nsprefix_ = None
+        self.PackageLocation_nsprefix_ = "ns"
         self.BuildingPart = BuildingPart
         self.validate_BuildingPartCode(self.BuildingPart)
-        self.BuildingPart_nsprefix_ = None
+        self.BuildingPart_nsprefix_ = "ns"
         self.BuildingPartDescription = BuildingPartDescription
         self.BuildingPartDescription_nsprefix_ = None
         if isinstance(ReadyTimestamp, BaseStrType_):
@@ -10889,7 +14661,7 @@ class PickupOriginDetail(GeneratedsSuper):
         self.StayLate_nsprefix_ = None
         self.PickupDateType = PickupDateType
         self.validate_PickupRequestType(self.PickupDateType)
-        self.PickupDateType_nsprefix_ = None
+        self.PickupDateType_nsprefix_ = "ns"
         if isinstance(LastAccessTime, BaseStrType_):
             initvalue_ = datetime_.datetime.strptime(LastAccessTime, '%H:%M:%S').time()
         else:
@@ -11260,6 +15032,196 @@ class PickupOriginDetail(GeneratedsSuper):
 # end class PickupOriginDetail
 
 
+class PickupPackageDetail(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, PackageSpecialServices=None, SignatureOptionDetail=None, Weight=None, InsuredValue=None, Description=None, CustomerReferences=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        if PackageSpecialServices is None:
+            self.PackageSpecialServices = []
+        else:
+            self.PackageSpecialServices = PackageSpecialServices
+        self.PackageSpecialServices_nsprefix_ = None
+        self.SignatureOptionDetail = SignatureOptionDetail
+        self.SignatureOptionDetail_nsprefix_ = "ns"
+        self.Weight = Weight
+        self.Weight_nsprefix_ = "ns"
+        self.InsuredValue = InsuredValue
+        self.InsuredValue_nsprefix_ = "ns"
+        self.Description = Description
+        self.Description_nsprefix_ = None
+        if CustomerReferences is None:
+            self.CustomerReferences = []
+        else:
+            self.CustomerReferences = CustomerReferences
+        self.CustomerReferences_nsprefix_ = "ns"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, PickupPackageDetail)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if PickupPackageDetail.subclass:
+            return PickupPackageDetail.subclass(*args_, **kwargs_)
+        else:
+            return PickupPackageDetail(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_PackageSpecialServices(self):
+        return self.PackageSpecialServices
+    def set_PackageSpecialServices(self, PackageSpecialServices):
+        self.PackageSpecialServices = PackageSpecialServices
+    def add_PackageSpecialServices(self, value):
+        self.PackageSpecialServices.append(value)
+    def insert_PackageSpecialServices_at(self, index, value):
+        self.PackageSpecialServices.insert(index, value)
+    def replace_PackageSpecialServices_at(self, index, value):
+        self.PackageSpecialServices[index] = value
+    def get_SignatureOptionDetail(self):
+        return self.SignatureOptionDetail
+    def set_SignatureOptionDetail(self, SignatureOptionDetail):
+        self.SignatureOptionDetail = SignatureOptionDetail
+    def get_Weight(self):
+        return self.Weight
+    def set_Weight(self, Weight):
+        self.Weight = Weight
+    def get_InsuredValue(self):
+        return self.InsuredValue
+    def set_InsuredValue(self, InsuredValue):
+        self.InsuredValue = InsuredValue
+    def get_Description(self):
+        return self.Description
+    def set_Description(self, Description):
+        self.Description = Description
+    def get_CustomerReferences(self):
+        return self.CustomerReferences
+    def set_CustomerReferences(self, CustomerReferences):
+        self.CustomerReferences = CustomerReferences
+    def add_CustomerReferences(self, value):
+        self.CustomerReferences.append(value)
+    def insert_CustomerReferences_at(self, index, value):
+        self.CustomerReferences.insert(index, value)
+    def replace_CustomerReferences_at(self, index, value):
+        self.CustomerReferences[index] = value
+    def hasContent_(self):
+        if (
+            self.PackageSpecialServices or
+            self.SignatureOptionDetail is not None or
+            self.Weight is not None or
+            self.InsuredValue is not None or
+            self.Description is not None or
+            self.CustomerReferences
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='PickupPackageDetail', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('PickupPackageDetail')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'PickupPackageDetail':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='PickupPackageDetail')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='PickupPackageDetail', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='PickupPackageDetail'):
+        pass
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='PickupPackageDetail', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for PackageSpecialServices_ in self.PackageSpecialServices:
+            namespaceprefix_ = self.PackageSpecialServices_nsprefix_ + ':' if (UseCapturedNS_ and self.PackageSpecialServices_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sPackageSpecialServices>%s</%sPackageSpecialServices>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(PackageSpecialServices_), input_name='PackageSpecialServices')), namespaceprefix_ , eol_))
+        if self.SignatureOptionDetail is not None:
+            namespaceprefix_ = self.SignatureOptionDetail_nsprefix_ + ':' if (UseCapturedNS_ and self.SignatureOptionDetail_nsprefix_) else ''
+            self.SignatureOptionDetail.export(outfile, level, namespaceprefix_, namespacedef_='', name_='SignatureOptionDetail', pretty_print=pretty_print)
+        if self.Weight is not None:
+            namespaceprefix_ = self.Weight_nsprefix_ + ':' if (UseCapturedNS_ and self.Weight_nsprefix_) else ''
+            self.Weight.export(outfile, level, namespaceprefix_, namespacedef_='', name_='Weight', pretty_print=pretty_print)
+        if self.InsuredValue is not None:
+            namespaceprefix_ = self.InsuredValue_nsprefix_ + ':' if (UseCapturedNS_ and self.InsuredValue_nsprefix_) else ''
+            self.InsuredValue.export(outfile, level, namespaceprefix_, namespacedef_='', name_='InsuredValue', pretty_print=pretty_print)
+        if self.Description is not None:
+            namespaceprefix_ = self.Description_nsprefix_ + ':' if (UseCapturedNS_ and self.Description_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sDescription>%s</%sDescription>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Description), input_name='Description')), namespaceprefix_ , eol_))
+        for CustomerReferences_ in self.CustomerReferences:
+            namespaceprefix_ = self.CustomerReferences_nsprefix_ + ':' if (UseCapturedNS_ and self.CustomerReferences_nsprefix_) else ''
+            CustomerReferences_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='CustomerReferences', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'PackageSpecialServices':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'PackageSpecialServices')
+            value_ = self.gds_validate_string(value_, node, 'PackageSpecialServices')
+            self.PackageSpecialServices.append(value_)
+            self.PackageSpecialServices_nsprefix_ = child_.prefix
+        elif nodeName_ == 'SignatureOptionDetail':
+            obj_ = SignatureOptionDetail.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.SignatureOptionDetail = obj_
+            obj_.original_tagname_ = 'SignatureOptionDetail'
+        elif nodeName_ == 'Weight':
+            obj_ = Weight.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Weight = obj_
+            obj_.original_tagname_ = 'Weight'
+        elif nodeName_ == 'InsuredValue':
+            obj_ = Money.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.InsuredValue = obj_
+            obj_.original_tagname_ = 'InsuredValue'
+        elif nodeName_ == 'Description':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Description')
+            value_ = self.gds_validate_string(value_, node, 'Description')
+            self.Description = value_
+            self.Description_nsprefix_ = child_.prefix
+        elif nodeName_ == 'CustomerReferences':
+            obj_ = CustomerReference.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.CustomerReferences.append(obj_)
+            obj_.original_tagname_ = 'CustomerReferences'
+# end class PickupPackageDetail
+
+
 class PickupPackageSpecialServicesRequested(GeneratedsSuper):
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
@@ -11276,9 +15238,9 @@ class PickupPackageSpecialServicesRequested(GeneratedsSuper):
             self.SpecialServiceTypes = SpecialServiceTypes
         self.SpecialServiceTypes_nsprefix_ = None
         self.DangerousGoodsDetail = DangerousGoodsDetail
-        self.DangerousGoodsDetail_nsprefix_ = None
+        self.DangerousGoodsDetail_nsprefix_ = "ns"
         self.PriorityAlertDetail = PriorityAlertDetail
-        self.PriorityAlertDetail_nsprefix_ = None
+        self.PriorityAlertDetail_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -11406,12 +15368,12 @@ class PickupScheduleOption(GeneratedsSuper):
         self.ns_prefix_ = None
         self.Carrier = Carrier
         self.validate_CarrierCodeType(self.Carrier)
-        self.Carrier_nsprefix_ = None
+        self.Carrier_nsprefix_ = "ns"
         self.Description = Description
         self.Description_nsprefix_ = None
         self.ScheduleDay = ScheduleDay
         self.validate_PickupRequestType(self.ScheduleDay)
-        self.ScheduleDay_nsprefix_ = None
+        self.ScheduleDay_nsprefix_ = "ns"
         self.Available = Available
         self.Available_nsprefix_ = None
         if isinstance(PickupDate, BaseStrType_):
@@ -11432,7 +15394,7 @@ class PickupScheduleOption(GeneratedsSuper):
         self.ResidentialAvailable_nsprefix_ = None
         self.CountryRelationship = CountryRelationship
         self.validate_CountryRelationshipType(self.CountryRelationship)
-        self.CountryRelationship_nsprefix_ = None
+        self.CountryRelationship_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -11493,7 +15455,7 @@ class PickupScheduleOption(GeneratedsSuper):
                 self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
                 return False
             value = value
-            enumerations = ['FDXC', 'FDXE', 'FDXG', 'FXCC', 'FXFR', 'FXSP']
+            enumerations = ['FDXC', 'FDXE', 'FDXG', 'FDXO', 'FXCC', 'FXFR', 'FXSP']
             if value not in enumerations:
                 lineno = self.gds_get_node_lineno_()
                 self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on CarrierCodeType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
@@ -11700,9 +15662,9 @@ class PickupShipmentAttributes(GeneratedsSuper):
         self.PackagingType = PackagingType
         self.PackagingType_nsprefix_ = None
         self.Dimensions = Dimensions
-        self.Dimensions_nsprefix_ = None
+        self.Dimensions_nsprefix_ = "ns"
         self.Weight = Weight
-        self.Weight_nsprefix_ = None
+        self.Weight_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -11827,6 +15789,455 @@ class PickupShipmentAttributes(GeneratedsSuper):
 # end class PickupShipmentAttributes
 
 
+class PickupShipmentSpecialServicesRequested(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, SpecialServiceTypes=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        if SpecialServiceTypes is None:
+            self.SpecialServiceTypes = []
+        else:
+            self.SpecialServiceTypes = SpecialServiceTypes
+        self.SpecialServiceTypes_nsprefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, PickupShipmentSpecialServicesRequested)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if PickupShipmentSpecialServicesRequested.subclass:
+            return PickupShipmentSpecialServicesRequested.subclass(*args_, **kwargs_)
+        else:
+            return PickupShipmentSpecialServicesRequested(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_SpecialServiceTypes(self):
+        return self.SpecialServiceTypes
+    def set_SpecialServiceTypes(self, SpecialServiceTypes):
+        self.SpecialServiceTypes = SpecialServiceTypes
+    def add_SpecialServiceTypes(self, value):
+        self.SpecialServiceTypes.append(value)
+    def insert_SpecialServiceTypes_at(self, index, value):
+        self.SpecialServiceTypes.insert(index, value)
+    def replace_SpecialServiceTypes_at(self, index, value):
+        self.SpecialServiceTypes[index] = value
+    def hasContent_(self):
+        if (
+            self.SpecialServiceTypes
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='PickupShipmentSpecialServicesRequested', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('PickupShipmentSpecialServicesRequested')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'PickupShipmentSpecialServicesRequested':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='PickupShipmentSpecialServicesRequested')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='PickupShipmentSpecialServicesRequested', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='PickupShipmentSpecialServicesRequested'):
+        pass
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='PickupShipmentSpecialServicesRequested', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for SpecialServiceTypes_ in self.SpecialServiceTypes:
+            namespaceprefix_ = self.SpecialServiceTypes_nsprefix_ + ':' if (UseCapturedNS_ and self.SpecialServiceTypes_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sSpecialServiceTypes>%s</%sSpecialServiceTypes>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(SpecialServiceTypes_), input_name='SpecialServiceTypes')), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'SpecialServiceTypes':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'SpecialServiceTypes')
+            value_ = self.gds_validate_string(value_, node, 'SpecialServiceTypes')
+            self.SpecialServiceTypes.append(value_)
+            self.SpecialServiceTypes_nsprefix_ = child_.prefix
+# end class PickupShipmentSpecialServicesRequested
+
+
+class PickupTagDetail(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, ServiceType=None, PackagingType=None, ShipmentSpecialServices=None, ShippingChargesPayment=None, RecipientLocation=None, RmaNumber=None, TotalInsuredValue=None, PackageDetails=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.ServiceType = ServiceType
+        self.ServiceType_nsprefix_ = None
+        self.PackagingType = PackagingType
+        self.PackagingType_nsprefix_ = None
+        if ShipmentSpecialServices is None:
+            self.ShipmentSpecialServices = []
+        else:
+            self.ShipmentSpecialServices = ShipmentSpecialServices
+        self.ShipmentSpecialServices_nsprefix_ = None
+        self.ShippingChargesPayment = ShippingChargesPayment
+        self.ShippingChargesPayment_nsprefix_ = "ns"
+        self.RecipientLocation = RecipientLocation
+        self.RecipientLocation_nsprefix_ = "ns"
+        self.RmaNumber = RmaNumber
+        self.RmaNumber_nsprefix_ = None
+        self.TotalInsuredValue = TotalInsuredValue
+        self.TotalInsuredValue_nsprefix_ = "ns"
+        if PackageDetails is None:
+            self.PackageDetails = []
+        else:
+            self.PackageDetails = PackageDetails
+        self.PackageDetails_nsprefix_ = "ns"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, PickupTagDetail)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if PickupTagDetail.subclass:
+            return PickupTagDetail.subclass(*args_, **kwargs_)
+        else:
+            return PickupTagDetail(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_ServiceType(self):
+        return self.ServiceType
+    def set_ServiceType(self, ServiceType):
+        self.ServiceType = ServiceType
+    def get_PackagingType(self):
+        return self.PackagingType
+    def set_PackagingType(self, PackagingType):
+        self.PackagingType = PackagingType
+    def get_ShipmentSpecialServices(self):
+        return self.ShipmentSpecialServices
+    def set_ShipmentSpecialServices(self, ShipmentSpecialServices):
+        self.ShipmentSpecialServices = ShipmentSpecialServices
+    def add_ShipmentSpecialServices(self, value):
+        self.ShipmentSpecialServices.append(value)
+    def insert_ShipmentSpecialServices_at(self, index, value):
+        self.ShipmentSpecialServices.insert(index, value)
+    def replace_ShipmentSpecialServices_at(self, index, value):
+        self.ShipmentSpecialServices[index] = value
+    def get_ShippingChargesPayment(self):
+        return self.ShippingChargesPayment
+    def set_ShippingChargesPayment(self, ShippingChargesPayment):
+        self.ShippingChargesPayment = ShippingChargesPayment
+    def get_RecipientLocation(self):
+        return self.RecipientLocation
+    def set_RecipientLocation(self, RecipientLocation):
+        self.RecipientLocation = RecipientLocation
+    def get_RmaNumber(self):
+        return self.RmaNumber
+    def set_RmaNumber(self, RmaNumber):
+        self.RmaNumber = RmaNumber
+    def get_TotalInsuredValue(self):
+        return self.TotalInsuredValue
+    def set_TotalInsuredValue(self, TotalInsuredValue):
+        self.TotalInsuredValue = TotalInsuredValue
+    def get_PackageDetails(self):
+        return self.PackageDetails
+    def set_PackageDetails(self, PackageDetails):
+        self.PackageDetails = PackageDetails
+    def add_PackageDetails(self, value):
+        self.PackageDetails.append(value)
+    def insert_PackageDetails_at(self, index, value):
+        self.PackageDetails.insert(index, value)
+    def replace_PackageDetails_at(self, index, value):
+        self.PackageDetails[index] = value
+    def hasContent_(self):
+        if (
+            self.ServiceType is not None or
+            self.PackagingType is not None or
+            self.ShipmentSpecialServices or
+            self.ShippingChargesPayment is not None or
+            self.RecipientLocation is not None or
+            self.RmaNumber is not None or
+            self.TotalInsuredValue is not None or
+            self.PackageDetails
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='PickupTagDetail', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('PickupTagDetail')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'PickupTagDetail':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='PickupTagDetail')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='PickupTagDetail', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='PickupTagDetail'):
+        pass
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='PickupTagDetail', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.ServiceType is not None:
+            namespaceprefix_ = self.ServiceType_nsprefix_ + ':' if (UseCapturedNS_ and self.ServiceType_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sServiceType>%s</%sServiceType>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.ServiceType), input_name='ServiceType')), namespaceprefix_ , eol_))
+        if self.PackagingType is not None:
+            namespaceprefix_ = self.PackagingType_nsprefix_ + ':' if (UseCapturedNS_ and self.PackagingType_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sPackagingType>%s</%sPackagingType>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.PackagingType), input_name='PackagingType')), namespaceprefix_ , eol_))
+        for ShipmentSpecialServices_ in self.ShipmentSpecialServices:
+            namespaceprefix_ = self.ShipmentSpecialServices_nsprefix_ + ':' if (UseCapturedNS_ and self.ShipmentSpecialServices_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sShipmentSpecialServices>%s</%sShipmentSpecialServices>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(ShipmentSpecialServices_), input_name='ShipmentSpecialServices')), namespaceprefix_ , eol_))
+        if self.ShippingChargesPayment is not None:
+            namespaceprefix_ = self.ShippingChargesPayment_nsprefix_ + ':' if (UseCapturedNS_ and self.ShippingChargesPayment_nsprefix_) else ''
+            self.ShippingChargesPayment.export(outfile, level, namespaceprefix_, namespacedef_='', name_='ShippingChargesPayment', pretty_print=pretty_print)
+        if self.RecipientLocation is not None:
+            namespaceprefix_ = self.RecipientLocation_nsprefix_ + ':' if (UseCapturedNS_ and self.RecipientLocation_nsprefix_) else ''
+            self.RecipientLocation.export(outfile, level, namespaceprefix_, namespacedef_='', name_='RecipientLocation', pretty_print=pretty_print)
+        if self.RmaNumber is not None:
+            namespaceprefix_ = self.RmaNumber_nsprefix_ + ':' if (UseCapturedNS_ and self.RmaNumber_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sRmaNumber>%s</%sRmaNumber>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.RmaNumber), input_name='RmaNumber')), namespaceprefix_ , eol_))
+        if self.TotalInsuredValue is not None:
+            namespaceprefix_ = self.TotalInsuredValue_nsprefix_ + ':' if (UseCapturedNS_ and self.TotalInsuredValue_nsprefix_) else ''
+            self.TotalInsuredValue.export(outfile, level, namespaceprefix_, namespacedef_='', name_='TotalInsuredValue', pretty_print=pretty_print)
+        for PackageDetails_ in self.PackageDetails:
+            namespaceprefix_ = self.PackageDetails_nsprefix_ + ':' if (UseCapturedNS_ and self.PackageDetails_nsprefix_) else ''
+            PackageDetails_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='PackageDetails', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'ServiceType':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'ServiceType')
+            value_ = self.gds_validate_string(value_, node, 'ServiceType')
+            self.ServiceType = value_
+            self.ServiceType_nsprefix_ = child_.prefix
+        elif nodeName_ == 'PackagingType':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'PackagingType')
+            value_ = self.gds_validate_string(value_, node, 'PackagingType')
+            self.PackagingType = value_
+            self.PackagingType_nsprefix_ = child_.prefix
+        elif nodeName_ == 'ShipmentSpecialServices':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'ShipmentSpecialServices')
+            value_ = self.gds_validate_string(value_, node, 'ShipmentSpecialServices')
+            self.ShipmentSpecialServices.append(value_)
+            self.ShipmentSpecialServices_nsprefix_ = child_.prefix
+        elif nodeName_ == 'ShippingChargesPayment':
+            obj_ = Payment.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.ShippingChargesPayment = obj_
+            obj_.original_tagname_ = 'ShippingChargesPayment'
+        elif nodeName_ == 'RecipientLocation':
+            obj_ = ContactAndAddress.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.RecipientLocation = obj_
+            obj_.original_tagname_ = 'RecipientLocation'
+        elif nodeName_ == 'RmaNumber':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'RmaNumber')
+            value_ = self.gds_validate_string(value_, node, 'RmaNumber')
+            self.RmaNumber = value_
+            self.RmaNumber_nsprefix_ = child_.prefix
+        elif nodeName_ == 'TotalInsuredValue':
+            obj_ = Money.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.TotalInsuredValue = obj_
+            obj_.original_tagname_ = 'TotalInsuredValue'
+        elif nodeName_ == 'PackageDetails':
+            obj_ = PickupPackageDetail.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.PackageDetails.append(obj_)
+            obj_.original_tagname_ = 'PackageDetails'
+# end class PickupTagDetail
+
+
+class PolicyGridManifest(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, GridId=None, Contents=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.GridId = GridId
+        self.GridId_nsprefix_ = None
+        if Contents is None:
+            self.Contents = []
+        else:
+            self.Contents = Contents
+        self.Contents_nsprefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, PolicyGridManifest)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if PolicyGridManifest.subclass:
+            return PolicyGridManifest.subclass(*args_, **kwargs_)
+        else:
+            return PolicyGridManifest(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_GridId(self):
+        return self.GridId
+    def set_GridId(self, GridId):
+        self.GridId = GridId
+    def get_Contents(self):
+        return self.Contents
+    def set_Contents(self, Contents):
+        self.Contents = Contents
+    def add_Contents(self, value):
+        self.Contents.append(value)
+    def insert_Contents_at(self, index, value):
+        self.Contents.insert(index, value)
+    def replace_Contents_at(self, index, value):
+        self.Contents[index] = value
+    def hasContent_(self):
+        if (
+            self.GridId is not None or
+            self.Contents
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='PolicyGridManifest', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('PolicyGridManifest')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'PolicyGridManifest':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='PolicyGridManifest')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='PolicyGridManifest', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='PolicyGridManifest'):
+        pass
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='PolicyGridManifest', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.GridId is not None:
+            namespaceprefix_ = self.GridId_nsprefix_ + ':' if (UseCapturedNS_ and self.GridId_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sGridId>%s</%sGridId>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.GridId), input_name='GridId')), namespaceprefix_ , eol_))
+        for Contents_ in self.Contents:
+            namespaceprefix_ = self.Contents_nsprefix_ + ':' if (UseCapturedNS_ and self.Contents_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sContents>%s</%sContents>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(Contents_), input_name='Contents')), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'GridId':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'GridId')
+            value_ = self.gds_validate_string(value_, node, 'GridId')
+            self.GridId = value_
+            self.GridId_nsprefix_ = child_.prefix
+        elif nodeName_ == 'Contents':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Contents')
+            value_ = self.gds_validate_string(value_, node, 'Contents')
+            self.Contents.append(value_)
+            self.Contents_nsprefix_ = child_.prefix
+# end class PolicyGridManifest
+
+
 class PriorityAlertDetail(GeneratedsSuper):
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
@@ -11841,7 +16252,7 @@ class PriorityAlertDetail(GeneratedsSuper):
             self.EnhancementTypes = []
         else:
             self.EnhancementTypes = EnhancementTypes
-        self.EnhancementTypes_nsprefix_ = None
+        self.EnhancementTypes_nsprefix_ = "ns"
         if Content is None:
             self.Content = []
         else:
@@ -11991,7 +16402,7 @@ class RecommendedDocumentSpecification(GeneratedsSuper):
             self.Types = []
         else:
             self.Types = Types
-        self.Types_nsprefix_ = None
+        self.Types_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -12109,9 +16520,9 @@ class RequestedPickupPackageDetail(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.PackageSpecialServices = PackageSpecialServices
-        self.PackageSpecialServices_nsprefix_ = None
+        self.PackageSpecialServices_nsprefix_ = "ns"
         self.Weight = Weight
-        self.Weight_nsprefix_ = None
+        self.Weight_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -12204,6 +16615,367 @@ class RequestedPickupPackageDetail(GeneratedsSuper):
             self.Weight = obj_
             obj_.original_tagname_ = 'Weight'
 # end class RequestedPickupPackageDetail
+
+
+class RequestedPickupShipmentDetail(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, ServiceCode=None, ServiceType=None, PackagingType=None, ShipmentSpecialServices=None, RecipientAddress=None, RecipientLocationId=None, PackageDetails=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.ServiceCode = ServiceCode
+        self.ServiceCode_nsprefix_ = None
+        self.ServiceType = ServiceType
+        self.ServiceType_nsprefix_ = None
+        self.PackagingType = PackagingType
+        self.PackagingType_nsprefix_ = None
+        self.ShipmentSpecialServices = ShipmentSpecialServices
+        self.ShipmentSpecialServices_nsprefix_ = "ns"
+        self.RecipientAddress = RecipientAddress
+        self.RecipientAddress_nsprefix_ = "ns"
+        self.RecipientLocationId = RecipientLocationId
+        self.RecipientLocationId_nsprefix_ = None
+        if PackageDetails is None:
+            self.PackageDetails = []
+        else:
+            self.PackageDetails = PackageDetails
+        self.PackageDetails_nsprefix_ = "ns"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, RequestedPickupShipmentDetail)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if RequestedPickupShipmentDetail.subclass:
+            return RequestedPickupShipmentDetail.subclass(*args_, **kwargs_)
+        else:
+            return RequestedPickupShipmentDetail(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_ServiceCode(self):
+        return self.ServiceCode
+    def set_ServiceCode(self, ServiceCode):
+        self.ServiceCode = ServiceCode
+    def get_ServiceType(self):
+        return self.ServiceType
+    def set_ServiceType(self, ServiceType):
+        self.ServiceType = ServiceType
+    def get_PackagingType(self):
+        return self.PackagingType
+    def set_PackagingType(self, PackagingType):
+        self.PackagingType = PackagingType
+    def get_ShipmentSpecialServices(self):
+        return self.ShipmentSpecialServices
+    def set_ShipmentSpecialServices(self, ShipmentSpecialServices):
+        self.ShipmentSpecialServices = ShipmentSpecialServices
+    def get_RecipientAddress(self):
+        return self.RecipientAddress
+    def set_RecipientAddress(self, RecipientAddress):
+        self.RecipientAddress = RecipientAddress
+    def get_RecipientLocationId(self):
+        return self.RecipientLocationId
+    def set_RecipientLocationId(self, RecipientLocationId):
+        self.RecipientLocationId = RecipientLocationId
+    def get_PackageDetails(self):
+        return self.PackageDetails
+    def set_PackageDetails(self, PackageDetails):
+        self.PackageDetails = PackageDetails
+    def add_PackageDetails(self, value):
+        self.PackageDetails.append(value)
+    def insert_PackageDetails_at(self, index, value):
+        self.PackageDetails.insert(index, value)
+    def replace_PackageDetails_at(self, index, value):
+        self.PackageDetails[index] = value
+    def hasContent_(self):
+        if (
+            self.ServiceCode is not None or
+            self.ServiceType is not None or
+            self.PackagingType is not None or
+            self.ShipmentSpecialServices is not None or
+            self.RecipientAddress is not None or
+            self.RecipientLocationId is not None or
+            self.PackageDetails
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='RequestedPickupShipmentDetail', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('RequestedPickupShipmentDetail')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'RequestedPickupShipmentDetail':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='RequestedPickupShipmentDetail')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='RequestedPickupShipmentDetail', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='RequestedPickupShipmentDetail'):
+        pass
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='RequestedPickupShipmentDetail', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.ServiceCode is not None:
+            namespaceprefix_ = self.ServiceCode_nsprefix_ + ':' if (UseCapturedNS_ and self.ServiceCode_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sServiceCode>%s</%sServiceCode>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.ServiceCode), input_name='ServiceCode')), namespaceprefix_ , eol_))
+        if self.ServiceType is not None:
+            namespaceprefix_ = self.ServiceType_nsprefix_ + ':' if (UseCapturedNS_ and self.ServiceType_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sServiceType>%s</%sServiceType>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.ServiceType), input_name='ServiceType')), namespaceprefix_ , eol_))
+        if self.PackagingType is not None:
+            namespaceprefix_ = self.PackagingType_nsprefix_ + ':' if (UseCapturedNS_ and self.PackagingType_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sPackagingType>%s</%sPackagingType>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.PackagingType), input_name='PackagingType')), namespaceprefix_ , eol_))
+        if self.ShipmentSpecialServices is not None:
+            namespaceprefix_ = self.ShipmentSpecialServices_nsprefix_ + ':' if (UseCapturedNS_ and self.ShipmentSpecialServices_nsprefix_) else ''
+            self.ShipmentSpecialServices.export(outfile, level, namespaceprefix_, namespacedef_='', name_='ShipmentSpecialServices', pretty_print=pretty_print)
+        if self.RecipientAddress is not None:
+            namespaceprefix_ = self.RecipientAddress_nsprefix_ + ':' if (UseCapturedNS_ and self.RecipientAddress_nsprefix_) else ''
+            self.RecipientAddress.export(outfile, level, namespaceprefix_, namespacedef_='', name_='RecipientAddress', pretty_print=pretty_print)
+        if self.RecipientLocationId is not None:
+            namespaceprefix_ = self.RecipientLocationId_nsprefix_ + ':' if (UseCapturedNS_ and self.RecipientLocationId_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sRecipientLocationId>%s</%sRecipientLocationId>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.RecipientLocationId), input_name='RecipientLocationId')), namespaceprefix_ , eol_))
+        for PackageDetails_ in self.PackageDetails:
+            namespaceprefix_ = self.PackageDetails_nsprefix_ + ':' if (UseCapturedNS_ and self.PackageDetails_nsprefix_) else ''
+            PackageDetails_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='PackageDetails', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'ServiceCode':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'ServiceCode')
+            value_ = self.gds_validate_string(value_, node, 'ServiceCode')
+            self.ServiceCode = value_
+            self.ServiceCode_nsprefix_ = child_.prefix
+        elif nodeName_ == 'ServiceType':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'ServiceType')
+            value_ = self.gds_validate_string(value_, node, 'ServiceType')
+            self.ServiceType = value_
+            self.ServiceType_nsprefix_ = child_.prefix
+        elif nodeName_ == 'PackagingType':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'PackagingType')
+            value_ = self.gds_validate_string(value_, node, 'PackagingType')
+            self.PackagingType = value_
+            self.PackagingType_nsprefix_ = child_.prefix
+        elif nodeName_ == 'ShipmentSpecialServices':
+            obj_ = PickupShipmentSpecialServicesRequested.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.ShipmentSpecialServices = obj_
+            obj_.original_tagname_ = 'ShipmentSpecialServices'
+        elif nodeName_ == 'RecipientAddress':
+            obj_ = Address.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.RecipientAddress = obj_
+            obj_.original_tagname_ = 'RecipientAddress'
+        elif nodeName_ == 'RecipientLocationId':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'RecipientLocationId')
+            value_ = self.gds_validate_string(value_, node, 'RecipientLocationId')
+            self.RecipientLocationId = value_
+            self.RecipientLocationId_nsprefix_ = child_.prefix
+        elif nodeName_ == 'PackageDetails':
+            obj_ = RequestedPickupPackageDetail.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.PackageDetails.append(obj_)
+            obj_.original_tagname_ = 'PackageDetails'
+# end class RequestedPickupShipmentDetail
+
+
+class RestrictionsAndPrivilegesPolicyDetail(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, ExceptionType=None, PolicyGridManifests=None, PrivilegeDetails=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.ExceptionType = ExceptionType
+        self.validate_RestrictionsAndPrivilegesPolicyExceptionType(self.ExceptionType)
+        self.ExceptionType_nsprefix_ = "ns"
+        if PolicyGridManifests is None:
+            self.PolicyGridManifests = []
+        else:
+            self.PolicyGridManifests = PolicyGridManifests
+        self.PolicyGridManifests_nsprefix_ = "ns"
+        if PrivilegeDetails is None:
+            self.PrivilegeDetails = []
+        else:
+            self.PrivilegeDetails = PrivilegeDetails
+        self.PrivilegeDetails_nsprefix_ = "ns"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, RestrictionsAndPrivilegesPolicyDetail)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if RestrictionsAndPrivilegesPolicyDetail.subclass:
+            return RestrictionsAndPrivilegesPolicyDetail.subclass(*args_, **kwargs_)
+        else:
+            return RestrictionsAndPrivilegesPolicyDetail(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_ExceptionType(self):
+        return self.ExceptionType
+    def set_ExceptionType(self, ExceptionType):
+        self.ExceptionType = ExceptionType
+    def get_PolicyGridManifests(self):
+        return self.PolicyGridManifests
+    def set_PolicyGridManifests(self, PolicyGridManifests):
+        self.PolicyGridManifests = PolicyGridManifests
+    def add_PolicyGridManifests(self, value):
+        self.PolicyGridManifests.append(value)
+    def insert_PolicyGridManifests_at(self, index, value):
+        self.PolicyGridManifests.insert(index, value)
+    def replace_PolicyGridManifests_at(self, index, value):
+        self.PolicyGridManifests[index] = value
+    def get_PrivilegeDetails(self):
+        return self.PrivilegeDetails
+    def set_PrivilegeDetails(self, PrivilegeDetails):
+        self.PrivilegeDetails = PrivilegeDetails
+    def add_PrivilegeDetails(self, value):
+        self.PrivilegeDetails.append(value)
+    def insert_PrivilegeDetails_at(self, index, value):
+        self.PrivilegeDetails.insert(index, value)
+    def replace_PrivilegeDetails_at(self, index, value):
+        self.PrivilegeDetails[index] = value
+    def validate_RestrictionsAndPrivilegesPolicyExceptionType(self, value):
+        result = True
+        # Validate type RestrictionsAndPrivilegesPolicyExceptionType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['POLICIES_NOT_FOUND', 'SERVICE_UNAVAILABLE']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on RestrictionsAndPrivilegesPolicyExceptionType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def hasContent_(self):
+        if (
+            self.ExceptionType is not None or
+            self.PolicyGridManifests or
+            self.PrivilegeDetails
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='RestrictionsAndPrivilegesPolicyDetail', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('RestrictionsAndPrivilegesPolicyDetail')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'RestrictionsAndPrivilegesPolicyDetail':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='RestrictionsAndPrivilegesPolicyDetail')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='RestrictionsAndPrivilegesPolicyDetail', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='RestrictionsAndPrivilegesPolicyDetail'):
+        pass
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='RestrictionsAndPrivilegesPolicyDetail', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.ExceptionType is not None:
+            namespaceprefix_ = self.ExceptionType_nsprefix_ + ':' if (UseCapturedNS_ and self.ExceptionType_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sExceptionType>%s</%sExceptionType>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.ExceptionType), input_name='ExceptionType')), namespaceprefix_ , eol_))
+        for PolicyGridManifests_ in self.PolicyGridManifests:
+            namespaceprefix_ = self.PolicyGridManifests_nsprefix_ + ':' if (UseCapturedNS_ and self.PolicyGridManifests_nsprefix_) else ''
+            PolicyGridManifests_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='PolicyGridManifests', pretty_print=pretty_print)
+        for PrivilegeDetails_ in self.PrivilegeDetails:
+            namespaceprefix_ = self.PrivilegeDetails_nsprefix_ + ':' if (UseCapturedNS_ and self.PrivilegeDetails_nsprefix_) else ''
+            PrivilegeDetails_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='PrivilegeDetails', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'ExceptionType':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'ExceptionType')
+            value_ = self.gds_validate_string(value_, node, 'ExceptionType')
+            self.ExceptionType = value_
+            self.ExceptionType_nsprefix_ = child_.prefix
+            # validate type RestrictionsAndPrivilegesPolicyExceptionType
+            self.validate_RestrictionsAndPrivilegesPolicyExceptionType(self.ExceptionType)
+        elif nodeName_ == 'PolicyGridManifests':
+            obj_ = PolicyGridManifest.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.PolicyGridManifests.append(obj_)
+            obj_.original_tagname_ = 'PolicyGridManifests'
+        elif nodeName_ == 'PrivilegeDetails':
+            obj_ = EnterprisePrivilegeDetail.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.PrivilegeDetails.append(obj_)
+            obj_.original_tagname_ = 'PrivilegeDetails'
+# end class RestrictionsAndPrivilegesPolicyDetail
 
 
 class ReturnAssociationDetail(GeneratedsSuper):
@@ -12337,7 +17109,7 @@ class ReturnEMailDetail(GeneratedsSuper):
             self.AllowedSpecialServices = []
         else:
             self.AllowedSpecialServices = AllowedSpecialServices
-        self.AllowedSpecialServices_nsprefix_ = None
+        self.AllowedSpecialServices_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -12471,13 +17243,13 @@ class ReturnShipmentDetail(GeneratedsSuper):
         self.ns_prefix_ = None
         self.ReturnType = ReturnType
         self.validate_ReturnType(self.ReturnType)
-        self.ReturnType_nsprefix_ = None
+        self.ReturnType_nsprefix_ = "ns"
         self.Rma = Rma
-        self.Rma_nsprefix_ = None
+        self.Rma_nsprefix_ = "ns"
         self.ReturnEMailDetail = ReturnEMailDetail
-        self.ReturnEMailDetail_nsprefix_ = None
+        self.ReturnEMailDetail_nsprefix_ = "ns"
         self.ReturnAssociation = ReturnAssociation
-        self.ReturnAssociation_nsprefix_ = None
+        self.ReturnAssociation_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -12729,7 +17501,7 @@ class ShipmentAssemblyDetail(GeneratedsSuper):
         self.PieceCount = PieceCount
         self.PieceCount_nsprefix_ = None
         self.Weight = Weight
-        self.Weight_nsprefix_ = None
+        self.Weight_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -12842,9 +17614,9 @@ class ShipmentDryIceDetail(GeneratedsSuper):
         self.PackageCount = PackageCount
         self.PackageCount_nsprefix_ = None
         self.TotalWeight = TotalWeight
-        self.TotalWeight_nsprefix_ = None
+        self.TotalWeight_nsprefix_ = "ns"
         self.ProcessingOptions = ProcessingOptions
-        self.ProcessingOptions_nsprefix_ = None
+        self.ProcessingOptions_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -12970,7 +17742,7 @@ class ShipmentDryIceProcessingOptionsRequested(GeneratedsSuper):
             self.Options = []
         else:
             self.Options = Options
-        self.Options_nsprefix_ = None
+        self.Options_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -13089,14 +17861,14 @@ class ShipmentEventNotificationDetail(GeneratedsSuper):
         self.ns_prefix_ = None
         self.AggregationType = AggregationType
         self.validate_ShipmentNotificationAggregationType(self.AggregationType)
-        self.AggregationType_nsprefix_ = None
+        self.AggregationType_nsprefix_ = "ns"
         self.PersonalMessage = PersonalMessage
         self.PersonalMessage_nsprefix_ = None
         if EventNotifications is None:
             self.EventNotifications = []
         else:
             self.EventNotifications = EventNotifications
-        self.EventNotifications_nsprefix_ = None
+        self.EventNotifications_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -13243,16 +18015,16 @@ class ShipmentEventNotificationSpecification(GeneratedsSuper):
         self.ns_prefix_ = None
         self.Role = Role
         self.validate_ShipmentNotificationRoleType(self.Role)
-        self.Role_nsprefix_ = None
+        self.Role_nsprefix_ = "ns"
         if Events is None:
             self.Events = []
         else:
             self.Events = Events
-        self.Events_nsprefix_ = None
+        self.Events_nsprefix_ = "ns"
         self.NotificationDetail = NotificationDetail
-        self.NotificationDetail_nsprefix_ = None
+        self.NotificationDetail_nsprefix_ = "ns"
         self.FormatSpecification = FormatSpecification
-        self.FormatSpecification_nsprefix_ = None
+        self.FormatSpecification_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -13299,7 +18071,7 @@ class ShipmentEventNotificationSpecification(GeneratedsSuper):
                 self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
                 return False
             value = value
-            enumerations = ['BROKER', 'OTHER', 'RECIPIENT', 'SHIPPER', 'THIRD_PARTY']
+            enumerations = ['BROKER', 'OTHER', 'RECIPIENT', 'SHIPPER']
             if value not in enumerations:
                 lineno = self.gds_get_node_lineno_()
                 self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on ShipmentNotificationRoleType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
@@ -13429,7 +18201,7 @@ class ShipmentNotificationFormatSpecification(GeneratedsSuper):
         self.ns_prefix_ = None
         self.Type = Type
         self.validate_NotificationFormatType(self.Type)
-        self.Type_nsprefix_ = None
+        self.Type_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -13552,55 +18324,55 @@ class ShipmentSpecialServicesRequested(GeneratedsSuper):
             self.SpecialServiceTypes = SpecialServiceTypes
         self.SpecialServiceTypes_nsprefix_ = None
         self.CodDetail = CodDetail
-        self.CodDetail_nsprefix_ = None
+        self.CodDetail_nsprefix_ = "ns"
         self.DeliveryOnInvoiceAcceptanceDetail = DeliveryOnInvoiceAcceptanceDetail
-        self.DeliveryOnInvoiceAcceptanceDetail_nsprefix_ = None
+        self.DeliveryOnInvoiceAcceptanceDetail_nsprefix_ = "ns"
         self.HoldAtLocationDetail = HoldAtLocationDetail
-        self.HoldAtLocationDetail_nsprefix_ = None
+        self.HoldAtLocationDetail_nsprefix_ = "ns"
         self.EventNotificationDetail = EventNotificationDetail
-        self.EventNotificationDetail_nsprefix_ = None
+        self.EventNotificationDetail_nsprefix_ = "ns"
         self.ReturnShipmentDetail = ReturnShipmentDetail
-        self.ReturnShipmentDetail_nsprefix_ = None
+        self.ReturnShipmentDetail_nsprefix_ = "ns"
         self.PendingShipmentDetail = PendingShipmentDetail
-        self.PendingShipmentDetail_nsprefix_ = None
+        self.PendingShipmentDetail_nsprefix_ = "ns"
         self.InternationalControlledExportDetail = InternationalControlledExportDetail
-        self.InternationalControlledExportDetail_nsprefix_ = None
+        self.InternationalControlledExportDetail_nsprefix_ = "ns"
         self.InternationalTrafficInArmsRegulationsDetail = InternationalTrafficInArmsRegulationsDetail
-        self.InternationalTrafficInArmsRegulationsDetail_nsprefix_ = None
+        self.InternationalTrafficInArmsRegulationsDetail_nsprefix_ = "ns"
         self.ShipmentDryIceDetail = ShipmentDryIceDetail
-        self.ShipmentDryIceDetail_nsprefix_ = None
+        self.ShipmentDryIceDetail_nsprefix_ = "ns"
         self.HomeDeliveryPremiumDetail = HomeDeliveryPremiumDetail
-        self.HomeDeliveryPremiumDetail_nsprefix_ = None
+        self.HomeDeliveryPremiumDetail_nsprefix_ = "ns"
         self.FlatbedTrailerDetail = FlatbedTrailerDetail
-        self.FlatbedTrailerDetail_nsprefix_ = None
+        self.FlatbedTrailerDetail_nsprefix_ = "ns"
         self.FreightGuaranteeDetail = FreightGuaranteeDetail
-        self.FreightGuaranteeDetail_nsprefix_ = None
+        self.FreightGuaranteeDetail_nsprefix_ = "ns"
         self.EtdDetail = EtdDetail
-        self.EtdDetail_nsprefix_ = None
+        self.EtdDetail_nsprefix_ = "ns"
         self.ExtraLaborDetail = ExtraLaborDetail
-        self.ExtraLaborDetail_nsprefix_ = None
+        self.ExtraLaborDetail_nsprefix_ = "ns"
         self.PalletShrinkwrapDetail = PalletShrinkwrapDetail
-        self.PalletShrinkwrapDetail_nsprefix_ = None
+        self.PalletShrinkwrapDetail_nsprefix_ = "ns"
         self.PalletsProvidedDetail = PalletsProvidedDetail
-        self.PalletsProvidedDetail_nsprefix_ = None
+        self.PalletsProvidedDetail_nsprefix_ = "ns"
         self.DetentionDetail = DetentionDetail
-        self.DetentionDetail_nsprefix_ = None
+        self.DetentionDetail_nsprefix_ = "ns"
         self.MarkingOrTaggingDetail = MarkingOrTaggingDetail
-        self.MarkingOrTaggingDetail_nsprefix_ = None
+        self.MarkingOrTaggingDetail_nsprefix_ = "ns"
         self.NonBusinessTimeDetail = NonBusinessTimeDetail
-        self.NonBusinessTimeDetail_nsprefix_ = None
+        self.NonBusinessTimeDetail_nsprefix_ = "ns"
         self.ShipmentAssemblyDetail = ShipmentAssemblyDetail
-        self.ShipmentAssemblyDetail_nsprefix_ = None
+        self.ShipmentAssemblyDetail_nsprefix_ = "ns"
         self.SortAndSegregateDetail = SortAndSegregateDetail
-        self.SortAndSegregateDetail_nsprefix_ = None
+        self.SortAndSegregateDetail_nsprefix_ = "ns"
         self.SpecialEquipmentDetail = SpecialEquipmentDetail
-        self.SpecialEquipmentDetail_nsprefix_ = None
+        self.SpecialEquipmentDetail_nsprefix_ = "ns"
         self.StorageDetail = StorageDetail
-        self.StorageDetail_nsprefix_ = None
+        self.StorageDetail_nsprefix_ = "ns"
         self.WeighingDetail = WeighingDetail
-        self.WeighingDetail_nsprefix_ = None
+        self.WeighingDetail_nsprefix_ = "ns"
         self.CustomDeliveryWindowDetail = CustomDeliveryWindowDetail
-        self.CustomDeliveryWindowDetail_nsprefix_ = None
+        self.CustomDeliveryWindowDetail_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -14015,6 +18787,136 @@ class ShipmentSpecialServicesRequested(GeneratedsSuper):
 # end class ShipmentSpecialServicesRequested
 
 
+class SignatureOptionDetail(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, OptionType=None, SignatureReleaseNumber=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.OptionType = OptionType
+        self.validate_SignatureOptionType(self.OptionType)
+        self.OptionType_nsprefix_ = "ns"
+        self.SignatureReleaseNumber = SignatureReleaseNumber
+        self.SignatureReleaseNumber_nsprefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, SignatureOptionDetail)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if SignatureOptionDetail.subclass:
+            return SignatureOptionDetail.subclass(*args_, **kwargs_)
+        else:
+            return SignatureOptionDetail(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_OptionType(self):
+        return self.OptionType
+    def set_OptionType(self, OptionType):
+        self.OptionType = OptionType
+    def get_SignatureReleaseNumber(self):
+        return self.SignatureReleaseNumber
+    def set_SignatureReleaseNumber(self, SignatureReleaseNumber):
+        self.SignatureReleaseNumber = SignatureReleaseNumber
+    def validate_SignatureOptionType(self, value):
+        result = True
+        # Validate type SignatureOptionType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['ADULT', 'DIRECT', 'INDIRECT', 'NO_SIGNATURE_REQUIRED', 'SERVICE_DEFAULT']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on SignatureOptionType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def hasContent_(self):
+        if (
+            self.OptionType is not None or
+            self.SignatureReleaseNumber is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='SignatureOptionDetail', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('SignatureOptionDetail')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'SignatureOptionDetail':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='SignatureOptionDetail')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='SignatureOptionDetail', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='SignatureOptionDetail'):
+        pass
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='SignatureOptionDetail', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.OptionType is not None:
+            namespaceprefix_ = self.OptionType_nsprefix_ + ':' if (UseCapturedNS_ and self.OptionType_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sOptionType>%s</%sOptionType>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.OptionType), input_name='OptionType')), namespaceprefix_ , eol_))
+        if self.SignatureReleaseNumber is not None:
+            namespaceprefix_ = self.SignatureReleaseNumber_nsprefix_ + ':' if (UseCapturedNS_ and self.SignatureReleaseNumber_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sSignatureReleaseNumber>%s</%sSignatureReleaseNumber>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.SignatureReleaseNumber), input_name='SignatureReleaseNumber')), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'OptionType':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'OptionType')
+            value_ = self.gds_validate_string(value_, node, 'OptionType')
+            self.OptionType = value_
+            self.OptionType_nsprefix_ = child_.prefix
+            # validate type SignatureOptionType
+            self.validate_SignatureOptionType(self.OptionType)
+        elif nodeName_ == 'SignatureReleaseNumber':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'SignatureReleaseNumber')
+            value_ = self.gds_validate_string(value_, node, 'SignatureReleaseNumber')
+            self.SignatureReleaseNumber = value_
+            self.SignatureReleaseNumber_nsprefix_ = child_.prefix
+# end class SignatureOptionDetail
+
+
 class SmsDetail(GeneratedsSuper):
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
@@ -14141,7 +19043,7 @@ class SortAndSegregateDetail(GeneratedsSuper):
         self.PieceCount = PieceCount
         self.PieceCount_nsprefix_ = None
         self.Weight = Weight
-        self.Weight_nsprefix_ = None
+        self.Weight_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -14256,7 +19158,7 @@ class SpecialEquipmentDetail(GeneratedsSuper):
             self.LineItems = []
         else:
             self.LineItems = LineItems
-        self.LineItems_nsprefix_ = None
+        self.LineItems_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -14358,7 +19260,7 @@ class SpecialEquipmentLineItem(GeneratedsSuper):
         self.ns_prefix_ = None
         self.Type = Type
         self.validate_SpecialEquipmentType(self.Type)
-        self.Type_nsprefix_ = None
+        self.Type_nsprefix_ = "ns"
         self.Duration = Duration
         self.Duration_nsprefix_ = None
     def factory(*args_, **kwargs_):
@@ -14584,7 +19486,7 @@ class TaxpayerIdentification(GeneratedsSuper):
         self.ns_prefix_ = None
         self.TinType = TinType
         self.validate_TinType(self.TinType)
-        self.TinType_nsprefix_ = None
+        self.TinType_nsprefix_ = "ns"
         self.Number = Number
         self.Number_nsprefix_ = None
         self.Usage = Usage
@@ -14771,7 +19673,7 @@ class TrackingId(GeneratedsSuper):
         self.ns_prefix_ = None
         self.TrackingIdType = TrackingIdType
         self.validate_TrackingIdType(self.TrackingIdType)
-        self.TrackingIdType_nsprefix_ = None
+        self.TrackingIdType_nsprefix_ = "ns"
         self.FormId = FormId
         self.FormId_nsprefix_ = None
         self.UspsApplicationId = UspsApplicationId
@@ -14818,7 +19720,7 @@ class TrackingId(GeneratedsSuper):
                 self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
                 return False
             value = value
-            enumerations = ['EXPRESS', 'FEDEX', 'FREIGHT', 'GROUND', 'USPS']
+            enumerations = ['EXPRESS', 'FEDEX', 'FREIGHT', 'GROUND', 'INTERNAL', 'UNKNOWN', 'USPS']
             if value not in enumerations:
                 lineno = self.gds_get_node_lineno_()
                 self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on TrackingIdType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
@@ -14927,7 +19829,7 @@ class TransactionDetail(GeneratedsSuper):
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, CustomerTransactionId=None, Localization=None, gds_collector_=None, **kwargs_):
+    def __init__(self, CustomerTransactionId=None, Localization=None, InternalTransactionId=None, Tracing=None, SourceFormat=None, Environment=None, gds_collector_=None, **kwargs_):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
@@ -14936,7 +19838,17 @@ class TransactionDetail(GeneratedsSuper):
         self.CustomerTransactionId = CustomerTransactionId
         self.CustomerTransactionId_nsprefix_ = None
         self.Localization = Localization
-        self.Localization_nsprefix_ = None
+        self.Localization_nsprefix_ = "ns"
+        self.InternalTransactionId = InternalTransactionId
+        self.InternalTransactionId_nsprefix_ = None
+        self.Tracing = Tracing
+        self.Tracing_nsprefix_ = None
+        self.SourceFormat = SourceFormat
+        self.validate_TransactionSourceFormat(self.SourceFormat)
+        self.SourceFormat_nsprefix_ = "ns"
+        self.Environment = Environment
+        self.validate_WebServiceEnvironment(self.Environment)
+        self.Environment_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -14960,10 +19872,60 @@ class TransactionDetail(GeneratedsSuper):
         return self.Localization
     def set_Localization(self, Localization):
         self.Localization = Localization
+    def get_InternalTransactionId(self):
+        return self.InternalTransactionId
+    def set_InternalTransactionId(self, InternalTransactionId):
+        self.InternalTransactionId = InternalTransactionId
+    def get_Tracing(self):
+        return self.Tracing
+    def set_Tracing(self, Tracing):
+        self.Tracing = Tracing
+    def get_SourceFormat(self):
+        return self.SourceFormat
+    def set_SourceFormat(self, SourceFormat):
+        self.SourceFormat = SourceFormat
+    def get_Environment(self):
+        return self.Environment
+    def set_Environment(self, Environment):
+        self.Environment = Environment
+    def validate_TransactionSourceFormat(self, value):
+        result = True
+        # Validate type TransactionSourceFormat, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['API_CTS', 'API_XML', 'DIRECT', 'DIRECT_XML', 'FXRS_CTS', 'UNKNOWN', 'WSI_XML']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on TransactionSourceFormat' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_WebServiceEnvironment(self, value):
+        result = True
+        # Validate type WebServiceEnvironment, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['PRODUCTION', 'TEST']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on WebServiceEnvironment' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
     def hasContent_(self):
         if (
             self.CustomerTransactionId is not None or
-            self.Localization is not None
+            self.Localization is not None or
+            self.InternalTransactionId is not None or
+            self.Tracing is not None or
+            self.SourceFormat is not None or
+            self.Environment is not None
         ):
             return True
         else:
@@ -15005,6 +19967,22 @@ class TransactionDetail(GeneratedsSuper):
         if self.Localization is not None:
             namespaceprefix_ = self.Localization_nsprefix_ + ':' if (UseCapturedNS_ and self.Localization_nsprefix_) else ''
             self.Localization.export(outfile, level, namespaceprefix_, namespacedef_='', name_='Localization', pretty_print=pretty_print)
+        if self.InternalTransactionId is not None:
+            namespaceprefix_ = self.InternalTransactionId_nsprefix_ + ':' if (UseCapturedNS_ and self.InternalTransactionId_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sInternalTransactionId>%s</%sInternalTransactionId>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.InternalTransactionId), input_name='InternalTransactionId')), namespaceprefix_ , eol_))
+        if self.Tracing is not None:
+            namespaceprefix_ = self.Tracing_nsprefix_ + ':' if (UseCapturedNS_ and self.Tracing_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sTracing>%s</%sTracing>%s' % (namespaceprefix_ , self.gds_format_boolean(self.Tracing, input_name='Tracing'), namespaceprefix_ , eol_))
+        if self.SourceFormat is not None:
+            namespaceprefix_ = self.SourceFormat_nsprefix_ + ':' if (UseCapturedNS_ and self.SourceFormat_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sSourceFormat>%s</%sSourceFormat>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.SourceFormat), input_name='SourceFormat')), namespaceprefix_ , eol_))
+        if self.Environment is not None:
+            namespaceprefix_ = self.Environment_nsprefix_ + ':' if (UseCapturedNS_ and self.Environment_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sEnvironment>%s</%sEnvironment>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Environment), input_name='Environment')), namespaceprefix_ , eol_))
     def build(self, node, gds_collector_=None):
         self.gds_collector_ = gds_collector_
         if SaveElementTreeNode:
@@ -15030,7 +20008,960 @@ class TransactionDetail(GeneratedsSuper):
             obj_.build(child_, gds_collector_=gds_collector_)
             self.Localization = obj_
             obj_.original_tagname_ = 'Localization'
+        elif nodeName_ == 'InternalTransactionId':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'InternalTransactionId')
+            value_ = self.gds_validate_string(value_, node, 'InternalTransactionId')
+            self.InternalTransactionId = value_
+            self.InternalTransactionId_nsprefix_ = child_.prefix
+        elif nodeName_ == 'Tracing':
+            sval_ = child_.text
+            ival_ = self.gds_parse_boolean(sval_, node, 'Tracing')
+            ival_ = self.gds_validate_boolean(ival_, node, 'Tracing')
+            self.Tracing = ival_
+            self.Tracing_nsprefix_ = child_.prefix
+        elif nodeName_ == 'SourceFormat':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'SourceFormat')
+            value_ = self.gds_validate_string(value_, node, 'SourceFormat')
+            self.SourceFormat = value_
+            self.SourceFormat_nsprefix_ = child_.prefix
+            # validate type TransactionSourceFormat
+            self.validate_TransactionSourceFormat(self.SourceFormat)
+        elif nodeName_ == 'Environment':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Environment')
+            value_ = self.gds_validate_string(value_, node, 'Environment')
+            self.Environment = value_
+            self.Environment_nsprefix_ = child_.prefix
+            # validate type WebServiceEnvironment
+            self.validate_WebServiceEnvironment(self.Environment)
 # end class TransactionDetail
+
+
+class UpdatePickupReply(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, HighestSeverity=None, Notifications=None, TransactionDetail=None, Version=None, PickupConfirmationNumber=None, Location=None, MessageCode=None, Message=None, PRPControlNumber=None, LastAccessTime=None, LastChangeTimestamp=None, CompletedFreightPickupDetail=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.HighestSeverity = HighestSeverity
+        self.validate_NotificationSeverityType(self.HighestSeverity)
+        self.HighestSeverity_nsprefix_ = "ns"
+        if Notifications is None:
+            self.Notifications = []
+        else:
+            self.Notifications = Notifications
+        self.Notifications_nsprefix_ = "ns"
+        self.TransactionDetail = TransactionDetail
+        self.TransactionDetail_nsprefix_ = "ns"
+        self.Version = Version
+        self.Version_nsprefix_ = "ns"
+        self.PickupConfirmationNumber = PickupConfirmationNumber
+        self.PickupConfirmationNumber_nsprefix_ = None
+        self.Location = Location
+        self.Location_nsprefix_ = None
+        self.MessageCode = MessageCode
+        self.MessageCode_nsprefix_ = None
+        self.Message = Message
+        self.Message_nsprefix_ = None
+        self.PRPControlNumber = PRPControlNumber
+        self.PRPControlNumber_nsprefix_ = None
+        if isinstance(LastAccessTime, BaseStrType_):
+            initvalue_ = datetime_.datetime.strptime(LastAccessTime, '%H:%M:%S').time()
+        else:
+            initvalue_ = LastAccessTime
+        self.LastAccessTime = initvalue_
+        self.LastAccessTime_nsprefix_ = None
+        if isinstance(LastChangeTimestamp, BaseStrType_):
+            initvalue_ = datetime_.datetime.strptime(LastChangeTimestamp, '%Y-%m-%dT%H:%M:%S')
+        else:
+            initvalue_ = LastChangeTimestamp
+        self.LastChangeTimestamp = initvalue_
+        self.LastChangeTimestamp_nsprefix_ = None
+        self.CompletedFreightPickupDetail = CompletedFreightPickupDetail
+        self.CompletedFreightPickupDetail_nsprefix_ = "ns"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, UpdatePickupReply)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if UpdatePickupReply.subclass:
+            return UpdatePickupReply.subclass(*args_, **kwargs_)
+        else:
+            return UpdatePickupReply(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_HighestSeverity(self):
+        return self.HighestSeverity
+    def set_HighestSeverity(self, HighestSeverity):
+        self.HighestSeverity = HighestSeverity
+    def get_Notifications(self):
+        return self.Notifications
+    def set_Notifications(self, Notifications):
+        self.Notifications = Notifications
+    def add_Notifications(self, value):
+        self.Notifications.append(value)
+    def insert_Notifications_at(self, index, value):
+        self.Notifications.insert(index, value)
+    def replace_Notifications_at(self, index, value):
+        self.Notifications[index] = value
+    def get_TransactionDetail(self):
+        return self.TransactionDetail
+    def set_TransactionDetail(self, TransactionDetail):
+        self.TransactionDetail = TransactionDetail
+    def get_Version(self):
+        return self.Version
+    def set_Version(self, Version):
+        self.Version = Version
+    def get_PickupConfirmationNumber(self):
+        return self.PickupConfirmationNumber
+    def set_PickupConfirmationNumber(self, PickupConfirmationNumber):
+        self.PickupConfirmationNumber = PickupConfirmationNumber
+    def get_Location(self):
+        return self.Location
+    def set_Location(self, Location):
+        self.Location = Location
+    def get_MessageCode(self):
+        return self.MessageCode
+    def set_MessageCode(self, MessageCode):
+        self.MessageCode = MessageCode
+    def get_Message(self):
+        return self.Message
+    def set_Message(self, Message):
+        self.Message = Message
+    def get_PRPControlNumber(self):
+        return self.PRPControlNumber
+    def set_PRPControlNumber(self, PRPControlNumber):
+        self.PRPControlNumber = PRPControlNumber
+    def get_LastAccessTime(self):
+        return self.LastAccessTime
+    def set_LastAccessTime(self, LastAccessTime):
+        self.LastAccessTime = LastAccessTime
+    def get_LastChangeTimestamp(self):
+        return self.LastChangeTimestamp
+    def set_LastChangeTimestamp(self, LastChangeTimestamp):
+        self.LastChangeTimestamp = LastChangeTimestamp
+    def get_CompletedFreightPickupDetail(self):
+        return self.CompletedFreightPickupDetail
+    def set_CompletedFreightPickupDetail(self, CompletedFreightPickupDetail):
+        self.CompletedFreightPickupDetail = CompletedFreightPickupDetail
+    def validate_NotificationSeverityType(self, value):
+        result = True
+        # Validate type NotificationSeverityType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['ERROR', 'FAILURE', 'NOTE', 'SUCCESS', 'WARNING']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on NotificationSeverityType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def hasContent_(self):
+        if (
+            self.HighestSeverity is not None or
+            self.Notifications or
+            self.TransactionDetail is not None or
+            self.Version is not None or
+            self.PickupConfirmationNumber is not None or
+            self.Location is not None or
+            self.MessageCode is not None or
+            self.Message is not None or
+            self.PRPControlNumber is not None or
+            self.LastAccessTime is not None or
+            self.LastChangeTimestamp is not None or
+            self.CompletedFreightPickupDetail is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='UpdatePickupReply', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('UpdatePickupReply')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'UpdatePickupReply':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='UpdatePickupReply')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='UpdatePickupReply', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='UpdatePickupReply'):
+        pass
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='UpdatePickupReply', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.HighestSeverity is not None:
+            namespaceprefix_ = self.HighestSeverity_nsprefix_ + ':' if (UseCapturedNS_ and self.HighestSeverity_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sHighestSeverity>%s</%sHighestSeverity>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.HighestSeverity), input_name='HighestSeverity')), namespaceprefix_ , eol_))
+        for Notifications_ in self.Notifications:
+            namespaceprefix_ = self.Notifications_nsprefix_ + ':' if (UseCapturedNS_ and self.Notifications_nsprefix_) else ''
+            Notifications_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='Notifications', pretty_print=pretty_print)
+        if self.TransactionDetail is not None:
+            namespaceprefix_ = self.TransactionDetail_nsprefix_ + ':' if (UseCapturedNS_ and self.TransactionDetail_nsprefix_) else ''
+            self.TransactionDetail.export(outfile, level, namespaceprefix_, namespacedef_='', name_='TransactionDetail', pretty_print=pretty_print)
+        if self.Version is not None:
+            namespaceprefix_ = self.Version_nsprefix_ + ':' if (UseCapturedNS_ and self.Version_nsprefix_) else ''
+            self.Version.export(outfile, level, namespaceprefix_, namespacedef_='', name_='Version', pretty_print=pretty_print)
+        if self.PickupConfirmationNumber is not None:
+            namespaceprefix_ = self.PickupConfirmationNumber_nsprefix_ + ':' if (UseCapturedNS_ and self.PickupConfirmationNumber_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sPickupConfirmationNumber>%s</%sPickupConfirmationNumber>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.PickupConfirmationNumber), input_name='PickupConfirmationNumber')), namespaceprefix_ , eol_))
+        if self.Location is not None:
+            namespaceprefix_ = self.Location_nsprefix_ + ':' if (UseCapturedNS_ and self.Location_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sLocation>%s</%sLocation>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Location), input_name='Location')), namespaceprefix_ , eol_))
+        if self.MessageCode is not None:
+            namespaceprefix_ = self.MessageCode_nsprefix_ + ':' if (UseCapturedNS_ and self.MessageCode_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sMessageCode>%s</%sMessageCode>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.MessageCode), input_name='MessageCode')), namespaceprefix_ , eol_))
+        if self.Message is not None:
+            namespaceprefix_ = self.Message_nsprefix_ + ':' if (UseCapturedNS_ and self.Message_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sMessage>%s</%sMessage>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Message), input_name='Message')), namespaceprefix_ , eol_))
+        if self.PRPControlNumber is not None:
+            namespaceprefix_ = self.PRPControlNumber_nsprefix_ + ':' if (UseCapturedNS_ and self.PRPControlNumber_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sPRPControlNumber>%s</%sPRPControlNumber>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.PRPControlNumber), input_name='PRPControlNumber')), namespaceprefix_ , eol_))
+        if self.LastAccessTime is not None:
+            namespaceprefix_ = self.LastAccessTime_nsprefix_ + ':' if (UseCapturedNS_ and self.LastAccessTime_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sLastAccessTime>%s</%sLastAccessTime>%s' % (namespaceprefix_ , self.gds_format_time(self.LastAccessTime, input_name='LastAccessTime'), namespaceprefix_ , eol_))
+        if self.LastChangeTimestamp is not None:
+            namespaceprefix_ = self.LastChangeTimestamp_nsprefix_ + ':' if (UseCapturedNS_ and self.LastChangeTimestamp_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sLastChangeTimestamp>%s</%sLastChangeTimestamp>%s' % (namespaceprefix_ , self.gds_format_datetime(self.LastChangeTimestamp, input_name='LastChangeTimestamp'), namespaceprefix_ , eol_))
+        if self.CompletedFreightPickupDetail is not None:
+            namespaceprefix_ = self.CompletedFreightPickupDetail_nsprefix_ + ':' if (UseCapturedNS_ and self.CompletedFreightPickupDetail_nsprefix_) else ''
+            self.CompletedFreightPickupDetail.export(outfile, level, namespaceprefix_, namespacedef_='', name_='CompletedFreightPickupDetail', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'HighestSeverity':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'HighestSeverity')
+            value_ = self.gds_validate_string(value_, node, 'HighestSeverity')
+            self.HighestSeverity = value_
+            self.HighestSeverity_nsprefix_ = child_.prefix
+            # validate type NotificationSeverityType
+            self.validate_NotificationSeverityType(self.HighestSeverity)
+        elif nodeName_ == 'Notifications':
+            obj_ = Notification.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Notifications.append(obj_)
+            obj_.original_tagname_ = 'Notifications'
+        elif nodeName_ == 'TransactionDetail':
+            obj_ = TransactionDetail.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.TransactionDetail = obj_
+            obj_.original_tagname_ = 'TransactionDetail'
+        elif nodeName_ == 'Version':
+            obj_ = VersionId.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Version = obj_
+            obj_.original_tagname_ = 'Version'
+        elif nodeName_ == 'PickupConfirmationNumber':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'PickupConfirmationNumber')
+            value_ = self.gds_validate_string(value_, node, 'PickupConfirmationNumber')
+            self.PickupConfirmationNumber = value_
+            self.PickupConfirmationNumber_nsprefix_ = child_.prefix
+        elif nodeName_ == 'Location':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Location')
+            value_ = self.gds_validate_string(value_, node, 'Location')
+            self.Location = value_
+            self.Location_nsprefix_ = child_.prefix
+        elif nodeName_ == 'MessageCode':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'MessageCode')
+            value_ = self.gds_validate_string(value_, node, 'MessageCode')
+            self.MessageCode = value_
+            self.MessageCode_nsprefix_ = child_.prefix
+        elif nodeName_ == 'Message':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Message')
+            value_ = self.gds_validate_string(value_, node, 'Message')
+            self.Message = value_
+            self.Message_nsprefix_ = child_.prefix
+        elif nodeName_ == 'PRPControlNumber':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'PRPControlNumber')
+            value_ = self.gds_validate_string(value_, node, 'PRPControlNumber')
+            self.PRPControlNumber = value_
+            self.PRPControlNumber_nsprefix_ = child_.prefix
+        elif nodeName_ == 'LastAccessTime':
+            sval_ = child_.text
+            dval_ = self.gds_parse_time(sval_)
+            self.LastAccessTime = dval_
+            self.LastAccessTime_nsprefix_ = child_.prefix
+        elif nodeName_ == 'LastChangeTimestamp':
+            sval_ = child_.text
+            dval_ = self.gds_parse_datetime(sval_)
+            self.LastChangeTimestamp = dval_
+            self.LastChangeTimestamp_nsprefix_ = child_.prefix
+        elif nodeName_ == 'CompletedFreightPickupDetail':
+            obj_ = CompletedFreightPickupDetail.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.CompletedFreightPickupDetail = obj_
+            obj_.original_tagname_ = 'CompletedFreightPickupDetail'
+# end class UpdatePickupReply
+
+
+class UpdatePickupRequest(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, WebAuthenticationDetail=None, ClientDetail=None, UserDetail=None, TransactionDetail=None, Version=None, ApplicationId=None, ProcessingOptions=None, PickupConfirmationNumber=None, ScheduledDate=None, Reason=None, Comments=None, TemporaryCustomerId=None, AssociatedAccountNumber=None, OriginDetail=None, PickupServiceCategory=None, FreightPickupDetail=None, ExpressFreightDetail=None, TagDetail=None, RequestedExpressPickupDetail=None, PickupType=None, PackageCount=None, TotalWeight=None, CarrierCode=None, OversizePackageCount=None, Remarks=None, CommodityDescription=None, CountryRelationship=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.WebAuthenticationDetail = WebAuthenticationDetail
+        self.WebAuthenticationDetail_nsprefix_ = "ns"
+        self.ClientDetail = ClientDetail
+        self.ClientDetail_nsprefix_ = "ns"
+        self.UserDetail = UserDetail
+        self.UserDetail_nsprefix_ = "ns"
+        self.TransactionDetail = TransactionDetail
+        self.TransactionDetail_nsprefix_ = "ns"
+        self.Version = Version
+        self.Version_nsprefix_ = "ns"
+        self.ApplicationId = ApplicationId
+        self.ApplicationId_nsprefix_ = None
+        if ProcessingOptions is None:
+            self.ProcessingOptions = []
+        else:
+            self.ProcessingOptions = ProcessingOptions
+        self.ProcessingOptions_nsprefix_ = "ns"
+        self.PickupConfirmationNumber = PickupConfirmationNumber
+        self.PickupConfirmationNumber_nsprefix_ = None
+        if isinstance(ScheduledDate, BaseStrType_):
+            initvalue_ = datetime_.datetime.strptime(ScheduledDate, '%Y-%m-%d').date()
+        else:
+            initvalue_ = ScheduledDate
+        self.ScheduledDate = initvalue_
+        self.ScheduledDate_nsprefix_ = None
+        self.Reason = Reason
+        self.Reason_nsprefix_ = None
+        self.Comments = Comments
+        self.Comments_nsprefix_ = None
+        self.TemporaryCustomerId = TemporaryCustomerId
+        self.TemporaryCustomerId_nsprefix_ = None
+        self.AssociatedAccountNumber = AssociatedAccountNumber
+        self.AssociatedAccountNumber_nsprefix_ = "ns"
+        self.OriginDetail = OriginDetail
+        self.OriginDetail_nsprefix_ = "ns"
+        self.PickupServiceCategory = PickupServiceCategory
+        self.validate_PickupServiceCategoryType(self.PickupServiceCategory)
+        self.PickupServiceCategory_nsprefix_ = "ns"
+        self.FreightPickupDetail = FreightPickupDetail
+        self.FreightPickupDetail_nsprefix_ = "ns"
+        self.ExpressFreightDetail = ExpressFreightDetail
+        self.ExpressFreightDetail_nsprefix_ = "ns"
+        self.TagDetail = TagDetail
+        self.TagDetail_nsprefix_ = "ns"
+        self.RequestedExpressPickupDetail = RequestedExpressPickupDetail
+        self.RequestedExpressPickupDetail_nsprefix_ = "ns"
+        self.PickupType = PickupType
+        self.validate_PickupType(self.PickupType)
+        self.PickupType_nsprefix_ = "ns"
+        self.PackageCount = PackageCount
+        self.PackageCount_nsprefix_ = None
+        self.TotalWeight = TotalWeight
+        self.TotalWeight_nsprefix_ = "ns"
+        self.CarrierCode = CarrierCode
+        self.validate_CarrierCodeType(self.CarrierCode)
+        self.CarrierCode_nsprefix_ = "ns"
+        self.OversizePackageCount = OversizePackageCount
+        self.OversizePackageCount_nsprefix_ = None
+        self.Remarks = Remarks
+        self.Remarks_nsprefix_ = None
+        self.CommodityDescription = CommodityDescription
+        self.CommodityDescription_nsprefix_ = None
+        self.CountryRelationship = CountryRelationship
+        self.validate_CountryRelationshipType(self.CountryRelationship)
+        self.CountryRelationship_nsprefix_ = "ns"
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, UpdatePickupRequest)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if UpdatePickupRequest.subclass:
+            return UpdatePickupRequest.subclass(*args_, **kwargs_)
+        else:
+            return UpdatePickupRequest(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_WebAuthenticationDetail(self):
+        return self.WebAuthenticationDetail
+    def set_WebAuthenticationDetail(self, WebAuthenticationDetail):
+        self.WebAuthenticationDetail = WebAuthenticationDetail
+    def get_ClientDetail(self):
+        return self.ClientDetail
+    def set_ClientDetail(self, ClientDetail):
+        self.ClientDetail = ClientDetail
+    def get_UserDetail(self):
+        return self.UserDetail
+    def set_UserDetail(self, UserDetail):
+        self.UserDetail = UserDetail
+    def get_TransactionDetail(self):
+        return self.TransactionDetail
+    def set_TransactionDetail(self, TransactionDetail):
+        self.TransactionDetail = TransactionDetail
+    def get_Version(self):
+        return self.Version
+    def set_Version(self, Version):
+        self.Version = Version
+    def get_ApplicationId(self):
+        return self.ApplicationId
+    def set_ApplicationId(self, ApplicationId):
+        self.ApplicationId = ApplicationId
+    def get_ProcessingOptions(self):
+        return self.ProcessingOptions
+    def set_ProcessingOptions(self, ProcessingOptions):
+        self.ProcessingOptions = ProcessingOptions
+    def add_ProcessingOptions(self, value):
+        self.ProcessingOptions.append(value)
+    def insert_ProcessingOptions_at(self, index, value):
+        self.ProcessingOptions.insert(index, value)
+    def replace_ProcessingOptions_at(self, index, value):
+        self.ProcessingOptions[index] = value
+    def get_PickupConfirmationNumber(self):
+        return self.PickupConfirmationNumber
+    def set_PickupConfirmationNumber(self, PickupConfirmationNumber):
+        self.PickupConfirmationNumber = PickupConfirmationNumber
+    def get_ScheduledDate(self):
+        return self.ScheduledDate
+    def set_ScheduledDate(self, ScheduledDate):
+        self.ScheduledDate = ScheduledDate
+    def get_Reason(self):
+        return self.Reason
+    def set_Reason(self, Reason):
+        self.Reason = Reason
+    def get_Comments(self):
+        return self.Comments
+    def set_Comments(self, Comments):
+        self.Comments = Comments
+    def get_TemporaryCustomerId(self):
+        return self.TemporaryCustomerId
+    def set_TemporaryCustomerId(self, TemporaryCustomerId):
+        self.TemporaryCustomerId = TemporaryCustomerId
+    def get_AssociatedAccountNumber(self):
+        return self.AssociatedAccountNumber
+    def set_AssociatedAccountNumber(self, AssociatedAccountNumber):
+        self.AssociatedAccountNumber = AssociatedAccountNumber
+    def get_OriginDetail(self):
+        return self.OriginDetail
+    def set_OriginDetail(self, OriginDetail):
+        self.OriginDetail = OriginDetail
+    def get_PickupServiceCategory(self):
+        return self.PickupServiceCategory
+    def set_PickupServiceCategory(self, PickupServiceCategory):
+        self.PickupServiceCategory = PickupServiceCategory
+    def get_FreightPickupDetail(self):
+        return self.FreightPickupDetail
+    def set_FreightPickupDetail(self, FreightPickupDetail):
+        self.FreightPickupDetail = FreightPickupDetail
+    def get_ExpressFreightDetail(self):
+        return self.ExpressFreightDetail
+    def set_ExpressFreightDetail(self, ExpressFreightDetail):
+        self.ExpressFreightDetail = ExpressFreightDetail
+    def get_TagDetail(self):
+        return self.TagDetail
+    def set_TagDetail(self, TagDetail):
+        self.TagDetail = TagDetail
+    def get_RequestedExpressPickupDetail(self):
+        return self.RequestedExpressPickupDetail
+    def set_RequestedExpressPickupDetail(self, RequestedExpressPickupDetail):
+        self.RequestedExpressPickupDetail = RequestedExpressPickupDetail
+    def get_PickupType(self):
+        return self.PickupType
+    def set_PickupType(self, PickupType):
+        self.PickupType = PickupType
+    def get_PackageCount(self):
+        return self.PackageCount
+    def set_PackageCount(self, PackageCount):
+        self.PackageCount = PackageCount
+    def get_TotalWeight(self):
+        return self.TotalWeight
+    def set_TotalWeight(self, TotalWeight):
+        self.TotalWeight = TotalWeight
+    def get_CarrierCode(self):
+        return self.CarrierCode
+    def set_CarrierCode(self, CarrierCode):
+        self.CarrierCode = CarrierCode
+    def get_OversizePackageCount(self):
+        return self.OversizePackageCount
+    def set_OversizePackageCount(self, OversizePackageCount):
+        self.OversizePackageCount = OversizePackageCount
+    def get_Remarks(self):
+        return self.Remarks
+    def set_Remarks(self, Remarks):
+        self.Remarks = Remarks
+    def get_CommodityDescription(self):
+        return self.CommodityDescription
+    def set_CommodityDescription(self, CommodityDescription):
+        self.CommodityDescription = CommodityDescription
+    def get_CountryRelationship(self):
+        return self.CountryRelationship
+    def set_CountryRelationship(self, CountryRelationship):
+        self.CountryRelationship = CountryRelationship
+    def validate_UpdatePickupRequestProcessingOptionType(self, value):
+        result = True
+        # Validate type UpdatePickupRequestProcessingOptionType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['OVERRIDE_CUTOFF', 'REACTIVATE_CANCELLED_PICKUP']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on UpdatePickupRequestProcessingOptionType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_PickupServiceCategoryType(self, value):
+        result = True
+        # Validate type PickupServiceCategoryType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['FEDEX_DISTANCE_DEFERRED', 'FEDEX_NEXT_DAY_AFTERNOON', 'FEDEX_NEXT_DAY_EARLY_MORNING', 'FEDEX_NEXT_DAY_END_OF_DAY', 'FEDEX_NEXT_DAY_FREIGHT', 'FEDEX_NEXT_DAY_MID_MORNING', 'SAME_DAY', 'SAME_DAY_CITY']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on PickupServiceCategoryType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_PickupType(self, value):
+        result = True
+        # Validate type PickupType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['ON_CALL', 'PACKAGE_RETURN_PROGRAM', 'REGULAR_STOP', 'REGULAR_STOP_WITH_AUTO_CANCEL', 'TAG']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on PickupType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_CarrierCodeType(self, value):
+        result = True
+        # Validate type CarrierCodeType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['FDXC', 'FDXE', 'FDXG', 'FDXO', 'FXCC', 'FXFR', 'FXSP']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on CarrierCodeType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_CountryRelationshipType(self, value):
+        result = True
+        # Validate type CountryRelationshipType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['DOMESTIC', 'INTERNATIONAL']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on CountryRelationshipType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def hasContent_(self):
+        if (
+            self.WebAuthenticationDetail is not None or
+            self.ClientDetail is not None or
+            self.UserDetail is not None or
+            self.TransactionDetail is not None or
+            self.Version is not None or
+            self.ApplicationId is not None or
+            self.ProcessingOptions or
+            self.PickupConfirmationNumber is not None or
+            self.ScheduledDate is not None or
+            self.Reason is not None or
+            self.Comments is not None or
+            self.TemporaryCustomerId is not None or
+            self.AssociatedAccountNumber is not None or
+            self.OriginDetail is not None or
+            self.PickupServiceCategory is not None or
+            self.FreightPickupDetail is not None or
+            self.ExpressFreightDetail is not None or
+            self.TagDetail is not None or
+            self.RequestedExpressPickupDetail is not None or
+            self.PickupType is not None or
+            self.PackageCount is not None or
+            self.TotalWeight is not None or
+            self.CarrierCode is not None or
+            self.OversizePackageCount is not None or
+            self.Remarks is not None or
+            self.CommodityDescription is not None or
+            self.CountryRelationship is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='UpdatePickupRequest', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('UpdatePickupRequest')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'UpdatePickupRequest':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='UpdatePickupRequest')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='UpdatePickupRequest', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='UpdatePickupRequest'):
+        pass
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='UpdatePickupRequest', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.WebAuthenticationDetail is not None:
+            namespaceprefix_ = self.WebAuthenticationDetail_nsprefix_ + ':' if (UseCapturedNS_ and self.WebAuthenticationDetail_nsprefix_) else ''
+            self.WebAuthenticationDetail.export(outfile, level, namespaceprefix_, namespacedef_='', name_='WebAuthenticationDetail', pretty_print=pretty_print)
+        if self.ClientDetail is not None:
+            namespaceprefix_ = self.ClientDetail_nsprefix_ + ':' if (UseCapturedNS_ and self.ClientDetail_nsprefix_) else ''
+            self.ClientDetail.export(outfile, level, namespaceprefix_, namespacedef_='', name_='ClientDetail', pretty_print=pretty_print)
+        if self.UserDetail is not None:
+            namespaceprefix_ = self.UserDetail_nsprefix_ + ':' if (UseCapturedNS_ and self.UserDetail_nsprefix_) else ''
+            self.UserDetail.export(outfile, level, namespaceprefix_, namespacedef_='', name_='UserDetail', pretty_print=pretty_print)
+        if self.TransactionDetail is not None:
+            namespaceprefix_ = self.TransactionDetail_nsprefix_ + ':' if (UseCapturedNS_ and self.TransactionDetail_nsprefix_) else ''
+            self.TransactionDetail.export(outfile, level, namespaceprefix_, namespacedef_='', name_='TransactionDetail', pretty_print=pretty_print)
+        if self.Version is not None:
+            namespaceprefix_ = self.Version_nsprefix_ + ':' if (UseCapturedNS_ and self.Version_nsprefix_) else ''
+            self.Version.export(outfile, level, namespaceprefix_, namespacedef_='', name_='Version', pretty_print=pretty_print)
+        if self.ApplicationId is not None:
+            namespaceprefix_ = self.ApplicationId_nsprefix_ + ':' if (UseCapturedNS_ and self.ApplicationId_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sApplicationId>%s</%sApplicationId>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.ApplicationId), input_name='ApplicationId')), namespaceprefix_ , eol_))
+        for ProcessingOptions_ in self.ProcessingOptions:
+            namespaceprefix_ = self.ProcessingOptions_nsprefix_ + ':' if (UseCapturedNS_ and self.ProcessingOptions_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sProcessingOptions>%s</%sProcessingOptions>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(ProcessingOptions_), input_name='ProcessingOptions')), namespaceprefix_ , eol_))
+        if self.PickupConfirmationNumber is not None:
+            namespaceprefix_ = self.PickupConfirmationNumber_nsprefix_ + ':' if (UseCapturedNS_ and self.PickupConfirmationNumber_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sPickupConfirmationNumber>%s</%sPickupConfirmationNumber>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.PickupConfirmationNumber), input_name='PickupConfirmationNumber')), namespaceprefix_ , eol_))
+        if self.ScheduledDate is not None:
+            namespaceprefix_ = self.ScheduledDate_nsprefix_ + ':' if (UseCapturedNS_ and self.ScheduledDate_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sScheduledDate>%s</%sScheduledDate>%s' % (namespaceprefix_ , self.gds_format_date(self.ScheduledDate, input_name='ScheduledDate'), namespaceprefix_ , eol_))
+        if self.Reason is not None:
+            namespaceprefix_ = self.Reason_nsprefix_ + ':' if (UseCapturedNS_ and self.Reason_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sReason>%s</%sReason>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Reason), input_name='Reason')), namespaceprefix_ , eol_))
+        if self.Comments is not None:
+            namespaceprefix_ = self.Comments_nsprefix_ + ':' if (UseCapturedNS_ and self.Comments_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sComments>%s</%sComments>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Comments), input_name='Comments')), namespaceprefix_ , eol_))
+        if self.TemporaryCustomerId is not None:
+            namespaceprefix_ = self.TemporaryCustomerId_nsprefix_ + ':' if (UseCapturedNS_ and self.TemporaryCustomerId_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sTemporaryCustomerId>%s</%sTemporaryCustomerId>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.TemporaryCustomerId), input_name='TemporaryCustomerId')), namespaceprefix_ , eol_))
+        if self.AssociatedAccountNumber is not None:
+            namespaceprefix_ = self.AssociatedAccountNumber_nsprefix_ + ':' if (UseCapturedNS_ and self.AssociatedAccountNumber_nsprefix_) else ''
+            self.AssociatedAccountNumber.export(outfile, level, namespaceprefix_, namespacedef_='', name_='AssociatedAccountNumber', pretty_print=pretty_print)
+        if self.OriginDetail is not None:
+            namespaceprefix_ = self.OriginDetail_nsprefix_ + ':' if (UseCapturedNS_ and self.OriginDetail_nsprefix_) else ''
+            self.OriginDetail.export(outfile, level, namespaceprefix_, namespacedef_='', name_='OriginDetail', pretty_print=pretty_print)
+        if self.PickupServiceCategory is not None:
+            namespaceprefix_ = self.PickupServiceCategory_nsprefix_ + ':' if (UseCapturedNS_ and self.PickupServiceCategory_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sPickupServiceCategory>%s</%sPickupServiceCategory>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.PickupServiceCategory), input_name='PickupServiceCategory')), namespaceprefix_ , eol_))
+        if self.FreightPickupDetail is not None:
+            namespaceprefix_ = self.FreightPickupDetail_nsprefix_ + ':' if (UseCapturedNS_ and self.FreightPickupDetail_nsprefix_) else ''
+            self.FreightPickupDetail.export(outfile, level, namespaceprefix_, namespacedef_='', name_='FreightPickupDetail', pretty_print=pretty_print)
+        if self.ExpressFreightDetail is not None:
+            namespaceprefix_ = self.ExpressFreightDetail_nsprefix_ + ':' if (UseCapturedNS_ and self.ExpressFreightDetail_nsprefix_) else ''
+            self.ExpressFreightDetail.export(outfile, level, namespaceprefix_, namespacedef_='', name_='ExpressFreightDetail', pretty_print=pretty_print)
+        if self.TagDetail is not None:
+            namespaceprefix_ = self.TagDetail_nsprefix_ + ':' if (UseCapturedNS_ and self.TagDetail_nsprefix_) else ''
+            self.TagDetail.export(outfile, level, namespaceprefix_, namespacedef_='', name_='TagDetail', pretty_print=pretty_print)
+        if self.RequestedExpressPickupDetail is not None:
+            namespaceprefix_ = self.RequestedExpressPickupDetail_nsprefix_ + ':' if (UseCapturedNS_ and self.RequestedExpressPickupDetail_nsprefix_) else ''
+            self.RequestedExpressPickupDetail.export(outfile, level, namespaceprefix_, namespacedef_='', name_='RequestedExpressPickupDetail', pretty_print=pretty_print)
+        if self.PickupType is not None:
+            namespaceprefix_ = self.PickupType_nsprefix_ + ':' if (UseCapturedNS_ and self.PickupType_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sPickupType>%s</%sPickupType>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.PickupType), input_name='PickupType')), namespaceprefix_ , eol_))
+        if self.PackageCount is not None:
+            namespaceprefix_ = self.PackageCount_nsprefix_ + ':' if (UseCapturedNS_ and self.PackageCount_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sPackageCount>%s</%sPackageCount>%s' % (namespaceprefix_ , self.gds_format_integer(self.PackageCount, input_name='PackageCount'), namespaceprefix_ , eol_))
+        if self.TotalWeight is not None:
+            namespaceprefix_ = self.TotalWeight_nsprefix_ + ':' if (UseCapturedNS_ and self.TotalWeight_nsprefix_) else ''
+            self.TotalWeight.export(outfile, level, namespaceprefix_, namespacedef_='', name_='TotalWeight', pretty_print=pretty_print)
+        if self.CarrierCode is not None:
+            namespaceprefix_ = self.CarrierCode_nsprefix_ + ':' if (UseCapturedNS_ and self.CarrierCode_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sCarrierCode>%s</%sCarrierCode>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.CarrierCode), input_name='CarrierCode')), namespaceprefix_ , eol_))
+        if self.OversizePackageCount is not None:
+            namespaceprefix_ = self.OversizePackageCount_nsprefix_ + ':' if (UseCapturedNS_ and self.OversizePackageCount_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sOversizePackageCount>%s</%sOversizePackageCount>%s' % (namespaceprefix_ , self.gds_format_integer(self.OversizePackageCount, input_name='OversizePackageCount'), namespaceprefix_ , eol_))
+        if self.Remarks is not None:
+            namespaceprefix_ = self.Remarks_nsprefix_ + ':' if (UseCapturedNS_ and self.Remarks_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sRemarks>%s</%sRemarks>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Remarks), input_name='Remarks')), namespaceprefix_ , eol_))
+        if self.CommodityDescription is not None:
+            namespaceprefix_ = self.CommodityDescription_nsprefix_ + ':' if (UseCapturedNS_ and self.CommodityDescription_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sCommodityDescription>%s</%sCommodityDescription>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.CommodityDescription), input_name='CommodityDescription')), namespaceprefix_ , eol_))
+        if self.CountryRelationship is not None:
+            namespaceprefix_ = self.CountryRelationship_nsprefix_ + ':' if (UseCapturedNS_ and self.CountryRelationship_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sCountryRelationship>%s</%sCountryRelationship>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.CountryRelationship), input_name='CountryRelationship')), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'WebAuthenticationDetail':
+            obj_ = WebAuthenticationDetail.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.WebAuthenticationDetail = obj_
+            obj_.original_tagname_ = 'WebAuthenticationDetail'
+        elif nodeName_ == 'ClientDetail':
+            obj_ = ClientDetail.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.ClientDetail = obj_
+            obj_.original_tagname_ = 'ClientDetail'
+        elif nodeName_ == 'UserDetail':
+            obj_ = UserDetail.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.UserDetail = obj_
+            obj_.original_tagname_ = 'UserDetail'
+        elif nodeName_ == 'TransactionDetail':
+            obj_ = TransactionDetail.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.TransactionDetail = obj_
+            obj_.original_tagname_ = 'TransactionDetail'
+        elif nodeName_ == 'Version':
+            obj_ = VersionId.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.Version = obj_
+            obj_.original_tagname_ = 'Version'
+        elif nodeName_ == 'ApplicationId':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'ApplicationId')
+            value_ = self.gds_validate_string(value_, node, 'ApplicationId')
+            self.ApplicationId = value_
+            self.ApplicationId_nsprefix_ = child_.prefix
+        elif nodeName_ == 'ProcessingOptions':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'ProcessingOptions')
+            value_ = self.gds_validate_string(value_, node, 'ProcessingOptions')
+            self.ProcessingOptions.append(value_)
+            self.ProcessingOptions_nsprefix_ = child_.prefix
+            # validate type UpdatePickupRequestProcessingOptionType
+            self.validate_UpdatePickupRequestProcessingOptionType(self.ProcessingOptions[-1])
+        elif nodeName_ == 'PickupConfirmationNumber':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'PickupConfirmationNumber')
+            value_ = self.gds_validate_string(value_, node, 'PickupConfirmationNumber')
+            self.PickupConfirmationNumber = value_
+            self.PickupConfirmationNumber_nsprefix_ = child_.prefix
+        elif nodeName_ == 'ScheduledDate':
+            sval_ = child_.text
+            dval_ = self.gds_parse_date(sval_)
+            self.ScheduledDate = dval_
+            self.ScheduledDate_nsprefix_ = child_.prefix
+        elif nodeName_ == 'Reason':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Reason')
+            value_ = self.gds_validate_string(value_, node, 'Reason')
+            self.Reason = value_
+            self.Reason_nsprefix_ = child_.prefix
+        elif nodeName_ == 'Comments':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Comments')
+            value_ = self.gds_validate_string(value_, node, 'Comments')
+            self.Comments = value_
+            self.Comments_nsprefix_ = child_.prefix
+        elif nodeName_ == 'TemporaryCustomerId':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'TemporaryCustomerId')
+            value_ = self.gds_validate_string(value_, node, 'TemporaryCustomerId')
+            self.TemporaryCustomerId = value_
+            self.TemporaryCustomerId_nsprefix_ = child_.prefix
+        elif nodeName_ == 'AssociatedAccountNumber':
+            obj_ = AssociatedAccount.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.AssociatedAccountNumber = obj_
+            obj_.original_tagname_ = 'AssociatedAccountNumber'
+        elif nodeName_ == 'OriginDetail':
+            obj_ = PickupOriginDetail.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.OriginDetail = obj_
+            obj_.original_tagname_ = 'OriginDetail'
+        elif nodeName_ == 'PickupServiceCategory':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'PickupServiceCategory')
+            value_ = self.gds_validate_string(value_, node, 'PickupServiceCategory')
+            self.PickupServiceCategory = value_
+            self.PickupServiceCategory_nsprefix_ = child_.prefix
+            # validate type PickupServiceCategoryType
+            self.validate_PickupServiceCategoryType(self.PickupServiceCategory)
+        elif nodeName_ == 'FreightPickupDetail':
+            obj_ = FreightPickupDetail.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.FreightPickupDetail = obj_
+            obj_.original_tagname_ = 'FreightPickupDetail'
+        elif nodeName_ == 'ExpressFreightDetail':
+            obj_ = ExpressFreightPickupDetail.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.ExpressFreightDetail = obj_
+            obj_.original_tagname_ = 'ExpressFreightDetail'
+        elif nodeName_ == 'TagDetail':
+            obj_ = PickupTagDetail.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.TagDetail = obj_
+            obj_.original_tagname_ = 'TagDetail'
+        elif nodeName_ == 'RequestedExpressPickupDetail':
+            obj_ = RequestedPickupShipmentDetail.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.RequestedExpressPickupDetail = obj_
+            obj_.original_tagname_ = 'RequestedExpressPickupDetail'
+        elif nodeName_ == 'PickupType':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'PickupType')
+            value_ = self.gds_validate_string(value_, node, 'PickupType')
+            self.PickupType = value_
+            self.PickupType_nsprefix_ = child_.prefix
+            # validate type PickupType
+            self.validate_PickupType(self.PickupType)
+        elif nodeName_ == 'PackageCount' and child_.text:
+            sval_ = child_.text
+            ival_ = self.gds_parse_integer(sval_, node, 'PackageCount')
+            if ival_ <= 0:
+                raise_parse_error(child_, 'requires positiveInteger')
+            ival_ = self.gds_validate_integer(ival_, node, 'PackageCount')
+            self.PackageCount = ival_
+            self.PackageCount_nsprefix_ = child_.prefix
+        elif nodeName_ == 'TotalWeight':
+            obj_ = Weight.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.TotalWeight = obj_
+            obj_.original_tagname_ = 'TotalWeight'
+        elif nodeName_ == 'CarrierCode':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'CarrierCode')
+            value_ = self.gds_validate_string(value_, node, 'CarrierCode')
+            self.CarrierCode = value_
+            self.CarrierCode_nsprefix_ = child_.prefix
+            # validate type CarrierCodeType
+            self.validate_CarrierCodeType(self.CarrierCode)
+        elif nodeName_ == 'OversizePackageCount' and child_.text:
+            sval_ = child_.text
+            ival_ = self.gds_parse_integer(sval_, node, 'OversizePackageCount')
+            if ival_ < 0:
+                raise_parse_error(child_, 'requires nonNegativeInteger')
+            ival_ = self.gds_validate_integer(ival_, node, 'OversizePackageCount')
+            self.OversizePackageCount = ival_
+            self.OversizePackageCount_nsprefix_ = child_.prefix
+        elif nodeName_ == 'Remarks':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Remarks')
+            value_ = self.gds_validate_string(value_, node, 'Remarks')
+            self.Remarks = value_
+            self.Remarks_nsprefix_ = child_.prefix
+        elif nodeName_ == 'CommodityDescription':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'CommodityDescription')
+            value_ = self.gds_validate_string(value_, node, 'CommodityDescription')
+            self.CommodityDescription = value_
+            self.CommodityDescription_nsprefix_ = child_.prefix
+        elif nodeName_ == 'CountryRelationship':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'CountryRelationship')
+            value_ = self.gds_validate_string(value_, node, 'CountryRelationship')
+            self.CountryRelationship = value_
+            self.CountryRelationship_nsprefix_ = child_.prefix
+            # validate type CountryRelationshipType
+            self.validate_CountryRelationshipType(self.CountryRelationship)
+# end class UpdatePickupRequest
 
 
 class UploadDocumentDetail(GeneratedsSuper):
@@ -15049,10 +20980,10 @@ class UploadDocumentDetail(GeneratedsSuper):
         self.CustomerReference_nsprefix_ = None
         self.DocumentProducer = DocumentProducer
         self.validate_UploadDocumentProducerType(self.DocumentProducer)
-        self.DocumentProducer_nsprefix_ = None
+        self.DocumentProducer_nsprefix_ = "ns"
         self.DocumentType = DocumentType
         self.validate_UploadDocumentType(self.DocumentType)
-        self.DocumentType_nsprefix_ = None
+        self.DocumentType_nsprefix_ = "ns"
         self.FileName = FileName
         self.FileName_nsprefix_ = None
         self.DocumentContent = DocumentContent
@@ -15295,15 +21226,15 @@ class UploadDocumentReferenceDetail(GeneratedsSuper):
         self.Description_nsprefix_ = None
         self.DocumentProducer = DocumentProducer
         self.validate_UploadDocumentProducerType(self.DocumentProducer)
-        self.DocumentProducer_nsprefix_ = None
+        self.DocumentProducer_nsprefix_ = "ns"
         self.DocumentType = DocumentType
         self.validate_UploadDocumentType(self.DocumentType)
-        self.DocumentType_nsprefix_ = None
+        self.DocumentType_nsprefix_ = "ns"
         self.DocumentId = DocumentId
         self.DocumentId_nsprefix_ = None
         self.DocumentIdProducer = DocumentIdProducer
         self.validate_UploadDocumentIdProducer(self.DocumentIdProducer)
-        self.DocumentIdProducer_nsprefix_ = None
+        self.DocumentIdProducer_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -15530,6 +21461,262 @@ class UploadDocumentReferenceDetail(GeneratedsSuper):
 # end class UploadDocumentReferenceDetail
 
 
+class UserDetail(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, UserId=None, Password=None, UniqueUserId=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.UserId = UserId
+        self.UserId_nsprefix_ = None
+        self.Password = Password
+        self.Password_nsprefix_ = None
+        self.UniqueUserId = UniqueUserId
+        self.UniqueUserId_nsprefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, UserDetail)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if UserDetail.subclass:
+            return UserDetail.subclass(*args_, **kwargs_)
+        else:
+            return UserDetail(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_UserId(self):
+        return self.UserId
+    def set_UserId(self, UserId):
+        self.UserId = UserId
+    def get_Password(self):
+        return self.Password
+    def set_Password(self, Password):
+        self.Password = Password
+    def get_UniqueUserId(self):
+        return self.UniqueUserId
+    def set_UniqueUserId(self, UniqueUserId):
+        self.UniqueUserId = UniqueUserId
+    def hasContent_(self):
+        if (
+            self.UserId is not None or
+            self.Password is not None or
+            self.UniqueUserId is not None
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='UserDetail', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('UserDetail')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'UserDetail':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='UserDetail')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='UserDetail', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='UserDetail'):
+        pass
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='UserDetail', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.UserId is not None:
+            namespaceprefix_ = self.UserId_nsprefix_ + ':' if (UseCapturedNS_ and self.UserId_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sUserId>%s</%sUserId>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.UserId), input_name='UserId')), namespaceprefix_ , eol_))
+        if self.Password is not None:
+            namespaceprefix_ = self.Password_nsprefix_ + ':' if (UseCapturedNS_ and self.Password_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sPassword>%s</%sPassword>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Password), input_name='Password')), namespaceprefix_ , eol_))
+        if self.UniqueUserId is not None:
+            namespaceprefix_ = self.UniqueUserId_nsprefix_ + ':' if (UseCapturedNS_ and self.UniqueUserId_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sUniqueUserId>%s</%sUniqueUserId>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.UniqueUserId), input_name='UniqueUserId')), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'UserId':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'UserId')
+            value_ = self.gds_validate_string(value_, node, 'UserId')
+            self.UserId = value_
+            self.UserId_nsprefix_ = child_.prefix
+        elif nodeName_ == 'Password':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Password')
+            value_ = self.gds_validate_string(value_, node, 'Password')
+            self.Password = value_
+            self.Password_nsprefix_ = child_.prefix
+        elif nodeName_ == 'UniqueUserId':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'UniqueUserId')
+            value_ = self.gds_validate_string(value_, node, 'UniqueUserId')
+            self.UniqueUserId = value_
+            self.UniqueUserId_nsprefix_ = child_.prefix
+# end class UserDetail
+
+
+class VariationOptionDetail(GeneratedsSuper):
+    """Allows clients the ability to specify variations in their capabilities
+    that may impact the set of features that are enabled in the called
+    service. In a typical use case, id may correspond to the name of an
+    initiative (or one feature of an initiative) and the values may contain
+    SUPPORTED to indicate that the client is prepared to accept the
+    feature."""
+    __hash__ = GeneratedsSuper.__hash__
+    subclass = None
+    superclass = None
+    def __init__(self, Id=None, Values=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
+        self.Id = Id
+        self.Id_nsprefix_ = None
+        if Values is None:
+            self.Values = []
+        else:
+            self.Values = Values
+        self.Values_nsprefix_ = None
+    def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, VariationOptionDetail)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
+        if VariationOptionDetail.subclass:
+            return VariationOptionDetail.subclass(*args_, **kwargs_)
+        else:
+            return VariationOptionDetail(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_Id(self):
+        return self.Id
+    def set_Id(self, Id):
+        self.Id = Id
+    def get_Values(self):
+        return self.Values
+    def set_Values(self, Values):
+        self.Values = Values
+    def add_Values(self, value):
+        self.Values.append(value)
+    def insert_Values_at(self, index, value):
+        self.Values.insert(index, value)
+    def replace_Values_at(self, index, value):
+        self.Values[index] = value
+    def hasContent_(self):
+        if (
+            self.Id is not None or
+            self.Values
+        ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='VariationOptionDetail', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('VariationOptionDetail')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'VariationOptionDetail':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='VariationOptionDetail')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='VariationOptionDetail', pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='VariationOptionDetail'):
+        pass
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='VariationOptionDetail', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.Id is not None:
+            namespaceprefix_ = self.Id_nsprefix_ + ':' if (UseCapturedNS_ and self.Id_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sId>%s</%sId>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Id), input_name='Id')), namespaceprefix_ , eol_))
+        for Values_ in self.Values:
+            namespaceprefix_ = self.Values_nsprefix_ + ':' if (UseCapturedNS_ and self.Values_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sValues>%s</%sValues>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(Values_), input_name='Values')), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
+        already_processed = set()
+        self.ns_prefix_ = node.prefix
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'Id':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Id')
+            value_ = self.gds_validate_string(value_, node, 'Id')
+            self.Id = value_
+            self.Id_nsprefix_ = child_.prefix
+        elif nodeName_ == 'Values':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Values')
+            value_ = self.gds_validate_string(value_, node, 'Values')
+            self.Values.append(value_)
+            self.Values_nsprefix_ = child_.prefix
+# end class VariationOptionDetail
+
+
 class WeighingDetail(GeneratedsSuper):
     """Specifies a single type of weighing performed on a shipment"""
     __hash__ = GeneratedsSuper.__hash__
@@ -15543,7 +21730,7 @@ class WeighingDetail(GeneratedsSuper):
         self.ns_prefix_ = None
         self.Type = Type
         self.validate_WeighingScaleType(self.Type)
-        self.Type_nsprefix_ = None
+        self.Type_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -15657,7 +21844,7 @@ class Weight(GeneratedsSuper):
         self.ns_prefix_ = None
         self.Units = Units
         self.validate_WeightUnits(self.Units)
-        self.Units_nsprefix_ = None
+        self.Units_nsprefix_ = "ns"
         self.Value = Value
         self.Value_nsprefix_ = None
     def factory(*args_, **kwargs_):
@@ -15787,9 +21974,9 @@ class WebAuthenticationDetail(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.ParentCredential = ParentCredential
-        self.ParentCredential_nsprefix_ = None
+        self.ParentCredential_nsprefix_ = "ns"
         self.UserCredential = UserCredential
-        self.UserCredential_nsprefix_ = None
+        self.UserCredential_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -16010,13 +22197,17 @@ class VersionId(GeneratedsSuper):
         self.parent_object_ = kwargs_.get('parent_object_')
         self.ns_prefix_ = None
         self.ServiceId = ServiceId
-        self.ServiceId_nsprefix_ = None
+        self.validate_ServiceIdType(self.ServiceId)
+        self.ServiceId_nsprefix_ = "ns"
         self.Major = Major
-        self.Major_nsprefix_ = None
+        self.validate_MajorVersionType(self.Major)
+        self.Major_nsprefix_ = "ns"
         self.Intermediate = Intermediate
-        self.Intermediate_nsprefix_ = None
+        self.validate_IntermediateVersionType(self.Intermediate)
+        self.Intermediate_nsprefix_ = "ns"
         self.Minor = Minor
-        self.Minor_nsprefix_ = None
+        self.validate_MinorVersionType(self.Minor)
+        self.Minor_nsprefix_ = "ns"
     def factory(*args_, **kwargs_):
         if CurrentSubclassModule_ is not None:
             subclass = getSubclassFromModule_(
@@ -16048,6 +22239,66 @@ class VersionId(GeneratedsSuper):
         return self.Minor
     def set_Minor(self, Minor):
         self.Minor = Minor
+    def validate_ServiceIdType(self, value):
+        result = True
+        # Validate type ServiceIdType, a restriction on xs:string.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, str):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (str)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = ['disp']
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on ServiceIdType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_MajorVersionType(self, value):
+        result = True
+        # Validate type MajorVersionType, a restriction on xs:int.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, int):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (int)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = [22]
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on MajorVersionType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_IntermediateVersionType(self, value):
+        result = True
+        # Validate type IntermediateVersionType, a restriction on xs:int.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, int):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (int)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = [0]
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on IntermediateVersionType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
+    def validate_MinorVersionType(self, value):
+        result = True
+        # Validate type MinorVersionType, a restriction on xs:int.
+        if value is not None and Validate_simpletypes_ and self.gds_collector_ is not None:
+            if not isinstance(value, int):
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s is not of the correct base simple type (int)' % {"value": value, "lineno": lineno, })
+                return False
+            value = value
+            enumerations = [0]
+            if value not in enumerations:
+                lineno = self.gds_get_node_lineno_()
+                self.gds_collector_.add_message('Value "%(value)s"%(lineno)s does not match xsd enumeration restriction on MinorVersionType' % {"value" : encode_str_2_3(value), "lineno": lineno} )
+                result = False
+        return result
     def hasContent_(self):
         if (
             self.ServiceId is not None or
@@ -16124,24 +22375,32 @@ class VersionId(GeneratedsSuper):
             value_ = self.gds_validate_string(value_, node, 'ServiceId')
             self.ServiceId = value_
             self.ServiceId_nsprefix_ = child_.prefix
+            # validate type ServiceIdType
+            self.validate_ServiceIdType(self.ServiceId)
         elif nodeName_ == 'Major' and child_.text:
             sval_ = child_.text
             ival_ = self.gds_parse_integer(sval_, node, 'Major')
             ival_ = self.gds_validate_integer(ival_, node, 'Major')
             self.Major = ival_
             self.Major_nsprefix_ = child_.prefix
+            # validate type MajorVersionType
+            self.validate_MajorVersionType(self.Major)
         elif nodeName_ == 'Intermediate' and child_.text:
             sval_ = child_.text
             ival_ = self.gds_parse_integer(sval_, node, 'Intermediate')
             ival_ = self.gds_validate_integer(ival_, node, 'Intermediate')
             self.Intermediate = ival_
             self.Intermediate_nsprefix_ = child_.prefix
+            # validate type IntermediateVersionType
+            self.validate_IntermediateVersionType(self.Intermediate)
         elif nodeName_ == 'Minor' and child_.text:
             sval_ = child_.text
             ival_ = self.gds_parse_integer(sval_, node, 'Minor')
             ival_ = self.gds_validate_integer(ival_, node, 'Minor')
             self.Minor = ival_
             self.Minor_nsprefix_ = child_.prefix
+            # validate type MinorVersionType
+            self.validate_MinorVersionType(self.Minor)
 # end class VersionId
 
 
@@ -16152,6 +22411,12 @@ GDSClassesMapping = {
     'CreatePickupRequest': CreatePickupRequest,
     'PickupAvailabilityReply': PickupAvailabilityReply,
     'PickupAvailabilityRequest': PickupAvailabilityRequest,
+    'PickupHistoryDetailReply': PickupHistoryDetailReply,
+    'PickupHistoryDetailRequest': PickupHistoryDetailRequest,
+    'PickupHistorySummaryReply': PickupHistorySummaryReply,
+    'PickupHistorySummaryRequest': PickupHistorySummaryRequest,
+    'UpdatePickupReply': UpdatePickupReply,
+    'UpdatePickupRequest': UpdatePickupRequest,
 }
 
 
@@ -16222,7 +22487,8 @@ def parse(inFileName, silence=False, print_warnings=True):
     return rootObj
 
 
-def parseEtree(inFileName, silence=False, print_warnings=True):
+def parseEtree(inFileName, silence=False, print_warnings=True,
+               mapping=None, nsmap=None):
     parser = None
     doc = parsexml_(inFileName, parser)
     gds_collector = GdsCollector_()
@@ -16234,8 +22500,10 @@ def parseEtree(inFileName, silence=False, print_warnings=True):
     rootObj = rootClass.factory()
     rootObj.build(rootNode, gds_collector_=gds_collector)
     # Enable Python to collect the space used by the DOM.
-    mapping = {}
-    rootElement = rootObj.to_etree(None, name_=rootTag, mapping_=mapping)
+    if mapping is None:
+        mapping = {}
+    rootElement = rootObj.to_etree(
+        None, name_=rootTag, mapping_=mapping, nsmap_=nsmap)
     reverse_mapping = rootObj.gds_reverse_node_mapping(mapping)
     if not SaveElementTreeNode:
         doc = None
@@ -16280,7 +22548,7 @@ def parseString(inString, silence=False, print_warnings=True):
         sys.stdout.write('<?xml version="1.0" ?>\n')
         rootObj.export(
             sys.stdout, 0, name_=rootTag,
-            namespacedef_='xmlns:ns="http://fedex.com/ws/pickup/v20"')
+            namespacedef_='xmlns:ns="http://fedex.com/ws/pickup/v22"')
     if print_warnings and len(gds_collector.get_messages()) > 0:
         separator = ('-' * 50) + '\n'
         sys.stderr.write(separator)
@@ -16307,8 +22575,8 @@ def parseLiteral(inFileName, silence=False, print_warnings=True):
         doc = None
         rootNode = None
     if not silence:
-        sys.stdout.write('#from pickup_service_v20 import *\n\n')
-        sys.stdout.write('import pickup_service_v20 as model_\n\n')
+        sys.stdout.write('#from pickup_service_v22 import *\n\n')
+        sys.stdout.write('import pickup_service_v22 as model_\n\n')
         sys.stdout.write('rootObj = model_.rootClass(\n')
         rootObj.exportLiteral(sys.stdout, 0, name_=rootTag)
         sys.stdout.write(')\n')
@@ -16337,6 +22605,751 @@ if __name__ == '__main__':
 RenameMappings_ = {
 }
 
+#
+# Mapping of namespaces to types defined in them
+# and the file in which each is defined.
+# simpleTypes are marked "ST" and complexTypes "CT".
+NamespaceToDefMappings_ = {'http://fedex.com/ws/pickup/v22': [('AccessorRoleType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('AssociatedAccountNumberType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('AutoConfigurationType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('BuildingPartCode',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('CarrierCodeType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('ChargeBasisLevelType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('CloseTimeType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('CodAddTransportationChargeBasisType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('CodCollectionType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('CodReturnReferenceIndicatorType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('CountryRelationshipType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('CreatePickupRequestProcessingOptionType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('CustomDeliveryWindowType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('CustomerReferenceType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('DangerousGoodsAccessibilityType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('DayOfWeekType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('DistanceUnits',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('EmailOptionType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('EnterprisePermissionType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('EtdAttributeType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('EtdConfirmationType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('ExpressRegionCode',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('FedExLocationType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('FlatbedTrailerOption',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('FreightGuaranteeType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('FreightServiceSchedulingType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('FreightShipmentRoleType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('HazardousCommodityOptionType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('HazardousCommodityRegulationType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('HomeDeliveryPremiumType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('InternationalControlledExportType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('LinearUnits',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('NotificationEventType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('NotificationFormatType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('NotificationSeverityType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('NotificationType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('PaymentType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('PendingShipmentType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('PhysicalPackagingType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('PickupBuildingLocationType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('PickupEventType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('PickupExceptionType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('PickupLookupConditionType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('PickupRequestType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('PickupServiceCategoryType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('PickupServiceLevelType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('PickupStatusType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('PickupType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('PriorityAlertEnhancementType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('RateLevelBasisType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('RateTypeBasisType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('RecommendedDocumentType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('RequestedShippingDocumentType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('RestrictionsAndPrivilegesPolicyExceptionType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('ReturnEMailAllowedSpecialServiceType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('ReturnType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('ShipmentDryIceProcessingOptionType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('ShipmentNotificationAggregationType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('ShipmentNotificationRoleType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('SignatureOptionType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('SpecialEquipmentType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('TinType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('TrackingIdType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('TrailerSizeType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('TransactionSourceFormat',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('TruckType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('UpdatePickupRequestProcessingOptionType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('UploadDocumentIdProducer',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('UploadDocumentProducerType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('UploadDocumentType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('WebServiceEnvironment',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('WeighingScaleType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('WeightUnits',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('MajorVersionType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('IntermediateVersionType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('MinorVersionType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('ServiceIdType',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'ST'),
+                                    ('Address',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('AssociatedAccount',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('CancelPickupReply',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('CancelPickupRequest',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('ClientDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('CodAddTransportationChargesDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('CodDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('CompletedFreightPickupDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('CompletedFreightPickupLineItem',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('Contact',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('ContactAndAddress',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('CreatePickupReply',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('CreatePickupRequest',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('CustomDeliveryWindowDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('CustomerReference',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('DateRange',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('DeliveryOnInvoiceAcceptanceDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('DetentionDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('Dimensions',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('Distance',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('EMailDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('EMailLabelDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('EMailRecipient',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('EmailOptionsRequested',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('EnterprisePrivilegeDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('EtdDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('ExpressFreightPickupDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('ExtraLaborDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('FaxDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('FlatbedTrailerDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('FreightGuaranteeDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('FreightPickupDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('FreightPickupLineItem',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('FreightServiceCenterDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('HoldAtLocationDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('HomeDeliveryPremiumDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('InternationalControlledExportDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('InternationalTrafficInArmsRegulationsDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('Localization',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('MarkingOrTaggingDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('Money',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('NonBusinessTimeDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('Notification',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('NotificationDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('NotificationParameter',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('PagingRequestDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('PagingResultsDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('PalletShrinkwrapDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('PalletsProvidedDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('Party',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('Payment',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('Payor',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('PendingShipmentDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('PickupAvailabilityReply',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('PickupAvailabilityRequest',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('PickupDangerousGoodsDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('PickupHistoryDetailReply',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('PickupHistoryDetailRequest',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('PickupHistoryEvent',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('PickupHistoryServiceSummary',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('PickupHistorySummary',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('PickupHistorySummaryReply',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('PickupHistorySummaryRequest',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('PickupLookupCondition',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('PickupOriginDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('PickupPackageDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('PickupPackageSpecialServicesRequested',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('PickupScheduleOption',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('PickupShipmentAttributes',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('PickupShipmentSpecialServicesRequested',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('PickupTagDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('PolicyGridManifest',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('PriorityAlertDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('RecommendedDocumentSpecification',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('RequestedPickupPackageDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('RequestedPickupShipmentDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('RestrictionsAndPrivilegesPolicyDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('ReturnAssociationDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('ReturnEMailDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('ReturnShipmentDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('Rma',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('ShipmentAssemblyDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('ShipmentDryIceDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('ShipmentDryIceProcessingOptionsRequested',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('ShipmentEventNotificationDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('ShipmentEventNotificationSpecification',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('ShipmentNotificationFormatSpecification',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('ShipmentSpecialServicesRequested',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('SignatureOptionDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('SmsDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('SortAndSegregateDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('SpecialEquipmentDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('SpecialEquipmentLineItem',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('StorageDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('TaxpayerIdentification',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('TrackingId',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('TransactionDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('UpdatePickupReply',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('UpdatePickupRequest',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('UploadDocumentDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('UploadDocumentReferenceDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('UserDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('VariationOptionDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('WeighingDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('Weight',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('WebAuthenticationDetail',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('WebAuthenticationCredential',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT'),
+                                    ('VersionId',
+                                     '../../../Carriers '
+                                     'Doc/Fedex/2020-09/schemas/PickupService_v22.xsd',
+                                     'CT')]}
+
 __all__ = [
     "Address",
     "AssociatedAccount",
@@ -16352,6 +23365,7 @@ __all__ = [
     "CreatePickupReply",
     "CreatePickupRequest",
     "CustomDeliveryWindowDetail",
+    "CustomerReference",
     "DateRange",
     "DeliveryOnInvoiceAcceptanceDetail",
     "DetentionDetail",
@@ -16361,6 +23375,7 @@ __all__ = [
     "EMailLabelDetail",
     "EMailRecipient",
     "EmailOptionsRequested",
+    "EnterprisePrivilegeDetail",
     "EtdDetail",
     "ExpressFreightPickupDetail",
     "ExtraLaborDetail",
@@ -16381,23 +23396,38 @@ __all__ = [
     "Notification",
     "NotificationDetail",
     "NotificationParameter",
+    "PagingRequestDetail",
+    "PagingResultsDetail",
     "PalletShrinkwrapDetail",
     "PalletsProvidedDetail",
     "Party",
     "Payment",
     "Payor",
     "PendingShipmentDetail",
-    "PendingShipmentProcessingOptionsRequested",
     "PickupAvailabilityReply",
     "PickupAvailabilityRequest",
     "PickupDangerousGoodsDetail",
+    "PickupHistoryDetailReply",
+    "PickupHistoryDetailRequest",
+    "PickupHistoryEvent",
+    "PickupHistoryServiceSummary",
+    "PickupHistorySummary",
+    "PickupHistorySummaryReply",
+    "PickupHistorySummaryRequest",
+    "PickupLookupCondition",
     "PickupOriginDetail",
+    "PickupPackageDetail",
     "PickupPackageSpecialServicesRequested",
     "PickupScheduleOption",
     "PickupShipmentAttributes",
+    "PickupShipmentSpecialServicesRequested",
+    "PickupTagDetail",
+    "PolicyGridManifest",
     "PriorityAlertDetail",
     "RecommendedDocumentSpecification",
     "RequestedPickupPackageDetail",
+    "RequestedPickupShipmentDetail",
+    "RestrictionsAndPrivilegesPolicyDetail",
     "ReturnAssociationDetail",
     "ReturnEMailDetail",
     "ReturnShipmentDetail",
@@ -16409,6 +23439,7 @@ __all__ = [
     "ShipmentEventNotificationSpecification",
     "ShipmentNotificationFormatSpecification",
     "ShipmentSpecialServicesRequested",
+    "SignatureOptionDetail",
     "SmsDetail",
     "SortAndSegregateDetail",
     "SpecialEquipmentDetail",
@@ -16417,8 +23448,12 @@ __all__ = [
     "TaxpayerIdentification",
     "TrackingId",
     "TransactionDetail",
+    "UpdatePickupReply",
+    "UpdatePickupRequest",
     "UploadDocumentDetail",
     "UploadDocumentReferenceDetail",
+    "UserDetail",
+    "VariationOptionDetail",
     "VersionId",
     "WebAuthenticationCredential",
     "WebAuthenticationDetail",
